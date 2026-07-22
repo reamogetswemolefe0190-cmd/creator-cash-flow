@@ -1,28 +1,28 @@
 /* ==========================================================================
-   Creator Cash Flow - Enterprise FinTech Design System
+   Creator Cash Flow - Enterprise FinTech Design System & Animation Engine
    Inspired by Ramp.com & Mercury.com
    ========================================================================== */
 
 :root {
     /* Ramp & Mercury Enterprise Carbon Palette */
-    --bg-app: #090C11;
+    --bg-app: #080B10;
     --bg-sidebar: #0D1117;
-    --bg-card: #161B22;
-    --bg-card-hover: #1C212B;
-    --bg-input: #1F242E;
+    --bg-card: #151B23;
+    --bg-card-hover: #1C222D;
+    --bg-input: #1F2633;
     
     --border-color: rgba(255, 255, 255, 0.08);
-    --border-highlight: rgba(255, 255, 255, 0.16);
+    --border-highlight: rgba(255, 255, 255, 0.18);
     
     /* Ramp Signature High-Contrast Colors */
     --text-primary: #FFFFFF;
-    --text-secondary: #919EAB;
-    --text-muted: #637381;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
     
     /* Ramp Signature Acid Emerald & Financial Accents */
-    --ramp-emerald: #00E699;
-    --ramp-emerald-dark: #00B377;
-    --ramp-emerald-glow: rgba(0, 230, 153, 0.15);
+    --ramp-emerald: #00F5A0;
+    --ramp-emerald-dark: #00C27E;
+    --ramp-emerald-glow: rgba(0, 245, 160, 0.2);
     
     --ramp-coral: #FF4D4D;
     --ramp-amber: #FFB800;
@@ -35,8 +35,8 @@
     --radius-lg: 14px;
     --radius-full: 9999px;
     
-    --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.6);
-    --shadow-glow: 0 0 24px var(--ramp-emerald-glow);
+    --shadow-card: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 0 28px var(--ramp-emerald-glow);
 }
 
 * {
@@ -53,6 +53,29 @@ body.software-app {
     height: 100vh;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
+}
+
+/* Keyframe Animations */
+@keyframes tabFadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes modalSpring {
+    0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+    70% { transform: scale(1.02) translateY(-4px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(0, 245, 160, 0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(0, 245, 160, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 245, 160, 0); }
+}
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* App Shell Viewport */
@@ -83,17 +106,18 @@ body.software-app {
 }
 
 .brand-logo {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     background: #000000;
-    border: 1px solid var(--ramp-emerald);
-    border-radius: 8px;
+    border: 1.5px solid var(--ramp-emerald);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--ramp-emerald);
     font-size: 1.2rem;
     box-shadow: var(--shadow-glow);
+    animation: pulseGlow 3s infinite;
 }
 
 .brand-info h2 {
@@ -107,14 +131,14 @@ body.software-app {
     font-size: 0.68rem;
     font-weight: 700;
     color: var(--ramp-emerald);
-    background: rgba(0, 230, 153, 0.08);
+    background: rgba(0, 245, 160, 0.08);
     padding: 2px 8px;
     border-radius: var(--radius-sm);
     display: inline-flex;
     align-items: center;
     gap: 4px;
     margin-top: 2px;
-    border: 1px solid rgba(0, 230, 153, 0.2);
+    border: 1px solid rgba(0, 245, 160, 0.2);
 }
 
 .icon-tiny { width: 12px; height: 12px; }
@@ -129,6 +153,12 @@ body.software-app {
     align-items: center;
     gap: 12px;
     margin-bottom: 24px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.account-card:hover {
+    border-color: var(--border-highlight);
+    transform: translateY(-1px);
 }
 
 .user-avatar {
@@ -147,7 +177,7 @@ body.software-app {
 
 .tier-badge {
     font-size: 0.7rem;
-    color: var(--text-secondary);
+    color: var(--ramp-emerald);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -174,13 +204,14 @@ body.software-app {
     font-size: 0.88rem;
     font-weight: 600;
     border-radius: var(--radius-md);
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .franc-nav-item i {
     width: 18px;
     height: 18px;
     color: var(--text-muted);
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .franc-nav-item:hover {
@@ -188,11 +219,16 @@ body.software-app {
     background: rgba(255, 255, 255, 0.04);
 }
 
+.franc-nav-item:hover i {
+    color: var(--text-primary);
+    transform: translateX(3px);
+}
+
 .franc-nav-item.active {
     color: #FFFFFF;
     background: var(--bg-card);
     border-left: 3px solid var(--ramp-emerald);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .franc-nav-item.active i {
@@ -205,6 +241,11 @@ body.software-app {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.health-card:hover {
+    border-color: var(--border-highlight);
 }
 
 .health-header {
@@ -235,6 +276,7 @@ body.software-app {
     height: 100%;
     background: var(--ramp-emerald);
     border-radius: 2px;
+    transition: width 1s ease-in-out;
 }
 
 .health-sub {
@@ -251,6 +293,15 @@ body.software-app {
     padding: 24px 32px;
     display: flex;
     flex-direction: column;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: tabFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .franc-top-bar {
@@ -270,6 +321,12 @@ body.software-app {
     padding: 8px 14px;
     border-radius: var(--radius-md);
     width: 360px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-command:focus-within {
+    border-color: var(--ramp-emerald);
+    box-shadow: 0 0 12px var(--ramp-emerald-glow);
 }
 
 .search-command input {
@@ -308,29 +365,34 @@ body.software-app {
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .seg-btn.active {
     background-color: var(--bg-card);
     color: #FFFFFF;
     border: 1px solid var(--border-highlight);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .action-buttons { display: flex; gap: 10px; }
 
-/* Buttons */
+/* Buttons with Tactile Press Animation */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 9px 18px;
     border-radius: var(--radius-md);
     font-size: 0.84rem;
     font-weight: 700;
     border: none;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn:active {
+    transform: scale(0.96);
 }
 
 .btn-emerald {
@@ -341,8 +403,9 @@ body.software-app {
 }
 
 .btn-emerald:hover {
-    background-color: var(--ramp-emerald-dark);
-    color: #FFFFFF;
+    background-color: #33FFB5;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.35);
 }
 
 .btn-secondary {
@@ -354,6 +417,7 @@ body.software-app {
 .btn-secondary:hover {
     border-color: var(--border-highlight);
     background: var(--bg-card-hover);
+    transform: translateY(-1px);
 }
 
 .btn-text {
@@ -363,9 +427,10 @@ body.software-app {
     font-weight: 700;
     font-size: 0.82rem;
     cursor: pointer;
+    transition: opacity 0.2s ease;
 }
 
-.btn-text:hover { text-decoration: underline; }
+.btn-text:hover { opacity: 0.8; text-decoration: underline; }
 
 .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
 
@@ -380,6 +445,11 @@ body.software-app {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: border-color 0.3s ease;
+}
+
+.hero-financial-banner:hover {
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
 .banner-label {
@@ -410,7 +480,7 @@ body.software-app {
     font-weight: 700;
 }
 
-.pill-green { background: rgba(0, 230, 153, 0.1); color: var(--ramp-emerald); border: 1px solid rgba(0, 230, 153, 0.2); }
+.pill-green { background: rgba(0, 245, 160, 0.1); color: var(--ramp-emerald); border: 1px solid rgba(0, 245, 160, 0.25); }
 .pill-blue { background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid var(--border-color); }
 
 .banner-metrics {
@@ -428,7 +498,7 @@ body.software-app {
 .stat-value { font-size: 1.2rem; font-weight: 800; margin-top: 2px; }
 .stat-divider { width: 1px; height: 28px; background-color: var(--border-color); }
 
-/* Mercury Executive Cards */
+/* Mercury Executive Cards with Smooth Hover Elevation */
 .franc-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -436,6 +506,13 @@ body.software-app {
     padding: 20px 24px;
     box-shadow: var(--shadow-card);
     margin-bottom: 20px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.franc-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-highlight);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
 }
 
 .franc-card-header {
@@ -467,6 +544,12 @@ body.software-app {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.franc-list-item:hover {
+    transform: translateX(4px);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .item-badge {
@@ -493,6 +576,12 @@ body.software-app {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.vault-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-highlight);
 }
 
 .vault-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -525,6 +614,7 @@ body.software-app {
     height: 6px;
     background-color: var(--ramp-emerald);
     border-radius: 50%;
+    animation: pulseGlow 2s infinite;
 }
 
 /* Dropzone */
@@ -534,6 +624,12 @@ body.software-app {
     padding: 40px 20px;
     text-align: center;
     background: rgba(255, 255, 255, 0.01);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.franc-dropzone:hover, .franc-dropzone.dragover {
+    border-color: var(--ramp-emerald);
+    background-color: rgba(0, 245, 160, 0.02);
 }
 
 .drop-circle {
@@ -557,6 +653,14 @@ body.software-app {
 .franc-table th, .franc-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border-color); }
 .franc-table th { color: var(--text-secondary); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
+.franc-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.franc-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
 .tag {
     display: inline-flex;
     align-items: center;
@@ -567,7 +671,7 @@ body.software-app {
     font-weight: 700;
 }
 
-.tag-income { background: rgba(0, 230, 153, 0.1); color: var(--ramp-emerald); border: 1px solid rgba(0, 230, 153, 0.2); }
+.tag-income { background: rgba(0, 245, 160, 0.1); color: var(--ramp-emerald); border: 1px solid rgba(0, 245, 160, 0.2); }
 .tag-expense { background: rgba(255, 77, 77, 0.1); color: var(--ramp-coral); border: 1px solid rgba(255, 77, 77, 0.2); }
 .tag-write-off { background: rgba(255, 184, 0, 0.12); color: var(--ramp-amber); border: 1px solid rgba(255, 184, 0, 0.2); }
 
@@ -588,12 +692,12 @@ body.software-app {
 .cursor-pointer { cursor: pointer; }
 .hidden { display: none !important; }
 
-/* Modal */
+/* Modal with Spring Pop Animation */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -603,7 +707,14 @@ body.software-app {
     transition: opacity 0.2s ease;
 }
 
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-overlay.active .franc-modal {
+    animation: modalSpring 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 .franc-modal {
     background: var(--bg-sidebar);
@@ -611,27 +722,31 @@ body.software-app {
     border-radius: var(--radius-lg);
     width: 90%;
     max-width: 440px;
-    padding: 22px;
+    padding: 24px;
     box-shadow: var(--shadow-card);
 }
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .modal-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
 
-.form-group { margin-bottom: 12px; }
-.form-group label { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; }
 .form-input {
     width: 100%;
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 8px 12px;
+    padding: 9px 14px;
     color: var(--text-primary);
-    font-size: 0.86rem;
+    font-size: 0.88rem;
     outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-input:focus { border-color: var(--ramp-emerald); }
+.form-input:focus {
+    border-color: var(--ramp-emerald);
+    box-shadow: 0 0 10px var(--ramp-emerald-glow);
+}
 
 @media (max-width: 1024px) {
     .app-shell { flex-direction: column; overflow-y: auto; }
