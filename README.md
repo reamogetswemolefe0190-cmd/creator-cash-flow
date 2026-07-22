@@ -80,6 +80,8 @@ Simply open `index.html` with the **Live Server** extension in VS Code.
 
 ---
 
-## 📄 License
+## 🔒 License & Copyright
 
-MIT License © 2026 Creator Cash Flow
+**All Rights Reserved © 2026 Creator Cash Flow**
+
+*Strictly private and proprietary software. Unauthorized copying, reverse engineering, distribution, or commercial use of this codebase, design system, or intellectual property is strictly prohibited.*
