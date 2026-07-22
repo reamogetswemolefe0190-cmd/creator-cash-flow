@@ -2,6 +2,8 @@
    Creator Cash Flow - Franc & Discovery Application Engine
    ========================================================================== */
 
+const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
+
 // --- Application State ---
 const state = {
     selectedPeriod: 'month',

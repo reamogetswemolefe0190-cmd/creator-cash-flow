@@ -21,6 +21,17 @@ app.use(helmet());
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
+// Root API Welcome Endpoint
+app.get('/', (req, res) => {
+    res.json({
+        name: "Creator Cash Flow API Engine",
+        status: "active",
+        security: "AES-256-CBC + JWT",
+        version: "2.0.0",
+        documentation: "https://github.com/reamogetswemolefe0190-cmd/creator-cash-flow"
+    });
+});
+
 // In-Memory Database Store for Testing (Complements Supabase Cloud DB)
 const db = {
     users: [
