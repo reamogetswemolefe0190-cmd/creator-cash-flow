@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Cash Flow | Financial OS for Content Creators</title>
+    <title>Creator Cash Flow | Track Every Rand You Earn Online</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4F46E5">
+    <meta name="theme-color" content="#3B82F6">
 
-    <!-- Modern Franc & Discovery Typography -->
+    <!-- Modern FinTech Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,297 +18,363 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Cache-busting CSS for Instant Browser Refresh -->
-    <link rel="stylesheet" href="style.css?v=3.0_ramp_enterprise">
+    <!-- Cache-busting CSS -->
+    <link rel="stylesheet" href="style.css?v=4.0_creators_saas">
 </head>
-<body class="software-app">
+<body class="saas-app">
 
-    <!-- Main Software App Container -->
+    <!-- Mobile Navigation Bar -->
+    <header class="mobile-header">
+        <div class="brand-box">
+            <div class="brand-logo"><i data-lucide="zap"></i></div>
+            <span class="brand-title">Creator Cash Flow</span>
+        </div>
+        <button class="hamburger-btn" id="mobile-menu-toggle">
+            <i data-lucide="menu"></i>
+        </button>
+    </header>
+
+    <!-- Main SaaS App Layout -->
     <div class="app-shell">
         
-        <!-- Floating Left Sidebar Navigation (Franc Style Soft Drawer) -->
-        <aside class="franc-sidebar">
-            <div class="brand-box">
-                <div class="brand-logo">
-                    <i data-lucide="shield-check"></i>
-                </div>
+        <!-- 2. Modern Sidebar Navigation -->
+        <aside class="saas-sidebar" id="app-sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo"><i data-lucide="zap"></i></div>
                 <div class="brand-info">
                     <h2>Creator Cash Flow</h2>
-                    <span class="software-tag"><i data-lucide="zap" class="icon-tiny"></i> Beta 2.0 Software</span>
+                    <span class="sub-badge">FinTech SaaS v2.0</span>
                 </div>
             </div>
 
-            <!-- User Franc Account Switcher -->
-            <div class="account-card">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Alex Rivera" class="user-avatar">
-                <div class="account-details">
-                    <span class="name">Alex Rivera</span>
-                    <span class="tier-badge"><i data-lucide="award"></i> Pro Creator Tier</span>
+            <!-- Creator Account Profile Card -->
+            <div class="creator-profile-card">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Reamogetswe" class="avatar">
+                <div class="profile-info">
+                    <span class="profile-name" id="user-display-name">Reamogetswe</span>
+                    <span class="profile-role">Pro Content Creator</span>
                 </div>
             </div>
 
-            <!-- Sidebar Links -->
-            <nav class="franc-nav">
-                <a href="#overview" class="franc-nav-item active" data-tab="overview">
+            <nav class="saas-nav">
+                <a href="#dashboard" class="nav-link active" data-tab="dashboard">
                     <i data-lucide="layout-dashboard"></i>
-                    <span>Financial OS</span>
+                    <span>🏠 Dashboard</span>
                 </a>
-                <a href="#integrations" class="franc-nav-item" data-tab="integrations">
-                    <i data-lucide="link-2"></i>
-                    <span>Connected Vaults</span>
+                <a href="#revenue" class="nav-link" data-tab="revenue">
+                    <i data-lucide="dollar-sign"></i>
+                    <span>💰 Revenue</span>
                 </a>
-                <a href="#csv-importer" class="franc-nav-item" data-tab="csv-importer">
-                    <i data-lucide="file-up"></i>
-                    <span>Smart CSV Parser</span>
+                <a href="#expenses" class="nav-link" data-tab="expenses">
+                    <i data-lucide="trending-down"></i>
+                    <span>📉 Expenses</span>
                 </a>
-                <a href="#transactions" class="franc-nav-item" data-tab="transactions">
-                    <i data-lucide="receipt"></i>
-                    <span>Tax & Ledger</span>
+                <a href="#analytics" class="nav-link" data-tab="analytics">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>📊 Creator Metrics</span>
+                </a>
+                <a href="#bank-accounts" class="nav-link" data-tab="bank-accounts">
+                    <i data-lucide="landmark"></i>
+                    <span>🏦 Bank Accounts</span>
+                </a>
+                <a href="#settings" class="nav-link" data-tab="settings">
+                    <i data-lucide="settings"></i>
+                    <span>⚙️ Settings & APIs</span>
                 </a>
             </nav>
 
-            <!-- Discovery Bank Health Ring Card -->
-            <div class="health-card">
-                <div class="health-header">
-                    <span>Tax Readiness Index</span>
-                    <strong class="health-score text-emerald">94%</strong>
-                </div>
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" style="width: 94%;"></div>
-                </div>
-                <small class="health-sub">R48,200 estimated write-offs auto-flagged for CPA review.</small>
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary w-full" id="btn-auth-trigger">
+                    <i data-lucide="user"></i>
+                    <span id="auth-btn-label">Sign In / Register</span>
+                </button>
             </div>
         </aside>
 
-        <!-- Right Main Software Viewport -->
-        <main class="software-viewport">
+        <!-- Main Content Area -->
+        <main class="saas-main">
             
-            <!-- Top Command & Action Navigation Bar -->
-            <header class="franc-top-bar">
-                <div class="search-command">
-                    <i data-lucide="search"></i>
-                    <input type="text" placeholder="Search transactions, platforms, tax deductions..." id="global-search">
-                    <kbd>Ctrl K</kbd>
+            <!-- 10. Landing Hero Banner & Getting Started -->
+            <section class="landing-hero" id="landing-banner">
+                <div class="hero-content">
+                    <h1>Track Every Rand You Earn Online</h1>
+                    <p>Connect YouTube, TikTok, Instagram, and your bank accounts in one consolidated financial dashboard.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-emerald" id="btn-hero-get-started">
+                            <i data-lucide="rocket"></i> Get Started
+                        </button>
+                        <button class="btn btn-secondary" id="btn-hero-demo">
+                            <i data-lucide="play-circle"></i> Load Interactive Demo
+                        </button>
+                        <button class="btn btn-secondary" id="btn-hero-feedback">
+                            <i data-lucide="message-square"></i> Beta Feedback
+                        </button>
+                    </div>
                 </div>
+            </section>
 
-                <div class="segmented-control">
-                    <button class="seg-btn active" data-period="month">This Month</button>
-                    <button class="seg-btn" data-period="quarter">Quarter 3</button>
-                    <button class="seg-btn" data-period="year">Tax Year 2026</button>
+            <!-- 1. Improved Dashboard Hierarchy & Welcome Greeting -->
+            <div class="dashboard-greeting">
+                <div>
+                    <h2 class="welcome-title">👋 Welcome Back, <span id="greeting-name">Reamogetswe</span></h2>
+                    <p class="welcome-sub">Here is your consolidated financial summary for South Africa (ZAR R).</p>
                 </div>
-
-                <div class="action-buttons">
-                    <button class="btn btn-emerald" id="btn-quick-import">
-                        <i data-lucide="plus-circle"></i>
-                        <span>Import Payout</span>
-                    </button>
-                    <button class="btn btn-secondary" id="btn-auth-modal">
-                        <i data-lucide="user-check"></i>
-                        <span id="nav-auth-label">Sign In / Register</span>
-                    </button>
-                    <button class="btn btn-secondary" id="btn-feedback">
-                        <i data-lucide="message-square"></i>
-                        <span>Beta Feedback</span>
-                    </button>
-                </div>
-            </header>
-
-            <!-- TAB 1: OVERVIEW DASHBOARD -->
-            <section id="tab-overview" class="tab-pane active">
                 
-                <!-- Hero Financial Summary Banner (Franc & Discovery Styled) -->
-                <div class="hero-financial-banner">
-                    <div class="banner-main">
-                        <span class="banner-label">Consolidated Net Cash Flow</span>
-                        <h1 class="net-amount" id="val-net-cashflow">$0.00</h1>
-                        <div class="banner-pill-group">
-                            <span class="pill pill-green"><i data-lucide="trending-up"></i> +18.4% vs last month</span>
-                            <span class="pill pill-blue"><i data-lucide="shield-check"></i> Audit Ready</span>
-                        </div>
-                    </div>
+                <!-- 5. Quick Actions -->
+                <div class="quick-actions-bar">
+                    <button class="btn btn-emerald btn-sm" onclick="switchTab('settings')">
+                        <i data-lucide="plus"></i> Connect Platform
+                    </button>
+                    <button class="btn btn-blue btn-sm" onclick="openAddRevenueModal()">
+                        <i data-lucide="plus"></i> Add Revenue
+                    </button>
+                    <button class="btn btn-red btn-sm" onclick="openAddExpenseModal()">
+                        <i data-lucide="plus"></i> Add Expense
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="generatePDFReport()">
+                        <i data-lucide="file-text"></i> Generate Report
+                    </button>
+                </div>
+            </div>
 
-                    <div class="banner-metrics">
-                        <div class="mini-stat">
-                            <span class="stat-label">Gross Creator Earnings</span>
-                            <span class="stat-value text-emerald" id="val-gross-revenue">$0.00</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="mini-stat">
-                            <span class="stat-label">Business Operational Expenses</span>
-                            <span class="stat-value text-coral" id="val-expenses">$0.00</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="mini-stat">
-                            <span class="stat-label">Recommended Tax Reserve (30%)</span>
-                            <span class="stat-value text-amber" id="val-tax-reserve">$0.00</span>
-                        </div>
+            <!-- 1. Large Top KPI Cards with Percentage Indicators -->
+            <div class="kpi-grid">
+                <div class="kpi-card income-card">
+                    <div class="kpi-header">
+                        <span class="kpi-label">Total Earnings</span>
+                        <span class="kpi-badge positive"><i data-lucide="arrow-up-right"></i> +12.4%</span>
                     </div>
+                    <div class="kpi-number" id="val-total-earnings">R45,600</div>
+                    <span class="kpi-sub">Across 4 Connected Platforms</span>
                 </div>
 
-                <!-- Interactive Financial Charts Grid -->
-                <div class="grid-2-1">
-                    <div class="franc-card flex-2">
-                        <div class="franc-card-header">
+                <div class="kpi-card expense-card">
+                    <div class="kpi-header">
+                        <span class="kpi-label">Total Expenses</span>
+                        <span class="kpi-badge negative"><i data-lucide="arrow-down-right"></i> -4.2%</span>
+                    </div>
+                    <div class="kpi-number" id="val-total-expenses">R12,300</div>
+                    <span class="kpi-sub">Tax Write-Offs & Operations</span>
+                </div>
+
+                <div class="kpi-card profit-card">
+                    <div class="kpi-header">
+                        <span class="kpi-label">Net Profit</span>
+                        <span class="kpi-badge profit"><i data-lucide="trending-up"></i> +15.8%</span>
+                    </div>
+                    <div class="kpi-number" id="val-net-profit">R33,300</div>
+                    <span class="kpi-sub">Take-Home Creator Profit</span>
+                </div>
+            </div>
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-pane active">
+                
+                <!-- 3. Revenue Source Visualization (Donut & Trend Charts) -->
+                <div class="charts-row">
+                    <div class="card flex-2">
+                        <div class="card-header">
                             <div>
-                                <h3>Revenue vs Expense Cash Flow Velocity</h3>
-                                <p class="card-sub">Monitored daily across connected YouTube, TikTok, Twitch, & Bank feeds.</p>
+                                <h3>Monthly Revenue & Expense Trend</h3>
+                                <p class="card-subtitle">Real-time creator earnings vs operational expenses.</p>
                             </div>
-                            <span class="tag tag-emerald"><i data-lucide="activity"></i> Live Sync</span>
+                            <span class="badge badge-emerald">Live ZAR Sync</span>
                         </div>
-                        <div class="chart-box">
-                            <canvas id="chart-cashflow"></canvas>
+                        <div class="chart-container">
+                            <canvas id="chart-monthly-trend"></canvas>
                         </div>
                     </div>
 
-                    <div class="franc-card flex-1">
-                        <div class="franc-card-header">
-                            <h3>Revenue Sources</h3>
+                    <div class="card flex-1">
+                        <div class="card-header">
+                            <h3>Revenue Source Share</h3>
                         </div>
-                        <div class="chart-box">
-                            <canvas id="chart-sources"></canvas>
+                        <div class="chart-container">
+                            <canvas id="chart-revenue-donut"></canvas>
+                        </div>
+                        <div class="donut-legend">
+                            <div class="legend-item"><span class="dot legend-yt"></span> YouTube (55%)</div>
+                            <div class="legend-item"><span class="dot legend-tt"></span> TikTok (25%)</div>
+                            <div class="legend-item"><span class="dot legend-ig"></span> Instagram (15%)</div>
+                            <div class="legend-item"><span class="dot legend-ot"></span> Other (5%)</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Platform Vaults & Bank Integration Feeds -->
-                <div class="grid-1-1">
-                    <div class="franc-card">
-                        <div class="franc-card-header">
-                            <h3>Social Earnings Vaults</h3>
-                            <button class="btn-text" onclick="switchTab('integrations')">Manage APIs</button>
+                <!-- 7. Creator-Specific Metrics & 8. Cash Flow Forecast -->
+                <div class="charts-row">
+                    <!-- 7. Creator Metrics Card -->
+                    <div class="card flex-1">
+                        <div class="card-header">
+                            <h3>📊 Creator Performance Metrics</h3>
                         </div>
-                        <div class="franc-list" id="stream-summary-list">
-                            <!-- Injected by JS -->
+                        <div class="metrics-list">
+                            <div class="metric-row">
+                                <span>Average RPM (Revenue Per 1k Views)</span>
+                                <strong class="text-emerald">R48.50</strong>
+                            </div>
+                            <div class="metric-row">
+                                <span>Average CPM (Cost Per 1k Impressions)</span>
+                                <strong class="text-blue">R85.20</strong>
+                            </div>
+                            <div class="metric-row">
+                                <span>Revenue Per Video Post</span>
+                                <strong class="text-emerald">R3,450.00</strong>
+                            </div>
+                            <div class="metric-row">
+                                <span>Best Performing Platform</span>
+                                <strong class="text-emerald">YouTube Studio</strong>
+                            </div>
+                            <div class="metric-row">
+                                <span>Monthly Growth Rate</span>
+                                <strong class="text-emerald">+18.4% MoM</strong>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="franc-card">
-                        <div class="franc-card-header">
-                            <h3>Connected Bank Accounts (Plaid)</h3>
-                            <button class="btn-text" onclick="switchTab('integrations')">Link Bank</button>
+                    <!-- 8. Projected Cash Flow Forecast -->
+                    <div class="card flex-1">
+                        <div class="card-header">
+                            <h3>🔮 Projected Cash Flow Forecast</h3>
+                            <span class="badge badge-blue">AI Estimation</span>
                         </div>
-                        <div class="franc-list" id="bank-summary-list">
-                            <!-- Injected by JS -->
+                        <p class="card-subtitle">Smoothing irregular income with quarterly predictions.</p>
+                        <div class="forecast-list">
+                            <div class="forecast-item">
+                                <span class="month">August 2026</span>
+                                <strong class="forecast-amount">R18,500</strong>
+                                <span class="forecast-status green">Projected (+12%)</span>
+                            </div>
+                            <div class="forecast-item">
+                                <span class="month">September 2026</span>
+                                <strong class="forecast-amount">R22,400</strong>
+                                <span class="forecast-status green">Projected (+21%)</span>
+                            </div>
+                            <div class="forecast-item">
+                                <span class="month">October 2026</span>
+                                <strong class="forecast-amount">R25,700</strong>
+                                <span class="forecast-status green">Projected (+14%)</span>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- 6. Engaging Empty State / Quick Platform Connect -->
+                <div class="card empty-state-card" id="empty-state-banner">
+                    <div class="empty-icon"><i data-lucide="line-chart"></i></div>
+                    <div class="empty-text">
+                        <h3>📈 Connect your first platform</h3>
+                        <p>Connect YouTube, TikTok, or Instagram to start tracking creator income automatically.</p>
+                    </div>
+                    <button class="btn btn-emerald" onclick="switchTab('settings')">
+                        <i data-lucide="plus-circle"></i> Connect Platform
+                    </button>
                 </div>
             </section>
 
-            <!-- TAB 2: CONNECTED ACCOUNTS -->
-            <section id="tab-integrations" class="tab-pane">
-                <div class="franc-card banner-card">
-                    <div class="banner-icon"><i data-lucide="cpu"></i></div>
-                    <div>
-                        <h3>Discovery-Grade Encrypted Financial Pipelines</h3>
-                        <p>All earnings connections are secured with AES-256 token encryption. Connect social developer mode credentials, Phyllo unified API tokens, or drop CSV files.</p>
-                    </div>
-                </div>
-
-                <div class="section-group">
-                    <h2 class="section-title">Social Media Revenue Vaults</h2>
-                    <div class="franc-cards-grid" id="platforms-grid"></div>
-                </div>
-
-                <div class="section-group">
-                    <h2 class="section-title">Connected Business Bank Feeds (Plaid)</h2>
-                    <div class="franc-cards-grid" id="banks-grid"></div>
-                </div>
-            </section>
-
-            <!-- TAB 3: SMART CSV PARSER -->
-            <section id="tab-csv-importer" class="tab-pane">
-                <div class="franc-card">
-                    <div class="franc-card-header">
+            <!-- TAB 2: REVENUE -->
+            <section id="tab-revenue" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
                         <div>
-                            <h2>Universal Statement & Payout Importer</h2>
-                            <p class="card-sub">Drag and drop your platform earnings report or bank CSV to instantly update your ledger.</p>
+                            <h2>💰 Creator Revenue Channels</h2>
+                            <p class="card-subtitle">All social earnings, AdSense, brand deals, and sponsorships.</p>
                         </div>
+                        <button class="btn btn-emerald btn-sm" onclick="openAddRevenueModal()">+ Add Revenue Entry</button>
                     </div>
-
-                    <div class="franc-dropzone" id="csv-dropzone">
-                        <div class="drop-circle"><i data-lucide="cloud-lightning"></i></div>
-                        <h3>Drop your payout statement or bank CSV here</h3>
-                        <p>Automatically maps YouTube, TikTok, Twitch, Patreon, Stripe, & standard bank columns.</p>
-                        <div class="drop-actions">
-                            <label class="btn btn-emerald cursor-pointer">
-                                <span>Select CSV File</span>
-                                <input type="file" id="csv-file-input" accept=".csv, .txt" hidden>
-                            </label>
-                            <button class="btn btn-secondary" id="btn-generate-sample-csv">
-                                <i data-lucide="file-text"></i>
-                                <span>Download Sample Template</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="csv-preview-container" class="csv-preview hidden">
-                        <div class="preview-header">
-                            <h3><i data-lucide="check-circle-2" class="text-emerald"></i> Statement Parsed Cleanly</h3>
-                            <button class="btn btn-emerald btn-sm" id="btn-confirm-import">Import Into Cash Flow Ledger</button>
-                        </div>
-                        <div class="table-container">
-                            <table class="franc-table" id="csv-preview-table">
-                                <thead></thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 4: TAX & LEDGER -->
-            <section id="tab-transactions" class="tab-pane">
-                <div class="franc-card">
-                    <div class="franc-card-header">
-                        <div>
-                            <h2>Unified Financial Ledger & Tax Detector</h2>
-                            <p class="card-sub">All creator earnings and expense write-offs consolidated in one place.</p>
-                        </div>
-                        <div class="filter-controls">
-                            <select id="filter-type" class="franc-select">
-                                <option value="all">All Transactions</option>
-                                <option value="income">Revenue Only</option>
-                                <option value="expense">Expenses Only</option>
-                            </select>
-                            <select id="filter-source" class="franc-select">
-                                <option value="all">All Sources</option>
-                                <option value="YouTube">YouTube</option>
-                                <option value="TikTok">TikTok</option>
-                                <option value="Twitch">Twitch</option>
-                                <option value="Patreon">Patreon</option>
-                                <option value="Bank">Bank Account</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table class="franc-table" id="ledger-table">
+                    <div class="table-wrapper">
+                        <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Source / Merchant</th>
-                                    <th>Type</th>
-                                    <th>Category</th>
-                                    <th>Discovery Tax Status</th>
-                                    <th class="text-right">Amount</th>
+                                    <th>Platform / Source</th>
+                                    <th>Channel / Merchant</th>
+                                    <th>RPM Rate</th>
+                                    <th class="text-right">Amount (ZAR)</th>
                                 </tr>
                             </thead>
-                            <tbody id="ledger-rows"></tbody>
+                            <tbody id="revenue-rows"></tbody>
                         </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: EXPENSES -->
+            <section id="tab-expenses" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2>📉 Tracked Business Expenses & Write-Offs</h2>
+                            <p class="card-subtitle">Operating costs, software subscriptions, camera gear, and contractor pay.</p>
+                        </div>
+                        <button class="btn btn-red btn-sm" onclick="openAddExpenseModal()">+ Add Expense</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Merchant / Vendor</th>
+                                    <th>Category</th>
+                                    <th>Tax Status</th>
+                                    <th class="text-right">Amount (ZAR)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expense-rows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: ANALYTICS -->
+            <section id="tab-analytics" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📊 Deep Creator Analytics</h2>
+                    </div>
+                    <p>Detailed channel metrics, RPM tracking, and audience monetization insights.</p>
+                </div>
+            </section>
+
+            <!-- TAB 5: BANK ACCOUNTS -->
+            <section id="tab-bank-accounts" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🏦 Linked Bank Accounts (Plaid Sandbox)</h2>
+                        <button class="btn btn-emerald btn-sm" onclick="alert('Linking bank via Plaid API Sandbox...')">+ Link Bank Account</button>
+                    </div>
+                    <div class="bank-grid" id="bank-cards-grid"></div>
+                </div>
+            </section>
+
+            <!-- TAB 6: SETTINGS & APIS -->
+            <section id="tab-settings" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>⚙️ Connected Platform APIs & CSV Importer</h2>
+                    </div>
+                    
+                    <div class="csv-importer-box">
+                        <h3>Universal CSV / Statement Importer</h3>
+                        <p>Drag and drop YouTube Studio CSVs, TikTok payout files, or Bank statements.</p>
+                        <input type="file" id="csv-file-input-saas" hidden accept=".csv, .txt">
+                        <button class="btn btn-emerald mt-3" onclick="document.getElementById('csv-file-input-saas').click()">
+                            Browse CSV File
+                        </button>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Modal for Connections & Beta Feedback -->
-    <div class="modal-overlay" id="modal-connect">
-        <div class="franc-modal">
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-app">
+        <div class="modal-box">
             <div class="modal-header">
-                <h3 id="modal-title">Modal</h3>
-                <button class="modal-close" id="btn-modal-close"><i data-lucide="x"></i></button>
+                <h3 id="modal-title">Modal Title</h3>
+                <button class="close-btn" onclick="closeAppModal()"><i data-lucide="x"></i></button>
             </div>
-            <div class="modal-body" id="modal-body-content"></div>
+            <div class="modal-body" id="modal-body"></div>
         </div>
     </div>
 
