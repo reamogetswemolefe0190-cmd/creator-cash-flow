@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Financial OS | Category-Defining Software</title>
+    <title>Creator Cash Flow | Financial Intelligence for the Creator Economy</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -18,25 +18,181 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Cache-Busting CSS (v12.0 Creator Financial OS System) -->
-    <link rel="stylesheet" href="style.css?v=12.0_creator_financial_os">
+    <!-- Cache-Busting CSS (v13.0 Creator Financial OS System) -->
+    <link rel="stylesheet" href="style.css?v=13.0_financial_intelligence">
 </head>
 <body class="codex-app">
 
-    <div class="app-shell">
+    <!-- ==========================================================================
+       VIEW 1: CLEAN MARKETING HOMEPAGE (No Sidebar)
+       ========================================================================== -->
+    <div id="view-marketing" class="marketing-page-wrapper">
+        
+        <!-- Marketing Navigation Bar -->
+        <header class="marketing-header">
+            <div class="marketing-brand">Creator Cash Flow</div>
+            <ul class="marketing-nav-links">
+                <li><a href="#product">Product</a></li>
+                <li><a href="#insights">Insights</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#resources">Resources</a></li>
+            </ul>
+            <div class="marketing-auth-btns">
+                <button class="btn btn-secondary" onclick="openAccountAuthModal()">Sign In</button>
+                <button class="btn btn-emerald" onclick="switchView('app')">Get Started</button>
+            </div>
+        </header>
+
+        <!-- Cinematic Hero Section -->
+        <section class="marketing-hero" id="product">
+            <div>
+                <h1 class="marketing-hero-title">Financial Intelligence<br>for Modern Creators</h1>
+                <p class="marketing-hero-subtitle">Understand where your money comes from, where it goes, and what happens next.</p>
+                <div class="marketing-hero-actions">
+                    <button class="btn btn-emerald" onclick="switchView('app')">Start Free</button>
+                    <button class="btn btn-secondary" onclick="switchView('app')">Watch Demo →</button>
+                </div>
+            </div>
+
+            <!-- Signature Visual: Animated Stream Flow Visualizer -->
+            <div class="marketing-stream-card">
+                <div style="font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 16px;">Live Creator Cash Flow Stream</div>
+                
+                <div class="stream-visual-node">
+                    <span>YouTube Studio</span>
+                    <span style="color: var(--accent-emerald); font-weight: 600;">R18,420</span>
+                </div>
+                <div class="stream-visual-node">
+                    <span>TikTok Creator Rewards</span>
+                    <span style="color: var(--accent-emerald); font-weight: 600;">R4,850</span>
+                </div>
+                <div class="stream-visual-node">
+                    <span>Instagram Sponsorships</span>
+                    <span style="color: var(--accent-emerald); font-weight: 600;">R2,100</span>
+                </div>
+                <div class="stream-visual-node">
+                    <span>Woolworths Brand Deal</span>
+                    <span style="color: var(--accent-emerald); font-weight: 600;">R4,940</span>
+                </div>
+
+                <div class="stream-arrow">↓</div>
+
+                <div class="stream-final-node">
+                    <span style="font-size: 14px; font-weight: 600;">Creator Cash Flow Net Profit</span>
+                    <span style="font-size: 24px; font-weight: 700; color: var(--accent-emerald);">R24,650</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Revenue Intelligence -->
+        <section class="marketing-section" id="insights">
+            <h2 class="marketing-section-headline">See your creator business<br>from every angle.</h2>
+
+            <div class="three-cards-grid">
+                <div class="large-stat-card">
+                    <div class="large-stat-label">Earnings</div>
+                    <div class="large-stat-val">R24,650</div>
+                </div>
+
+                <div class="large-stat-card">
+                    <div class="large-stat-label">Growth</div>
+                    <div class="large-stat-val emerald">+18.4%</div>
+                </div>
+
+                <div class="large-stat-card">
+                    <div class="large-stat-label">Forecast</div>
+                    <div class="large-stat-val">R31,200</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">next month</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Platform Breakdown Horizontal Stream -->
+        <section class="marketing-section">
+            <h2 class="marketing-section-headline" style="font-size: 32px; margin-bottom: 24px;">Platform Breakdown</h2>
+            <div class="horizontal-stream-card">
+                <div class="stream-bar-row">
+                    <div class="stream-bar-meta">
+                        <span>YouTube Studio</span>
+                        <span style="color: var(--accent-emerald);">62%</span>
+                    </div>
+                    <div class="stream-bar-track">
+                        <div class="stream-bar-fill" style="width: 62%;"></div>
+                    </div>
+                </div>
+
+                <div class="stream-bar-row">
+                    <div class="stream-bar-meta">
+                        <span>TikTok Rewards</span>
+                        <span>21%</span>
+                    </div>
+                    <div class="stream-bar-track">
+                        <div class="stream-bar-fill" style="width: 21%; opacity: 0.8;"></div>
+                    </div>
+                </div>
+
+                <div class="stream-bar-row">
+                    <div class="stream-bar-meta">
+                        <span>Instagram Deals</span>
+                        <span>10%</span>
+                    </div>
+                    <div class="stream-bar-track">
+                        <div class="stream-bar-fill" style="width: 10%; opacity: 0.6;"></div>
+                    </div>
+                </div>
+
+                <div class="stream-bar-row" style="margin-bottom: 0;">
+                    <div class="stream-bar-meta">
+                        <span>Sponsors & Affiliate</span>
+                        <span>7%</span>
+                    </div>
+                    <div class="stream-bar-track">
+                        <div class="stream-bar-fill" style="width: 7%; opacity: 0.4;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: AI Insights -->
+        <section class="marketing-section" style="padding-bottom: 128px;">
+            <h2 class="marketing-section-headline" style="font-size: 32px; margin-bottom: 32px;">Automated Intelligence</h2>
+            
+            <div class="three-cards-grid">
+                <div class="large-stat-card">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--accent-emerald); margin-bottom: 8px;">📈 Revenue Acceleration</div>
+                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">Your YouTube earnings grew 14% faster than last month.</p>
+                </div>
+
+                <div class="large-stat-card">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">⚠️ Risk Alert</div>
+                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">82% of your creator income comes from one platform.</p>
+                </div>
+
+                <div class="large-stat-card">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--accent-emerald); margin-bottom: 8px;">🔮 Forecast</div>
+                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">Expected August revenue: <span style="color: var(--accent-emerald);">R28,400</span></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==========================================================================
+       VIEW 2: LOGGED-IN SOFTWARE DASHBOARD WORKSPACE
+       ========================================================================== -->
+    <div id="view-app" class="app-shell hidden">
         
         <!-- Sidebar Navigation -->
         <aside class="codex-sidebar">
-            <div class="brand-header">
-                <h2>Creator Financial OS</h2>
-                <p>Verified Session</p>
+            <div style="margin-bottom: 48px;">
+                <h2 style="font-size: 18px; font-weight: 700;">Creator Cash Flow</h2>
+                <p style="font-size: 14px; color: var(--text-secondary);">Financial Workspace</p>
             </div>
 
             <nav class="codex-nav">
                 <a href="#overview" class="nav-item active" data-tab="overview">Dashboard</a>
                 <a href="#revenue" class="nav-item" data-tab="revenue">Revenue</a>
-                <a href="#dependence" class="nav-item" data-tab="dependence">Dependence</a>
                 <a href="#expenses" class="nav-item" data-tab="expenses">Expenses</a>
+                <a href="#marketing" class="nav-item" onclick="switchView('marketing')">Landing View</a>
                 <a href="#settings" class="nav-item" data-tab="settings">Settings</a>
             </nav>
 
@@ -53,100 +209,75 @@
             <!-- TAB 1: OVERVIEW -->
             <section id="tab-overview" class="tab-pane active">
                 
-                <!-- 1. Almost Empty First Screen (Oversized 96px Balance + Giant Chart) -->
-                <div class="hero-minimal-screen">
-                    <div class="brand-category-tag">✦ Creator Financial OS</div>
-                    <div class="absurd-balance" id="val-current-balance">R24,650</div>
-                    <div class="hero-change-label">+14.8% this month</div>
-
-                    <!-- Giant Artwork Chart Canvas -->
-                    <div class="giant-chart-card">
-                        <div class="section-header" style="margin-bottom: 20px;">
-                            <div>
-                                <h3 style="font-size: 16px; font-weight: 600;">Revenue Acceleration Trajectory</h3>
-                                <p style="font-size: 13px; color: var(--text-secondary);">Consolidated daily cash flow across connected platform APIs.</p>
-                            </div>
-                            <button class="btn btn-secondary btn-sm" id="btn-sync-trigger">Sync</button>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-revenue-os"></canvas>
-                        </div>
-                    </div>
+                <!-- Date & Balance Header (No Top Cards / No 4-Card Grid!) -->
+                <div class="dashboard-balance-header">
+                    <div class="dashboard-date-label">July 2026 Cash Flow</div>
+                    <div class="dashboard-balance-amount" id="val-current-balance">R24,650</div>
+                    <div class="dashboard-change-badge">+14.8% this month</div>
                 </div>
 
-                <!-- 7. The Feature Nobody Expects: Revenue Dependence & Platform Risk Index -->
-                <div class="dependence-section">
-                    <div class="section-header">
+                <!-- One Massive Chart: Revenue Intelligence Timeline -->
+                <div class="massive-chart-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <div>
-                            <h2 class="section-title">Revenue Dependence</h2>
-                            <p style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">Monetization concentration across social media algorithms.</p>
+                            <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 4px;">Revenue Intelligence Timeline</h3>
+                            <p style="font-size: 14px; color: var(--text-secondary);">Consolidated daily cash flow trajectory.</p>
                         </div>
-                        <span class="risk-badge">⚠️ Risk Level: High</span>
+                        <button class="btn btn-secondary" id="btn-sync-trigger">Sync</button>
                     </div>
-
-                    <div class="dependence-bars">
-                        <!-- YouTube Bar -->
-                        <div class="bar-row">
-                            <div class="bar-meta">
-                                <span>YouTube Studio (AdSense & Memberships)</span>
-                                <span style="color: var(--accent-emerald);">82%</span>
-                            </div>
-                            <div class="bar-track">
-                                <div class="bar-fill" style="width: 82%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- TikTok Bar -->
-                        <div class="bar-row">
-                            <div class="bar-meta">
-                                <span>TikTok Creator Rewards</span>
-                                <span>11%</span>
-                            </div>
-                            <div class="bar-track">
-                                <div class="bar-fill" style="width: 11%; background: var(--text-secondary);"></div>
-                            </div>
-                        </div>
-
-                        <!-- Instagram Bar -->
-                        <div class="bar-row">
-                            <div class="bar-meta">
-                                <span>Instagram Sponsorships</span>
-                                <span>7%</span>
-                            </div>
-                            <div class="bar-track">
-                                <div class="bar-fill" style="width: 7%; background: var(--text-muted);"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="risk-insight-text">
-                        <strong>⚡ Investor-Grade Risk Insight:</strong> Your cash flow is heavily reliant on YouTube monetization (82%). An algorithm shift or monetization policy change would impact R20,210 of your monthly creator income. <em>Recommendation: Expand brand sponsorships or Substack paid newsletters to lower platform risk.</em>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-revenue-intelligence"></canvas>
                     </div>
                 </div>
 
-                <!-- 2 & 5. Premium Creator Questions & Narrative Intelligence Grid -->
-                <div class="intelligence-grid">
-                    
-                    <!-- Answers: Which platform is carrying me? & August Forecast -->
+                <!-- Revenue Sources & AI Insights Side-by-Side -->
+                <div class="dashboard-two-column">
+                    <!-- Revenue Sources -->
                     <div class="codex-card">
-                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Predictive Creator Forecast</h3>
-                        <div style="font-size: 40px; font-weight: 700; color: var(--accent-emerald); letter-spacing: -0.04em;">
-                            R24,800
-                        </div>
-                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Projected August Income (87% Confidence)</div>
-
-                        <div class="story-box">
-                            <strong>📈 Platform Story:</strong> Revenue is accelerating (+18.4% compared to last month). YouTube Studio is currently carrying 82% of your monthly cash flow.
-                        </div>
+                        <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 16px;">Revenue Sources</h3>
+                        <div id="sources-stream-list"></div>
                     </div>
 
-                    <!-- Recent Activity Stream -->
+                    <!-- AI Insights -->
                     <div class="codex-card">
-                        <div class="section-header" style="margin-bottom: 20px;">
-                            <h3 style="font-size: 16px; font-weight: 600;">Latest Payouts & Write-Offs</h3>
-                            <button class="btn btn-secondary btn-sm" id="btn-add-activity">+ Add</button>
+                        <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 16px;">AI Insights</h3>
+                        <div style="background: rgba(255,255,255,0.02); border: var(--border-card); border-radius: var(--radius-strict); padding: 18px; margin-bottom: 14px;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--accent-emerald); margin-bottom: 4px;">📈 Growth Acceleration</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">Your YouTube earnings grew <strong>14% faster</strong> than last month.</div>
                         </div>
-                        <div class="activity-list" id="activity-stream-os"></div>
+
+                        <div style="background: rgba(255,255,255,0.02); border: var(--border-card); border-radius: var(--radius-strict); padding: 18px;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">⚠️ Algorithm Risk Alert</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);"><strong>82% of your income</strong> comes from YouTube Studio. Consider diversifying into sponsorship deals.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SIGNATURE FEATURE: Creator Revenue Engine -->
+                <div class="signature-engine-card">
+                    <h3 class="section-title-32">Creator Revenue Engine</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">Automated pipeline connecting multi-platform income into consolidated creator profit.</p>
+                    
+                    <div class="engine-stream-pipeline">
+                        <div class="engine-source-box">
+                            <div class="engine-source-title">YouTube Studio</div>
+                            <div class="engine-source-val">R18,420</div>
+                        </div>
+                        <div class="engine-source-box">
+                            <div class="engine-source-title">TikTok Rewards</div>
+                            <div class="engine-source-val">R4,850</div>
+                        </div>
+                        <div class="engine-source-box">
+                            <div class="engine-source-title">Instagram Deals</div>
+                            <div class="engine-source-val">R2,100</div>
+                        </div>
+                        
+                        <div class="engine-flow-arrow">→</div>
+
+                        <div class="engine-total-box">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Net Creator Profit</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">R24,650</div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -154,42 +285,34 @@
             <!-- TAB 2: REVENUE -->
             <section id="tab-revenue" class="tab-pane hidden">
                 <div class="codex-card">
-                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Revenue Transactions</h3>
-                    <div class="activity-list" id="full-revenue-stream"></div>
+                    <h3 class="section-title-32" style="font-size: 24px;">Revenue Streams</h3>
+                    <div id="full-revenue-stream"></div>
                 </div>
             </section>
 
-            <!-- TAB 3: DEPENDENCE -->
-            <section id="tab-dependence" class="tab-pane hidden">
-                <div class="codex-card">
-                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Algorithm Risk Index</h3>
-                    <p style="font-size: 14px; color: var(--text-secondary);">Detailed platform dependency metrics.</p>
-                </div>
-            </section>
-
-            <!-- TAB 4: EXPENSES -->
+            <!-- TAB 3: EXPENSES -->
             <section id="tab-expenses" class="tab-pane hidden">
                 <div class="codex-card">
-                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Expense Write-Offs</h3>
-                    <div class="activity-list" id="full-expense-stream"></div>
+                    <h3 class="section-title-32" style="font-size: 24px;">Expense Write-Offs</h3>
+                    <div id="full-expense-stream"></div>
                 </div>
             </section>
 
-            <!-- TAB 5: SETTINGS -->
+            <!-- TAB 4: SETTINGS -->
             <section id="tab-settings" class="tab-pane hidden">
                 <div class="codex-card">
-                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Workspace Settings</h3>
-                    <p style="font-size: 14px; color: var(--text-secondary);">Currency, security API credentials, and account settings.</p>
+                    <h3 class="section-title-32" style="font-size: 24px;">Settings & Security</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Security tokens and account authentication.</p>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Modal -->
+    <!-- Minimal Modal -->
     <div class="modal-overlay" id="modal-app">
         <div class="codex-modal">
             <div class="modal-header">
-                <h3 id="modal-title" style="font-size: 16px; font-weight: 600;">Modal Title</h3>
+                <h3 id="modal-title" style="font-size: 18px; font-weight: 700;">Modal Title</h3>
                 <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body" id="modal-body"></div>

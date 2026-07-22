@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Creator Financial OS - Engine & Chart Artwork
+   Creator Cash Flow - Financial Intelligence Engine & View Switcher
    ========================================================================== */
 
 const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
@@ -8,6 +8,12 @@ const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
 const state = {
     user: { name: 'Reamogetswe', email: 'reamogetswe@creator.co.za' },
     balance: 24650,
+    sources: [
+        { name: 'YouTube Studio', amount: 18420, percent: '62%' },
+        { name: 'TikTok Creator Rewards', amount: 4850, percent: '21%' },
+        { name: 'Instagram Sponsorships', amount: 2100, percent: '10%' },
+        { name: 'Sponsors & Affiliate', amount: 4940, percent: '7%' }
+    ],
     timelineData: [
         { date: 'Jul 1', rev: 4200, exp: 500, profit: 3700 },
         { date: 'Jul 5', rev: 8900, exp: 1200, profit: 7700 },
@@ -25,7 +31,7 @@ const state = {
     ]
 };
 
-let osChartInstance = null;
+let intelligenceChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
@@ -34,22 +40,40 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAuthModalTrigger();
 
     renderDashboardData();
-    initOSChart();
+    initIntelligenceChart();
     animateCounter();
 
     // Event Listeners
-    document.getElementById('btn-sync-trigger').addEventListener('click', syncData);
-    document.getElementById('btn-add-activity').addEventListener('click', openAddActivityModal);
+    const syncBtn = document.getElementById('btn-sync-trigger');
+    if (syncBtn) syncBtn.addEventListener('click', syncData);
 });
 
-// Navigation Engine
+// View Switcher (Marketing Landing Page vs Logged-In App)
+function switchView(mode) {
+    const marketingView = document.getElementById('view-marketing');
+    const appView = document.getElementById('view-app');
+
+    if (mode === 'app') {
+        marketingView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        initIntelligenceChart();
+        animateCounter();
+    } else {
+        appView.classList.add('hidden');
+        marketingView.classList.remove('hidden');
+    }
+}
+
+// Navigation Engine inside App
 function setupNavigation() {
     const navItems = document.querySelectorAll('.codex-nav .nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
-            e.preventDefault();
             const tabId = item.getAttribute('data-tab');
-            switchTab(tabId);
+            if (tabId) {
+                e.preventDefault();
+                switchTab(tabId);
+            }
         });
     });
 }
@@ -68,7 +92,7 @@ function switchTab(tabId) {
     }
 }
 
-// 1. Absurd 96px Balance Counter Animation (0 -> R24,650)
+// 80px Balance Counter Animation (0 -> R24,650)
 function animateCounter() {
     const target = state.balance;
     const element = document.getElementById('val-current-balance');
@@ -86,21 +110,16 @@ function animateCounter() {
     }, 20);
 }
 
-// Render Data & Activity Streams
+// Render Dashboard Streams
 function renderDashboardData() {
-    const activityStream = document.getElementById('activity-stream-os');
-    if (activityStream) {
-        activityStream.innerHTML = '';
-        state.activities.slice(0, 4).forEach(a => {
-            const amountClass = a.type === 'income' ? 'style="color: var(--accent-emerald); font-weight: 700;"' : 'style="font-weight: 600;"';
-            const prefix = a.type === 'income' ? '+' : '-';
-            activityStream.innerHTML += `
-                <div class="activity-item">
-                    <div>
-                        <div style="font-weight: 600; font-size: 13px;">${a.desc}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary); opacity: 0.6;">${a.date} • Verified Sync</div>
-                    </div>
-                    <div ${amountClass} font-size: 14px;">${prefix}R${a.amount.toLocaleString()}</div>
+    const sourceContainer = document.getElementById('sources-stream-list');
+    if (sourceContainer) {
+        sourceContainer.innerHTML = '';
+        state.sources.forEach(s => {
+            sourceContainer.innerHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: var(--border-card);">
+                    <span style="font-size: 14px; font-weight: 500;">${s.name}</span>
+                    <span style="font-size: 16px; font-weight: 700; color: var(--accent-emerald);">R${s.amount.toLocaleString()} (${s.percent})</span>
                 </div>
             `;
         });
@@ -115,12 +134,12 @@ function renderFullStreams() {
         revStream.innerHTML = '';
         state.activities.filter(a => a.type === 'income').forEach(a => {
             revStream.innerHTML += `
-                <div class="activity-item">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: var(--border-card);">
                     <div>
-                        <div style="font-weight: 600;">${a.desc}</div>
+                        <div style="font-size: 14px; font-weight: 600;">${a.desc}</div>
                         <div style="font-size: 12px; color: var(--text-secondary);">${a.date}</div>
                     </div>
-                    <div style="color: var(--accent-emerald); font-weight: 700;">+R${a.amount.toLocaleString()}</div>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--accent-emerald);">+R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -131,34 +150,36 @@ function renderFullStreams() {
         expStream.innerHTML = '';
         state.activities.filter(a => a.type === 'expense').forEach(a => {
             expStream.innerHTML += `
-                <div class="activity-item">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: var(--border-card);">
                     <div>
-                        <div style="font-weight: 600;">${a.desc}</div>
+                        <div style="font-size: 14px; font-weight: 600;">${a.desc}</div>
                         <div style="font-size: 12px; color: var(--text-secondary);">${a.date} • 100% Tax Write-Off</div>
                     </div>
-                    <div style="font-weight: 600;">-R${a.amount.toLocaleString()}</div>
+                    <div style="font-size: 16px; font-weight: 600;">-R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
     }
 }
 
-// Giant Artwork Chart Canvas
-function initOSChart() {
-    const canvas = document.getElementById('chart-revenue-os');
+// Massive Hero Chart Canvas
+function initIntelligenceChart() {
+    const canvas = document.getElementById('chart-revenue-intelligence');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 340);
+    const gradient = ctx.createLinearGradient(0, 0, 0, 360);
     gradient.addColorStop(0, 'rgba(34, 197, 94, 0.18)');
     gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
 
-    osChartInstance = new Chart(ctx, {
+    if (intelligenceChartInstance) intelligenceChartInstance.destroy();
+
+    intelligenceChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: state.timelineData.map(d => d.date),
             datasets: [{
-                label: 'Cash Flow Trajectory',
+                label: 'Revenue Timeline',
                 data: state.timelineData.map(d => d.rev),
                 borderColor: '#22C55E',
                 borderWidth: 3,
@@ -182,10 +203,10 @@ function initOSChart() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#0A0A0C',
+                    backgroundColor: '#0B0B0B',
                     titleColor: '#FFFFFF',
                     bodyColor: '#22C55E',
-                    borderColor: 'rgba(255, 255, 255, 0.14)',
+                    borderColor: 'rgba(255, 255, 255, 0.16)',
                     borderWidth: 1,
                     displayColors: false,
                     padding: 14,
@@ -226,67 +247,23 @@ function initOSChart() {
 
 function syncData() {
     const btn = document.getElementById('btn-sync-trigger');
-    btn.innerText = `Syncing...`;
-
-    setTimeout(() => {
-        btn.innerText = `Synced`;
+    if (btn) {
+        btn.innerText = `Syncing...`;
         setTimeout(() => {
-            btn.innerText = `Sync`;
-        }, 2000);
-    }, 1000);
-}
-
-function openAddActivityModal() {
-    openModal('Add Cash Flow Entry', `
-        <div class="form-group">
-            <label>Description</label>
-            <input type="text" id="act-desc" class="form-input" placeholder="e.g. YouTube AdSense Payout">
-        </div>
-        <div class="form-group">
-            <label>Type</label>
-            <select id="act-type" class="form-input">
-                <option value="income">Income (+)</option>
-                <option value="expense">Expense (-)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Amount (ZAR)</label>
-            <input type="number" id="act-amount" class="form-input" placeholder="2500">
-        </div>
-        <button class="btn btn-emerald" style="width: 100%; margin-top: 12px;" onclick="submitActivity()">Add Entry</button>
-    `);
-}
-
-function submitActivity() {
-    const desc = document.getElementById('act-desc').value || 'New Entry';
-    const type = document.getElementById('act-type').value;
-    const amount = parseFloat(document.getElementById('act-amount').value) || 2500;
-
-    state.activities.unshift({
-        date: 'Today',
-        desc,
-        type,
-        amount
-    });
-
-    if (type === 'income') state.balance += amount;
-    else state.balance -= amount;
-
-    renderDashboardData();
-    animateCounter();
-    closeModal();
+            btn.innerText = `Synced`;
+            setTimeout(() => { btn.innerText = `Sync`; }, 2000);
+        }, 1000);
+    }
 }
 
 function setupAuthModalTrigger() {
     const authBtn = document.getElementById('btn-auth-modal');
-    if (authBtn) {
-        authBtn.addEventListener('click', openAccountAuthModal);
-    }
+    if (authBtn) authBtn.addEventListener('click', openAccountAuthModal);
 }
 
 function openAccountAuthModal() {
-    openModal('Creator Account & Session Login', `
-        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: var(--radius-sm);">
+    openModal('Creator Financial OS Authentication', `
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: var(--radius-strict);">
             <button class="btn btn-emerald btn-sm" id="auth-tab-signup" style="flex:1;" onclick="switchAuthTab('signup')">Create Account</button>
             <button class="btn btn-secondary btn-sm" id="auth-tab-login" style="flex:1;" onclick="switchAuthTab('login')">Sign In</button>
         </div>
@@ -304,7 +281,7 @@ function openAccountAuthModal() {
                 <label>Password</label>
                 <input type="password" id="reg-pass" class="form-input" placeholder="••••••••••••">
             </div>
-            <button class="btn btn-emerald w-full" id="btn-submit-signup" onclick="executeCreateAccount()">
+            <button class="btn btn-emerald" style="width: 100%; margin-top: 8px;" onclick="executeCreateAccount()">
                 Create Creator Account
             </button>
         </div>
@@ -318,7 +295,7 @@ function openAccountAuthModal() {
                 <label>Password</label>
                 <input type="password" id="login-pass" class="form-input" placeholder="••••••••••••">
             </div>
-            <button class="btn btn-emerald w-full" id="btn-submit-login" onclick="executeLogin()">
+            <button class="btn btn-emerald" style="width: 100%; margin-top: 8px;" onclick="executeLogin()">
                 Sign In To Workspace
             </button>
         </div>
@@ -351,9 +328,11 @@ async function executeCreateAccount() {
     const userData = { id: 'usr_' + Date.now(), name, email, verified: true };
     localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
 
-    document.getElementById('nav-user-label').innerText = name.split(' ')[0];
+    const label = document.getElementById('nav-user-label');
+    if (label) label.innerText = name.split(' ')[0];
     closeModal();
-    alert(`🎉 Creator Account Successfully Activated for ${name} (${email})!\n\nYour session is active.`);
+    switchView('app');
+    alert(`🎉 Account Activated for ${name} (${email})!\n\nWelcome to your Financial Intelligence workspace.`);
 }
 
 async function executeLogin() {
@@ -363,9 +342,11 @@ async function executeLogin() {
     const userData = { id: 'usr_logged_in', name, email, verified: true };
     localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
 
-    document.getElementById('nav-user-label').innerText = name;
+    const label = document.getElementById('nav-user-label');
+    if (label) label.innerText = name;
     closeModal();
-    alert(`Welcome back, ${name}! Your financial workspace is active.`);
+    switchView('app');
+    alert(`Welcome back, ${name}! Session active.`);
 }
 
 function openModal(title, html) {
