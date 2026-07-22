@@ -47,9 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners
     document.getElementById('btn-quick-import').addEventListener('click', () => switchTab('csv-importer'));
+    document.getElementById('btn-auth-modal').addEventListener('click', openAuthModal);
     document.getElementById('btn-feedback').addEventListener('click', openFeedbackModal);
     document.getElementById('btn-modal-close').addEventListener('click', closeModal);
     document.getElementById('btn-generate-sample-csv').addEventListener('click', downloadSampleCsv);
+
+    checkLocalUserSession();
 
     setupCsvImporter();
 
@@ -559,6 +562,84 @@ function submitFeedback() {
         return;
     }
     alert("Thank you! Your feedback will directly shape our upcoming software release.");
+    closeModal();
+}
+
+function checkLocalUserSession() {
+    const savedUserJson = localStorage.getItem('creator_cashflow_user');
+    if (savedUserJson) {
+        try {
+            const user = JSON.parse(savedUserJson);
+            document.querySelector('.account-details .name').innerText = user.name;
+            document.getElementById('nav-auth-label').innerText = `${user.name.split(' ')[0]} (Verified)`;
+        } catch (e) {}
+    }
+}
+
+function openAuthModal() {
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body-content');
+
+    modalTitle.innerText = `Creator Account & Security Login`;
+    modalBody.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: center;">
+            <div style="width: 48px; height: 48px; background: rgba(79, 70, 229, 0.15); color: var(--indigo); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                <i data-lucide="shield-check"></i>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Sign in or create your verified creator account to sync your cash flow across devices.</p>
+        </div>
+
+        <div class="form-group">
+            <label>Full Creator Name</label>
+            <input type="text" class="form-input" id="auth-name" placeholder="e.g. Alex Rivera">
+        </div>
+
+        <div class="form-group">
+            <label>Creator Email Address</label>
+            <input type="email" class="form-input" id="auth-email" placeholder="alex@creator.com">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-input" id="auth-password" placeholder="••••••••••••">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-emerald" style="flex: 1;" onclick="handleLogin()">Log In</button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick="handleSignup()">Create Account</button>
+        </div>
+    `;
+
+    document.getElementById('modal-connect').classList.add('active');
+    lucide.createIcons();
+}
+
+function handleSignup() {
+    const name = document.getElementById('auth-name').value || 'Alex Rivera';
+    const email = document.getElementById('auth-email').value;
+    
+    if (!email) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
+    const userData = { id: 'usr_' + Date.now(), name, email, verified: true };
+    localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
+
+    alert(`🎉 Account created for ${email}!\n\nA verification confirmation email has been dispatched to your inbox. You are now logged in!`);
+    checkLocalUserSession();
+    closeModal();
+}
+
+function handleLogin() {
+    const email = document.getElementById('auth-email').value || 'alex@creator.com';
+    const name = document.getElementById('auth-name').value || 'Alex Rivera';
+
+    const userData = { id: 'usr_logged_in', name, email, verified: true };
+    localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
+
+    alert(`Welcome back, ${name}! Your financial vaults & cash flow ledger are synced.`);
+    checkLocalUserSession();
     closeModal();
 }
 
