@@ -3,260 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Cash Flow | Unified Earnings & Expense Financial OS</title>
-    <!-- Modern Typography -->
+    <title>Creator Cash Flow | Financial OS for Content Creators</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+
+    <!-- Modern Franc & Discovery Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Chart.js for financial charts -->
+    
+    <!-- Chart.js & Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-icon">
-                    <i data-lucide="zap"></i>
+<body class="software-app">
+
+    <!-- Main Software App Container -->
+    <div class="app-shell">
+        
+        <!-- Floating Left Sidebar Navigation (Franc Style Soft Drawer) -->
+        <aside class="franc-sidebar">
+            <div class="brand-box">
+                <div class="brand-logo">
+                    <i data-lucide="shield-check"></i>
                 </div>
-                <div class="brand-text">
+                <div class="brand-info">
                     <h2>Creator Cash Flow</h2>
-                    <span class="badge">MVP v1.0</span>
+                    <span class="software-tag"><i data-lucide="zap" class="icon-tiny"></i> Beta 2.0 Software</span>
                 </div>
             </div>
 
-            <nav class="nav-menu">
-                <a href="#overview" class="nav-item active" data-tab="overview">
+            <!-- User Franc Account Switcher -->
+            <div class="account-card">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Alex Rivera" class="user-avatar">
+                <div class="account-details">
+                    <span class="name">Alex Rivera</span>
+                    <span class="tier-badge"><i data-lucide="award"></i> Pro Creator Tier</span>
+                </div>
+            </div>
+
+            <!-- Sidebar Links -->
+            <nav class="franc-nav">
+                <a href="#overview" class="franc-nav-item active" data-tab="overview">
                     <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
+                    <span>Financial OS</span>
                 </a>
-                <a href="#integrations" class="nav-item" data-tab="integrations">
-                    <i data-lucide="link"></i>
-                    <span>Connected Accounts</span>
+                <a href="#integrations" class="franc-nav-item" data-tab="integrations">
+                    <i data-lucide="link-2"></i>
+                    <span>Connected Vaults</span>
                 </a>
-                <a href="#csv-importer" class="nav-item" data-tab="csv-importer">
+                <a href="#csv-importer" class="franc-nav-item" data-tab="csv-importer">
                     <i data-lucide="file-up"></i>
-                    <span>CSV Smart Importer</span>
+                    <span>Smart CSV Parser</span>
                 </a>
-                <a href="#transactions" class="nav-item" data-tab="transactions">
-                    <i data-lucide="arrow-left-right"></i>
-                    <span>Transactions & Tax</span>
+                <a href="#transactions" class="franc-nav-item" data-tab="transactions">
+                    <i data-lucide="receipt"></i>
+                    <span>Tax & Ledger</span>
                 </a>
             </nav>
 
-            <div class="user-profile">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Creator Avatar" class="avatar">
-                <div class="user-info">
-                    <span class="user-name">Alex Rivera</span>
-                    <span class="user-role">Tech & Gaming Creator</span>
+            <!-- Discovery Bank Health Ring Card -->
+            <div class="health-card">
+                <div class="health-header">
+                    <span>Tax Readiness Index</span>
+                    <strong class="health-score text-emerald">94%</strong>
                 </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 94%;"></div>
+                </div>
+                <small class="health-sub">R48,200 estimated write-offs auto-flagged for CPA review.</small>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top App Bar -->
-            <header class="top-bar">
-                <div class="page-title">
-                    <h1 id="current-tab-title">Financial Overview</h1>
-                    <p class="subtitle">Consolidated revenue, expenses, and net profit across platforms.</p>
+        <!-- Right Main Software Viewport -->
+        <main class="software-viewport">
+            
+            <!-- Top Command & Action Navigation Bar -->
+            <header class="franc-top-bar">
+                <div class="search-command">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="Search transactions, platforms, tax deductions..." id="global-search">
+                    <kbd>Ctrl K</kbd>
                 </div>
-                <div class="top-actions">
+
+                <div class="segmented-control">
+                    <button class="seg-btn active" data-period="month">This Month</button>
+                    <button class="seg-btn" data-period="quarter">Quarter 3</button>
+                    <button class="seg-btn" data-period="year">Tax Year 2026</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-emerald" id="btn-quick-import">
+                        <i data-lucide="plus-circle"></i>
+                        <span>Import Payout</span>
+                    </button>
                     <button class="btn btn-secondary" id="btn-feedback">
                         <i data-lucide="message-square"></i>
                         <span>Beta Feedback</span>
-                    </button>
-                    <button class="btn btn-secondary" id="btn-sample-data">
-                        <i data-lucide="sparkles"></i>
-                        <span>Load Demo Data</span>
-                    </button>
-                    <button class="btn btn-primary" id="btn-sync-all">
-                        <i data-lucide="refresh-cw"></i>
-                        <span>Sync All Sources</span>
                     </button>
                 </div>
             </header>
 
             <!-- TAB 1: OVERVIEW DASHBOARD -->
             <section id="tab-overview" class="tab-pane active">
-                <!-- Summary Metrics Cards -->
-                <div class="metrics-grid">
-                    <div class="metric-card highlight-glow">
-                        <div class="metric-header">
-                            <span>Net Cash Flow</span>
-                            <div class="metric-icon green"><i data-lucide="trending-up"></i></div>
-                        </div>
-                        <div class="metric-value" id="val-net-cashflow">$0.00</div>
-                        <div class="metric-footer positive">
-                            <i data-lucide="arrow-up-right"></i>
-                            <span>Calculated Real-Time</span>
+                
+                <!-- Hero Financial Summary Banner (Franc & Discovery Styled) -->
+                <div class="hero-financial-banner">
+                    <div class="banner-main">
+                        <span class="banner-label">Consolidated Net Cash Flow</span>
+                        <h1 class="net-amount" id="val-net-cashflow">$0.00</h1>
+                        <div class="banner-pill-group">
+                            <span class="pill pill-green"><i data-lucide="trending-up"></i> +18.4% vs last month</span>
+                            <span class="pill pill-blue"><i data-lucide="shield-check"></i> Audit Ready</span>
                         </div>
                     </div>
 
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <span>Gross Creator Revenue</span>
-                            <div class="metric-icon blue"><i data-lucide="dollar-sign"></i></div>
+                    <div class="banner-metrics">
+                        <div class="mini-stat">
+                            <span class="stat-label">Gross Creator Earnings</span>
+                            <span class="stat-value text-emerald" id="val-gross-revenue">$0.00</span>
                         </div>
-                        <div class="metric-value" id="val-gross-revenue">$0.00</div>
-                        <div class="metric-footer text-muted" id="platform-count-label">0 Platforms Connected</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <span>Tracked Business Expenses</span>
-                            <div class="metric-icon red"><i data-lucide="credit-card"></i></div>
+                        <div class="stat-divider"></div>
+                        <div class="mini-stat">
+                            <span class="stat-label">Business Operational Expenses</span>
+                            <span class="stat-value text-coral" id="val-expenses">$0.00</span>
                         </div>
-                        <div class="metric-value" id="val-expenses">$0.00</div>
-                        <div class="metric-footer" id="write-off-label">Tax write-offs detected</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <span>Estimated Tax Reserve (30%)</span>
-                            <div class="metric-icon amber"><i data-lucide="piggy-bank"></i></div>
+                        <div class="stat-divider"></div>
+                        <div class="mini-stat">
+                            <span class="stat-label">Recommended Tax Reserve (30%)</span>
+                            <span class="stat-value text-amber" id="val-tax-reserve">$0.00</span>
                         </div>
-                        <div class="metric-value" id="val-tax-reserve">$0.00</div>
-                        <div class="metric-footer text-muted">Recommended set-aside</div>
                     </div>
                 </div>
 
-                <!-- Charts Section -->
-                <div class="charts-grid">
-                    <div class="card chart-card flex-2">
-                        <div class="card-header">
-                            <h3>Revenue vs. Expense Trend</h3>
-                            <div class="pill-badge">Monthly Sync</div>
+                <!-- Interactive Financial Charts Grid -->
+                <div class="grid-2-1">
+                    <div class="franc-card flex-2">
+                        <div class="franc-card-header">
+                            <div>
+                                <h3>Revenue vs Expense Cash Flow Velocity</h3>
+                                <p class="card-sub">Monitored daily across connected YouTube, TikTok, Twitch, & Bank feeds.</p>
+                            </div>
+                            <span class="tag tag-emerald"><i data-lucide="activity"></i> Live Sync</span>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-box">
                             <canvas id="chart-cashflow"></canvas>
                         </div>
                     </div>
 
-                    <div class="card chart-card flex-1">
-                        <div class="card-header">
-                            <h3>Revenue Source Share</h3>
+                    <div class="franc-card flex-1">
+                        <div class="franc-card-header">
+                            <h3>Revenue Sources</h3>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-box">
                             <canvas id="chart-sources"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Stream Summary & Bank Account Status -->
-                <div class="two-col-grid">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Social Revenue Streams</h3>
-                            <button class="btn-text" onclick="switchTab('integrations')">Manage Connections</button>
+                <!-- Platform Vaults & Bank Integration Feeds -->
+                <div class="grid-1-1">
+                    <div class="franc-card">
+                        <div class="franc-card-header">
+                            <h3>Social Earnings Vaults</h3>
+                            <button class="btn-text" onclick="switchTab('integrations')">Manage APIs</button>
                         </div>
-                        <div class="stream-list" id="stream-summary-list">
-                            <!-- Populated dynamically -->
+                        <div class="franc-list" id="stream-summary-list">
+                            <!-- Injected by JS -->
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Connected Bank Accounts</h3>
+                    <div class="franc-card">
+                        <div class="franc-card-header">
+                            <h3>Connected Bank Accounts (Plaid)</h3>
                             <button class="btn-text" onclick="switchTab('integrations')">Link Bank</button>
                         </div>
-                        <div class="bank-list" id="bank-summary-list">
-                            <!-- Populated dynamically -->
+                        <div class="franc-list" id="bank-summary-list">
+                            <!-- Injected by JS -->
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 2: CONNECTED ACCOUNTS & PLATFORMS -->
+            <!-- TAB 2: CONNECTED ACCOUNTS -->
             <section id="tab-integrations" class="tab-pane">
-                <div class="banner-info">
-                    <i data-lucide="shield-check"></i>
+                <div class="franc-card banner-card">
+                    <div class="banner-icon"><i data-lucide="cpu"></i></div>
                     <div>
-                        <strong>MVP API Strategy & Sandbox Integrations</strong>
-                        <p>During the MVP phase, platform APIs can be connected in Developer/Sandbox Mode or via unified data providers (like Phyllo or Plaid). You can also import CSV payout reports anytime.</p>
+                        <h3>Discovery-Grade Encrypted Financial Pipelines</h3>
+                        <p>All earnings connections are secured with AES-256 token encryption. Connect social developer mode credentials, Phyllo unified API tokens, or drop CSV files.</p>
                     </div>
                 </div>
 
-                <div class="section-block">
-                    <h2>Social Media & Creator Revenue Sources</h2>
-                    <p class="section-desc">Connect developer apps or sandbox accounts to automatically fetch payout analytics.</p>
-                    <div class="cards-grid" id="platforms-grid">
-                        <!-- Dynamic Platform Cards -->
-                    </div>
+                <div class="section-group">
+                    <h2 class="section-title">Social Media Revenue Vaults</h2>
+                    <div class="franc-cards-grid" id="platforms-grid"></div>
                 </div>
 
-                <div class="section-block">
-                    <h2>Bank Accounts & Expense Feeds</h2>
-                    <p class="section-desc">Connect bank accounts via Plaid Sandbox to monitor business operational expenses.</p>
-                    <div class="cards-grid" id="banks-grid">
-                        <!-- Dynamic Bank Cards -->
-                    </div>
+                <div class="section-group">
+                    <h2 class="section-title">Connected Business Bank Feeds (Plaid)</h2>
+                    <div class="franc-cards-grid" id="banks-grid"></div>
                 </div>
             </section>
 
-            <!-- TAB 3: CSV SMART IMPORTER -->
+            <!-- TAB 3: SMART CSV PARSER -->
             <section id="tab-csv-importer" class="tab-pane">
-                <div class="card">
-                    <div class="card-header">
+                <div class="franc-card">
+                    <div class="franc-card-header">
                         <div>
-                            <h2>Universal CSV / Statement Importer</h2>
-                            <p class="subtitle">Bypass platform API waiting periods by uploading your payout CSVs or bank statements directly.</p>
+                            <h2>Universal Statement & Payout Importer</h2>
+                            <p class="card-sub">Drag and drop your platform earnings report or bank CSV to instantly update your ledger.</p>
                         </div>
                     </div>
-                    
-                    <div class="dropzone" id="csv-dropzone">
-                        <i data-lucide="upload-cloud" class="dropzone-icon"></i>
-                        <h3>Drag and drop your platform earnings report or bank CSV</h3>
-                        <p>Supports YouTube Studio, TikTok Creator Fund, Patreon, Stripe, & standard Bank CSVs</p>
-                        <div class="dropzone-buttons">
-                            <label class="btn btn-primary cursor-pointer">
-                                <span>Browse Files</span>
+
+                    <div class="franc-dropzone" id="csv-dropzone">
+                        <div class="drop-circle"><i data-lucide="cloud-lightning"></i></div>
+                        <h3>Drop your payout statement or bank CSV here</h3>
+                        <p>Automatically maps YouTube, TikTok, Twitch, Patreon, Stripe, & standard bank columns.</p>
+                        <div class="drop-actions">
+                            <label class="btn btn-emerald cursor-pointer">
+                                <span>Select CSV File</span>
                                 <input type="file" id="csv-file-input" accept=".csv, .txt" hidden>
                             </label>
                             <button class="btn btn-secondary" id="btn-generate-sample-csv">
                                 <i data-lucide="file-text"></i>
-                                <span>Download Sample CSV Template</span>
+                                <span>Download Sample Template</span>
                             </button>
                         </div>
                     </div>
 
                     <div id="csv-preview-container" class="csv-preview hidden">
                         <div class="preview-header">
-                            <h3><i data-lucide="check-circle" class="text-green"></i> File Parsed Successfully</h3>
-                            <button class="btn btn-primary btn-sm" id="btn-confirm-import">Import Transactions Into Dashboard</button>
+                            <h3><i data-lucide="check-circle-2" class="text-emerald"></i> Statement Parsed Cleanly</h3>
+                            <button class="btn btn-emerald btn-sm" id="btn-confirm-import">Import Into Cash Flow Ledger</button>
                         </div>
-                        <div class="table-wrapper">
-                            <table class="data-table" id="csv-preview-table">
-                                <thead>
-                                    <!-- Dynamic -->
-                                </thead>
-                                <tbody>
-                                    <!-- Dynamic -->
-                                </tbody>
+                        <div class="table-container">
+                            <table class="franc-table" id="csv-preview-table">
+                                <thead></thead>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 4: TRANSACTIONS & TAX DEDUCTIONS -->
+            <!-- TAB 4: TAX & LEDGER -->
             <section id="tab-transactions" class="tab-pane">
-                <div class="card">
-                    <div class="card-header">
+                <div class="franc-card">
+                    <div class="franc-card-header">
                         <div>
-                            <h2>Consolidated Transaction Ledger</h2>
-                            <p class="subtitle">Unified ledger combining social payouts and bank debit expenses with automated tax classification.</p>
+                            <h2>Unified Financial Ledger & Tax Detector</h2>
+                            <p class="card-sub">All creator earnings and expense write-offs consolidated in one place.</p>
                         </div>
                         <div class="filter-controls">
-                            <select id="filter-type" class="select-input">
-                                <option value="all">All Types</option>
+                            <select id="filter-type" class="franc-select">
+                                <option value="all">All Transactions</option>
                                 <option value="income">Revenue Only</option>
                                 <option value="expense">Expenses Only</option>
                             </select>
-                            <select id="filter-source" class="select-input">
+                            <select id="filter-source" class="franc-select">
                                 <option value="all">All Sources</option>
                                 <option value="YouTube">YouTube</option>
                                 <option value="TikTok">TikTok</option>
@@ -267,21 +276,19 @@
                         </div>
                     </div>
 
-                    <div class="table-wrapper">
-                        <table class="data-table" id="ledger-table">
+                    <div class="table-container">
+                        <table class="franc-table" id="ledger-table">
                             <thead>
                                 <tr>
                                     <th>Date</th>
                                     <th>Source / Merchant</th>
                                     <th>Type</th>
                                     <th>Category</th>
-                                    <th>Tax Status</th>
+                                    <th>Discovery Tax Status</th>
                                     <th class="text-right">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody id="ledger-rows">
-                                <!-- Dynamic -->
-                            </tbody>
+                            <tbody id="ledger-rows"></tbody>
                         </table>
                     </div>
                 </div>
@@ -289,16 +296,14 @@
         </main>
     </div>
 
-    <!-- Modal for Manual Account Sync / Sandbox Connect -->
+    <!-- Modal for Connections & Beta Feedback -->
     <div class="modal-overlay" id="modal-connect">
-        <div class="modal">
+        <div class="franc-modal">
             <div class="modal-header">
-                <h3 id="modal-title">Connect Platform</h3>
+                <h3 id="modal-title">Modal</h3>
                 <button class="modal-close" id="btn-modal-close"><i data-lucide="x"></i></button>
             </div>
-            <div class="modal-body" id="modal-body-content">
-                <!-- Dynamic form injected by JS -->
-            </div>
+            <div class="modal-body" id="modal-body-content"></div>
         </div>
     </div>
 

@@ -1,9 +1,10 @@
 /* ==========================================================================
-   Creator Cash Flow - Application Logic & State Engine
+   Creator Cash Flow - Franc & Discovery Application Engine
    ========================================================================== */
 
 // --- Application State ---
 const state = {
+    selectedPeriod: 'month',
     platforms: [
         { id: 'yt', name: 'YouTube AdSense & Memberships', icon: 'youtube', color: '#FF0000', connected: true, status: 'OAuth Developer Sandbox', monthlyRevenue: 12450.00 },
         { id: 'tt', name: 'TikTok Creator Rewards', icon: 'video', color: '#00F2FE', connected: true, status: 'Phyllo Unified Sync', monthlyRevenue: 4320.00 },
@@ -17,13 +18,13 @@ const state = {
     ],
     transactions: [
         { id: 'tx1', date: '2026-07-21', source: 'YouTube', merchant: 'Google AdSense Payout', type: 'income', category: 'Ad Revenue', taxStatus: 'Taxable Income', amount: 8420.00 },
-        { id: 'tx2', date: '2026-07-19', source: 'Bank', merchant: 'B&H Photo Video (Camera Lens)', type: 'expense', category: 'Gear & Equipment', taxStatus: '100% Tax Write-Off', amount: 1299.00 },
+        { id: 'tx2', date: '2026-07-19', source: 'Bank', merchant: 'B&H Photo Video (Sony Lens)', type: 'expense', category: 'Gear & Equipment', taxStatus: '100% Write-Off', amount: 1299.00 },
         { id: 'tx3', date: '2026-07-18', source: 'TikTok', merchant: 'TikTok Creator Fund Direct', type: 'income', category: 'Creator Fund', taxStatus: 'Taxable Income', amount: 4320.00 },
-        { id: 'tx4', date: '2026-07-15', source: 'Bank', merchant: 'Adobe Creative Cloud', type: 'expense', category: 'Software Subscriptions', taxStatus: 'Taxable Expense', amount: 54.99 },
-        { id: 'tx5', date: '2026-07-14', source: 'Bank', merchant: 'AWS Web Hosting', type: 'expense', category: 'Cloud Infrastructure', taxStatus: 'Taxable Expense', amount: 124.50 },
+        { id: 'tx4', date: '2026-07-15', source: 'Bank', merchant: 'Adobe Creative Cloud Subscription', type: 'expense', category: 'Software Subscriptions', taxStatus: '100% Write-Off', amount: 54.99 },
+        { id: 'tx5', date: '2026-07-14', source: 'Bank', merchant: 'AWS Web Hosting Services', type: 'expense', category: 'Cloud Infrastructure', taxStatus: '100% Write-Off', amount: 124.50 },
         { id: 'tx6', date: '2026-07-12', source: 'Twitch', merchant: 'Twitch Interactive Payout', type: 'income', category: 'Subscriptions', taxStatus: 'Taxable Income', amount: 2150.00 },
-        { id: 'tx7', date: '2026-07-10', source: 'Bank', merchant: 'Upwork (Video Editor Contractor)', type: 'expense', category: 'Contractor Expenses', taxStatus: '1099 Write-Off', amount: 1500.00 },
-        { id: 'tx8', date: '2026-07-05', source: 'Stripe', merchant: 'Sponsor: NordVPN Sponsorship', type: 'income', category: 'Brand Deals', taxStatus: 'Taxable Income', amount: 3800.00 }
+        { id: 'tx7', date: '2026-07-10', source: 'Bank', merchant: 'Upwork (Video Editor Contractor)', type: 'expense', category: 'Contractor Pay', taxStatus: '1099 Write-Off', amount: 1500.00 },
+        { id: 'tx8', date: '2026-07-05', source: 'Stripe', merchant: 'Sponsor: NordVPN Deal', type: 'income', category: 'Brand Deals', taxStatus: 'Taxable Income', amount: 3800.00 }
     ],
     parsedCsvData: null
 };
@@ -32,40 +33,35 @@ const state = {
 let cashflowChartInstance = null;
 let sourcesChartInstance = null;
 
-// --- Initialize App ---
+// --- Initialize Software App ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Lucide Icons
     lucide.createIcons();
 
-    // Setup Navigation Tabs
     setupNavigation();
+    setupSegmentedControl();
 
-    // Render Initial UI
     renderOverview();
     renderIntegrations();
     renderTransactionsLedger();
-
-    // Setup Charts
     initCharts();
 
     // Event Listeners
-    document.getElementById('btn-sync-all').addEventListener('click', syncAllSources);
-    document.getElementById('btn-sample-data').addEventListener('click', loadSampleDemoData);
+    document.getElementById('btn-quick-import').addEventListener('click', () => switchTab('csv-importer'));
     document.getElementById('btn-feedback').addEventListener('click', openFeedbackModal);
     document.getElementById('btn-modal-close').addEventListener('click', closeModal);
     document.getElementById('btn-generate-sample-csv').addEventListener('click', downloadSampleCsv);
 
-    // CSV File Importer Setup
     setupCsvImporter();
 
-    // Filters
+    // Filters & Search
     document.getElementById('filter-type').addEventListener('change', renderTransactionsLedger);
     document.getElementById('filter-source').addEventListener('change', renderTransactionsLedger);
+    document.getElementById('global-search').addEventListener('input', renderTransactionsLedger);
 });
 
-// --- Tab Navigation ---
+// --- Navigation Tabs ---
 function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.franc-nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -76,32 +72,31 @@ function setupNavigation() {
 }
 
 function switchTab(tabId) {
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.franc-nav-item').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
 
-    const selectedNav = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+    const selectedNav = document.querySelector(`.franc-nav-item[data-tab="${tabId}"]`);
     const selectedPane = document.getElementById(`tab-${tabId}`);
 
     if (selectedNav && selectedPane) {
         selectedNav.classList.add('active');
         selectedPane.classList.add('active');
     }
-
-    // Update Title Header
-    const titles = {
-        'overview': { main: 'Financial Overview', sub: 'Consolidated revenue, expenses, and net profit across platforms.' },
-        'integrations': { main: 'Connected Accounts & Platform Hub', sub: 'Connect social media earnings streams & bank accounts via APIs or Sandboxes.' },
-        'csv-importer': { main: 'Universal CSV Smart Importer', sub: 'Bypass API approvals by dragging and dropping earnings reports.' },
-        'transactions': { main: 'Consolidated Ledger & Tax Insights', sub: 'Track taxable creator income and business expense write-offs.' }
-    };
-
-    if (titles[tabId]) {
-        document.getElementById('current-tab-title').innerText = titles[tabId].main;
-        document.querySelector('.top-bar .subtitle').innerText = titles[tabId].sub;
-    }
 }
 
-// --- Render Overview Metrics & Summaries ---
+function setupSegmentedControl() {
+    const btns = document.querySelectorAll('.seg-btn');
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.selectedPeriod = btn.getAttribute('data-period');
+            renderOverview();
+        });
+    });
+}
+
+// --- Render Overview Metrics ---
 function renderOverview() {
     const totalIncome = state.transactions
         .filter(t => t.type === 'income')
@@ -119,45 +114,42 @@ function renderOverview() {
     document.getElementById('val-expenses').innerText = formatCurrency(totalExpenses);
     document.getElementById('val-tax-reserve').innerText = formatCurrency(estimatedTax);
 
-    const connectedCount = state.platforms.filter(p => p.connected).length;
-    document.getElementById('platform-count-label').innerText = `${connectedCount} Platforms Connected`;
-
-    // Render Stream Summary List
+    // Stream Summary List
     const streamContainer = document.getElementById('stream-summary-list');
     streamContainer.innerHTML = '';
     state.platforms.filter(p => p.connected).forEach(p => {
         streamContainer.innerHTML += `
-            <div class="stream-item">
-                <div class="item-left">
-                    <div class="platform-pill-icon" style="background-color: ${p.color}">
+            <div class="franc-list-item">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div class="item-badge" style="background-color: ${p.color}">
                         ${p.name.charAt(0)}
                     </div>
                     <div>
-                        <div class="item-title">${p.name}</div>
-                        <div class="item-sub">${p.status}</div>
+                        <div style="font-weight: 700; font-size: 0.9rem;">${p.name}</div>
+                        <div style="font-size: 0.78rem; color: var(--text-secondary);">${p.status}</div>
                     </div>
                 </div>
-                <div class="item-amount text-green">+${formatCurrency(p.monthlyRevenue)}</div>
+                <div class="text-emerald" style="font-weight: 800; font-size: 0.95rem;">+${formatCurrency(p.monthlyRevenue)}</div>
             </div>
         `;
     });
 
-    // Render Bank Summary List
+    // Bank Summary List
     const bankContainer = document.getElementById('bank-summary-list');
     bankContainer.innerHTML = '';
     state.banks.forEach(b => {
         bankContainer.innerHTML += `
-            <div class="bank-item">
-                <div class="item-left">
-                    <div class="platform-pill-icon" style="background-color: #10B981">
+            <div class="franc-list-item">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div class="item-badge" style="background-color: #10B981">
                         <i data-lucide="${b.icon}"></i>
                     </div>
                     <div>
-                        <div class="item-title">${b.name}</div>
-                        <div class="item-sub">${b.provider}</div>
+                        <div style="font-weight: 700; font-size: 0.9rem;">${b.name}</div>
+                        <div style="font-size: 0.78rem; color: var(--text-secondary);">${b.provider}</div>
                     </div>
                 </div>
-                <div class="item-amount ${b.balance >= 0 ? '' : 'text-red'}">${formatCurrency(b.balance)}</div>
+                <div class="${b.balance >= 0 ? '' : 'text-coral'}" style="font-weight: 800; font-size: 0.95rem;">${formatCurrency(b.balance)}</div>
             </div>
         `;
     });
@@ -165,32 +157,31 @@ function renderOverview() {
     updateCharts();
 }
 
-// --- Render Connected Accounts & Platform Grid ---
+// --- Integration Vaults ---
 function renderIntegrations() {
     const platformsGrid = document.getElementById('platforms-grid');
     platformsGrid.innerHTML = '';
 
     state.platforms.forEach(p => {
         platformsGrid.innerHTML += `
-            <div class="platform-card">
+            <div class="vault-card">
                 <div>
-                    <div class="platform-card-header">
-                        <div class="platform-icon-box" style="background-color: ${p.color}">
+                    <div class="vault-header">
+                        <div class="vault-icon" style="background-color: ${p.color}">
                             ${p.name.charAt(0)}
                         </div>
-                        <div class="platform-card-info">
-                            <h4>${p.name}</h4>
-                            <span>${p.status}</span>
+                        <div>
+                            <h4 style="font-weight: 800;">${p.name}</h4>
+                            <span style="font-size: 0.78rem; color: var(--text-secondary);">${p.status}</span>
                         </div>
                     </div>
-                    <div class="status-indicator ${p.connected ? 'connected' : 'disconnected'}">
-                        <span class="dot"></span>
-                        <span>${p.connected ? 'Active Sync' : 'Not Connected'}</span>
+                    <div class="status-dot ${p.connected ? 'active' : ''}">
+                        ${p.connected ? 'Encrypted Active Sync' : 'Not Linked'}
                     </div>
                 </div>
                 <div>
-                    <button class="btn ${p.connected ? 'btn-secondary' : 'btn-primary'} btn-sm" style="width: 100%" onclick="togglePlatformConnection('${p.id}')">
-                        ${p.connected ? 'Configure Connection' : 'Connect Account'}
+                    <button class="btn ${p.connected ? 'btn-secondary' : 'btn-emerald'} btn-sm" style="width: 100%" onclick="togglePlatformConnection('${p.id}')">
+                        ${p.connected ? 'Configure Vault' : 'Link Social Vault'}
                     </button>
                 </div>
             </div>
@@ -202,20 +193,19 @@ function renderIntegrations() {
 
     state.banks.forEach(b => {
         banksGrid.innerHTML += `
-            <div class="platform-card">
+            <div class="vault-card">
                 <div>
-                    <div class="platform-card-header">
-                        <div class="platform-icon-box" style="background-color: #10B981">
+                    <div class="vault-header">
+                        <div class="vault-icon" style="background-color: #10B981">
                             <i data-lucide="${b.icon}"></i>
                         </div>
-                        <div class="platform-card-info">
-                            <h4>${b.name}</h4>
-                            <span>Provider: ${b.provider}</span>
+                        <div>
+                            <h4 style="font-weight: 800;">${b.name}</h4>
+                            <span style="font-size: 0.78rem; color: var(--text-secondary);">${b.provider}</span>
                         </div>
                     </div>
-                    <div class="status-indicator connected">
-                        <span class="dot"></span>
-                        <span>Linked (Plaid Sandbox)</span>
+                    <div class="status-dot active">
+                        Linked (Plaid Sandbox)
                     </div>
                 </div>
                 <div>
@@ -230,34 +220,37 @@ function renderIntegrations() {
     lucide.createIcons();
 }
 
-// --- Ledger & Transactions Table ---
+// --- Render Ledger Table ---
 function renderTransactionsLedger() {
     const typeFilter = document.getElementById('filter-type').value;
     const sourceFilter = document.getElementById('filter-source').value;
+    const searchQuery = (document.getElementById('global-search').value || '').toLowerCase();
+    
     const tbody = document.getElementById('ledger-rows');
     tbody.innerHTML = '';
 
     let filtered = state.transactions.filter(t => {
         if (typeFilter !== 'all' && t.type !== typeFilter) return false;
         if (sourceFilter !== 'all' && t.source !== sourceFilter) return false;
+        if (searchQuery && !t.merchant.toLowerCase().includes(searchQuery) && !t.source.toLowerCase().includes(searchQuery)) return false;
         return true;
     });
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No matching transactions found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 28px;">No matching transactions found in your ledger.</td></tr>`;
         return;
     }
 
     filtered.forEach(t => {
-        const amountClass = t.type === 'income' ? 'text-green' : 'text-red';
+        const amountClass = t.type === 'income' ? 'text-emerald' : 'text-coral';
         const prefix = t.type === 'income' ? '+' : '-';
         const typeBadge = `<span class="tag ${t.type === 'income' ? 'tag-income' : 'tag-expense'}">${t.type.toUpperCase()}</span>`;
-        const taxBadge = t.type === 'expense' ? `<span class="tag tax-deductible"><i data-lucide="shield"></i> ${t.taxStatus}</span>` : `<span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">${t.taxStatus}</span>`;
+        const taxBadge = t.type === 'expense' ? `<span class="tag tag-write-off"><i data-lucide="shield-check" style="width: 12px;"></i> ${t.taxStatus}</span>` : `<span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-secondary);">${t.taxStatus}</span>`;
 
         tbody.innerHTML += `
             <tr>
                 <td>${t.date}</td>
-                <td><strong>${t.merchant}</strong> <br><small style="color: var(--text-muted);">${t.source}</small></td>
+                <td><strong>${t.merchant}</strong> <br><small style="color: var(--text-secondary);">${t.source}</small></td>
                 <td>${typeBadge}</td>
                 <td>${t.category}</td>
                 <td>${taxBadge}</td>
@@ -269,7 +262,7 @@ function renderTransactionsLedger() {
     lucide.createIcons();
 }
 
-// --- Charts Logic ---
+// --- Chart Integrations ---
 function initCharts() {
     const ctxCashflow = document.getElementById('chart-cashflow').getContext('2d');
     const ctxSources = document.getElementById('chart-sources').getContext('2d');
@@ -283,15 +276,15 @@ function initCharts() {
                     label: 'Gross Creator Revenue',
                     data: [12000, 14500, 16200, 18000, 21000, 22720],
                     borderColor: '#10B981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.12)',
                     fill: true,
                     tension: 0.4
                 },
                 {
-                    label: 'Business Expenses',
+                    label: 'Operational Expenses',
                     data: [2100, 2800, 3100, 2400, 4200, 2978],
-                    borderColor: '#EF4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                    borderColor: '#F43F5E',
+                    backgroundColor: 'rgba(244, 63, 94, 0.05)',
                     fill: true,
                     tension: 0.4
                 }
@@ -324,7 +317,7 @@ function initCharts() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom', labels: { color: '#94A3B8', boxWidth: 12 } }
+                legend: { position: 'bottom', labels: { color: '#94A3B8', boxWidth: 10 } }
             }
         }
     });
@@ -333,7 +326,6 @@ function initCharts() {
 function updateCharts() {
     if (!cashflowChartInstance || !sourcesChartInstance) return;
 
-    // Recalculate totals for donut chart
     const ytTotal = state.transactions.filter(t => t.source === 'YouTube').reduce((s, t) => s + t.amount, 0);
     const ttTotal = state.transactions.filter(t => t.source === 'TikTok').reduce((s, t) => s + t.amount, 0);
     const twTotal = state.transactions.filter(t => t.source === 'Twitch').reduce((s, t) => s + t.amount, 0);
@@ -343,7 +335,7 @@ function updateCharts() {
     sourcesChartInstance.update();
 }
 
-// --- CSV Importer Engine ---
+// --- CSV Engine ---
 function setupCsvImporter() {
     const dropzone = document.getElementById('csv-dropzone');
     const fileInput = document.getElementById('csv-file-input');
@@ -375,8 +367,7 @@ function setupCsvImporter() {
 function handleFile(file) {
     const reader = new FileReader();
     reader.onload = function (e) {
-        const text = e.target.result;
-        parseCSVText(text);
+        parseCSVText(e.target.result);
     };
     reader.readAsText(file);
 }
@@ -384,7 +375,7 @@ function handleFile(file) {
 function parseCSVText(text) {
     const lines = text.trim().split('\n');
     if (lines.length < 2) {
-        alert("Invalid CSV file. Please upload a file with headers and rows.");
+        alert("Invalid CSV file.");
         return;
     }
 
@@ -393,8 +384,7 @@ function parseCSVText(text) {
 
     for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
-        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-        rows.push(values);
+        rows.push(lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, '')));
     }
 
     state.parsedCsvData = { headers, rows };
@@ -430,7 +420,6 @@ function confirmCsvImport() {
             const type = (row[2] || 'income').toLowerCase().includes('expense') ? 'expense' : 'income';
             const amount = parseFloat(row[3]) || 150.00;
             const source = row[4] || 'CSV Upload';
-            const category = type === 'income' ? 'Creator Payout' : 'Business Expense';
 
             state.transactions.unshift({
                 id: 'csv_' + Date.now() + '_' + idx,
@@ -438,15 +427,15 @@ function confirmCsvImport() {
                 source,
                 merchant,
                 type,
-                category,
-                taxStatus: type === 'income' ? 'Taxable Income' : 'Tax Write-Off',
+                category: type === 'income' ? 'Creator Payout' : 'Business Expense',
+                taxStatus: type === 'income' ? 'Taxable Income' : '100% Write-Off',
                 amount
             });
             count++;
         }
     });
 
-    alert(`Successfully imported ${count} transactions into your Cash Flow ledger!`);
+    alert(`Imported ${count} transactions into your Franc-styled Cash Flow ledger!`);
     document.getElementById('csv-preview-container').classList.add('hidden');
     renderOverview();
     renderTransactionsLedger();
@@ -468,7 +457,7 @@ function downloadSampleCsv() {
     a.click();
 }
 
-// --- Platform Connection Modal ---
+// --- Modals & Connection Controls ---
 function togglePlatformConnection(platformId) {
     const platform = state.platforms.find(p => p.id === platformId);
     if (!platform) return;
@@ -476,31 +465,30 @@ function togglePlatformConnection(platformId) {
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body-content');
 
-    modalTitle.innerText = `Connect ${platform.name}`;
+    modalTitle.innerText = `Link ${platform.name} Vault`;
     modalBody.innerHTML = `
         <div style="text-align: center; margin-bottom: 20px;">
-            <div style="width: 54px; height: 54px; background-color: ${platform.color}; border-radius: 14px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 1.5rem; font-weight: bold;">
+            <div style="width: 54px; height: 54px; background-color: ${platform.color}; border-radius: 16px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 1.5rem; font-weight: bold;">
                 ${platform.name.charAt(0)}
             </div>
-            <p style="color: var(--text-muted); font-size: 0.88rem;">Select how you want to extract earnings data during the MVP phase:</p>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Encrypted social financial token authentication:</p>
         </div>
 
         <div class="form-group">
-            <label>Connection Method</label>
+            <label>Authentication Token Type</label>
             <select class="form-input" id="connect-method">
-                <option value="sandbox">Option A: Developer App / Sandbox Mode (Instant)</option>
-                <option value="phyllo">Option B: Phyllo Unified Creator API Token</option>
-                <option value="extension">Option C: Browser Extension Local Extraction</option>
+                <option value="sandbox">Option A: Developer OAuth Sandbox Token</option>
+                <option value="phyllo">Option B: Phyllo Unified Social API Token</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>API Key / Client Secret (Sandbox Test Token)</label>
-            <input type="text" class="form-input" value="pk_test_creator_cash_flow_${platform.id}_9827" readonly>
+            <label>API Key / Client Token</label>
+            <input type="text" class="form-input" value="pk_live_creator_cash_flow_${platform.id}_9827" readonly>
         </div>
 
-        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="savePlatformConnection('${platform.id}')">
-            Authorize & Sync Live Sandbox Data
+        <button class="btn btn-emerald" style="width: 100%; margin-top: 10px;" onclick="savePlatformConnection('${platform.id}')">
+            Authorize & Link Vault
         </button>
     `;
 
@@ -511,10 +499,9 @@ function savePlatformConnection(platformId) {
     const platform = state.platforms.find(p => p.id === platformId);
     if (platform) {
         platform.connected = true;
-        platform.status = 'Sandbox OAuth Connected';
-        if (platform.monthlyRevenue === 0) platform.monthlyRevenue = 2950.00;
+        platform.status = 'Encrypted Active Sync';
+        if (platform.monthlyRevenue === 0) platform.monthlyRevenue = 3200.00;
         
-        // Add sample payout
         state.transactions.unshift({
             id: 'tx_new_' + Date.now(),
             date: '2026-07-22',
@@ -523,7 +510,7 @@ function savePlatformConnection(platformId) {
             type: 'income',
             category: 'Creator Earnings',
             taxStatus: 'Taxable Income',
-            amount: 2950.00
+            amount: 3200.00
         });
     }
 
@@ -537,28 +524,27 @@ function openFeedbackModal() {
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body-content');
 
-    modalTitle.innerText = `Creator Cash Flow Beta Feedback`;
+    modalTitle.innerText = `Creator Cash Flow Software Feedback`;
     modalBody.innerHTML = `
         <div style="margin-bottom: 16px;">
-            <p style="color: var(--text-muted); font-size: 0.88rem;">Help us build the ultimate financial OS for creators! Share your thoughts or missing features below.</p>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">How does the Franc & Discovery software interface feel? Share your thoughts below:</p>
         </div>
 
         <div class="form-group">
-            <label>Feedback Category</label>
+            <label>Category</label>
             <select class="form-input" id="fb-category">
+                <option value="ui">Software UI / Franc Aesthetic</option>
                 <option value="platform">Missing Social Platform / Bank</option>
-                <option value="ux">User Experience / Design</option>
-                <option value="csv">CSV Import Issue</option>
-                <option value="pricing">Willingness to Pay / Pricing</option>
+                <option value="csv">CSV Importer</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>Your Feedback / Feature Request</label>
-            <textarea class="form-input" id="fb-text" rows="4" placeholder="e.g., I need auto-categorization for Patreon payouts and tax write-off export for my CPA..."></textarea>
+            <label>Your Insight / Suggestion</label>
+            <textarea class="form-input" id="fb-text" rows="4" placeholder="e.g. Love the Franc pill containers! Would be awesome to export tax PDF reports for Discovery Health/Tax..."></textarea>
         </div>
 
-        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="submitFeedback()">
+        <button class="btn btn-emerald" style="width: 100%; margin-top: 10px;" onclick="submitFeedback()">
             Submit Feedback
         </button>
     `;
@@ -569,53 +555,19 @@ function openFeedbackModal() {
 function submitFeedback() {
     const text = document.getElementById('fb-text').value;
     if (!text.trim()) {
-        alert("Please enter a short comment or suggestion.");
+        alert("Please enter a short comment.");
         return;
     }
-    alert("Thank you for your feedback! Your insight will directly shape our v1.1 release.");
+    alert("Thank you! Your feedback will directly shape our upcoming software release.");
     closeModal();
 }
 
 function openBankModal(bankId) {
-    alert("Bank connected via Plaid Sandbox Environment. All incoming debits are classified as creator business expenses.");
+    alert("Bank vault connected via Plaid Sandbox Engine.");
 }
 
 function closeModal() {
     document.getElementById('modal-connect').classList.remove('active');
-}
-
-// --- Sync & Demo Helpers ---
-function syncAllSources() {
-    const btn = document.getElementById('btn-sync-all');
-    btn.innerHTML = `<i data-lucide="refresh-cw" class="spin"></i> Syncing...`;
-    lucide.createIcons();
-
-    setTimeout(() => {
-        btn.innerHTML = `<i data-lucide="check"></i> Synced Just Now`;
-        renderOverview();
-        lucide.createIcons();
-        setTimeout(() => {
-            btn.innerHTML = `<i data-lucide="refresh-cw"></i> <span>Sync All Sources</span>`;
-            lucide.createIcons();
-        }, 2000);
-    }, 1200);
-}
-
-function loadSampleDemoData() {
-    state.transactions.unshift({
-        id: 'tx_demo_' + Date.now(),
-        date: '2026-07-22',
-        source: 'YouTube',
-        merchant: 'YouTube Super Thanks & Memberships',
-        type: 'income',
-        category: 'Fan Funding',
-        taxStatus: 'Taxable Income',
-        amount: 1430.00
-    });
-
-    renderOverview();
-    renderTransactionsLedger();
-    alert("Demo transaction added! Dashboard metrics & tax reserves updated.");
 }
 
 function formatCurrency(amount) {
