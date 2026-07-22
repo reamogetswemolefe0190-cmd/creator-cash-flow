@@ -74,10 +74,11 @@ function switchTab(tabId) {
     }
 }
 
-// 1. 72px Balance Counter Animation (0 -> R24,650)
+// 1. 80px Balance Counter Animation (0 -> R24,650)
 function animateCounter() {
     const target = state.balance;
     const element = document.getElementById('val-current-balance');
+    if (!element) return;
     let current = 0;
     const step = Math.ceil(target / 35);
 

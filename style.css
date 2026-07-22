@@ -1,33 +1,30 @@
 /* ==========================================================================
-   Creator Cash Flow - Executive Masterclass Design System (Linear / Vercel)
+   Creator Cash Flow - Category-Defining Design System
+   80px Balance | 72px Headline | 32px Section Titles | Asymmetric Grid
    ========================================================================== */
 
 :root {
-    /* Pure Deep Dark Mode */
     --bg-page: #09090B;
     --bg-card: rgba(255, 255, 255, 0.02);
     --bg-card-hover: rgba(255, 255, 255, 0.04);
     --bg-input: rgba(255, 255, 255, 0.03);
     
-    /* 5. Lifted Depth Borders */
     --border-subtle: rgba(255, 255, 255, 0.06);
     --border-hover: rgba(255, 255, 255, 0.14);
     
-    /* Typography Colors */
     --text-primary: #FAFAFA;
     --text-secondary: #A1A1AA;
     --text-muted: #71717A;
     
-    /* Single Accent */
     --accent-emerald: #22C55E;
-    --accent-emerald-glow: rgba(34, 197, 94, 0.12);
+    --accent-coral: #EF4444;
+    --accent-blue: #38BDF8;
 
-    /* Radii & Spacing */
     --radius-card: 20px;
     --radius-btn: 10px;
     --radius-sm: 8px;
     
-    --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -39,8 +36,7 @@
 body.codex-app {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Geist', sans-serif;
     background-color: var(--bg-page);
-    /* 7. Subtle Ambient Lighting (Stripe / Vercel Style) */
-    background-image: radial-gradient(circle at top center, rgba(34, 197, 94, 0.07), transparent 55%);
+    background-image: radial-gradient(circle at top center, rgba(34, 197, 94, 0.08), transparent 50%);
     color: var(--text-primary);
     line-height: 1.5;
     min-height: 100vh;
@@ -48,13 +44,13 @@ body.codex-app {
     -webkit-font-smoothing: antialiased;
 }
 
-/* App Shell Framework */
+/* App Shell Layout */
 .app-shell {
     display: flex;
     min-height: 100vh;
 }
 
-/* 6. Quieter Navigation Sidebar */
+/* Sidebar */
 .codex-sidebar {
     width: 250px;
     background-color: var(--bg-page);
@@ -69,32 +65,11 @@ body.codex-app {
     z-index: 40;
 }
 
-.brand-header {
-    margin-bottom: 48px;
-}
+.brand-header { margin-bottom: 48px; }
+.brand-header h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-primary); }
+.brand-header p { font-size: 13px; color: var(--text-secondary); opacity: 0.6; margin-top: 2px; }
 
-.brand-header h2 {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-}
-
-.brand-header p {
-    font-size: 13px;
-    color: var(--text-secondary);
-    opacity: 0.6;
-    margin-top: 2px;
-}
-
-.codex-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
-}
-
-/* 6. Quieter Navigation Items (Opacity hierarchy) */
+.codex-nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .nav-item {
     display: flex;
     align-items: center;
@@ -109,66 +84,123 @@ body.codex-app {
     transition: var(--transition-smooth);
 }
 
-.nav-item:hover {
-    opacity: 0.85;
-    background-color: var(--bg-card);
-}
+.nav-item:hover { opacity: 0.85; background-color: var(--bg-card); }
+.nav-item.active { opacity: 1; font-weight: 600; background-color: var(--bg-card); }
 
-.nav-item.active {
-    opacity: 1;
-    font-weight: 600;
-    background-color: var(--bg-card);
-}
+.sidebar-footer { padding-top: 24px; border-top: 1px solid var(--border-subtle); }
 
-.sidebar-footer {
-    padding-top: 24px;
-    border-top: 1px solid var(--border-subtle);
-}
-
-/* 3. Main Viewport with 20-30% Increased Whitespace */
+/* Main Viewport */
 .codex-main {
     flex: 1;
     padding: 64px 80px;
-    max-width: 1180px;
+    max-width: 1240px;
     margin: 0 auto;
     width: 100%;
 }
 
-/* 8. Upgraded Hero Section */
+/* 6 & 2. World-Class Typography & Hero Section */
 .hero-section {
-    margin-bottom: 56px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 48px;
+    align-items: center;
+    margin-bottom: 64px;
 }
 
+/* 6. 72px Headline */
 .hero-title {
-    font-size: 32px;
-    font-weight: 600;
-    letter-spacing: -0.03em;
+    font-size: 72px;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1.05;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 16px;
 }
 
 .hero-subtitle {
     font-size: 15px;
     color: var(--text-secondary);
     opacity: 0.7;
-    max-width: 600px;
     line-height: 1.6;
+    margin-bottom: 24px;
+    max-width: 520px;
+}
+
+.hero-actions { display: flex; align-items: center; gap: 18px; }
+.hero-stat-pill { font-size: 13px; color: var(--text-secondary); opacity: 0.6; }
+
+/* 2 & 7. Category-Defining "WHOA" Living Revenue Stream Visualizer */
+.hero-visualizer-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    padding: 32px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.visualizer-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    opacity: 0.6;
+    margin-bottom: 20px;
+}
+
+.stream-flow-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stream-node {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+}
+
+.stream-label { font-weight: 500; }
+.stream-amount { font-weight: 600; color: var(--accent-emerald); }
+
+.stream-flow-arrow {
+    text-align: center;
+    color: var(--accent-emerald);
+    font-size: 16px;
+    margin: 4px 0;
+    opacity: 0.8;
+}
+
+.net-income-node {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.net-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.net-val { font-size: 20px; font-weight: 700; color: var(--accent-emerald); }
+
+/* 6. Section Titles (32px) */
+.section-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
     margin-bottom: 24px;
 }
 
-.hero-actions {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
-
-.hero-stat-pill {
-    font-size: 13px;
-    color: var(--text-secondary);
-    opacity: 0.6;
-}
-
-/* 1. Locked Eye Balance Hero (72px Typography) */
+/* 6. 80px Balance Typography */
 .balance-hero {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
@@ -199,7 +231,6 @@ body.codex-app {
     letter-spacing: 0.05em;
 }
 
-/* 10. Operational Operational Details (Last synced 2 mins ago) */
 .operational-meta {
     display: flex;
     align-items: center;
@@ -217,9 +248,8 @@ body.codex-app {
     display: inline-block;
 }
 
-/* 1. 72px Balance Typography */
 .balance-amount {
-    font-size: 72px;
+    font-size: 80px;
     font-weight: 700;
     letter-spacing: -0.06em;
     color: var(--text-primary);
@@ -236,13 +266,20 @@ body.codex-app {
     color: var(--accent-emerald);
 }
 
-/* 2. Signature Element: Full-Width Revenue Timeline Chart Card */
+/* 3. Asymmetric Dashboard Layout (Chart Left, Cards Right) */
+.asymmetric-dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+    margin-bottom: 48px;
+}
+
+/* Signature Timeline Card */
 .signature-card {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 40px;
-    margin-bottom: 48px;
+    padding: 36px;
     transition: var(--transition-smooth);
 }
 
@@ -255,7 +292,7 @@ body.codex-app {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
 .card-title {
@@ -273,24 +310,72 @@ body.codex-app {
 
 .chart-wrapper {
     position: relative;
-    height: 320px;
+    height: 340px;
     width: 100%;
 }
 
-/* 3. Section Grid with 48px Gap */
-.section-grid {
+/* 1. Creator-Focused Platform Cards (Right Column) */
+.creator-cards-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.creator-platform-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    padding: 20px 24px;
+    transition: var(--transition-smooth);
+}
+
+.creator-platform-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+}
+
+.platform-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.platform-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.platform-change {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.platform-change.up { color: var(--accent-emerald); }
+.platform-change.down { color: var(--accent-coral); }
+
+.platform-val {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+}
+
+/* 4 & 5. AI Intelligent Insights & Predictions */
+.intelligence-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 48px;
+    gap: 32px;
     margin-bottom: 48px;
 }
 
-/* 5. Card Lifted Depth Effect */
 .codex-card {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 36px;
+    padding: 32px;
     transition: var(--transition-smooth);
 }
 
@@ -299,43 +384,25 @@ body.codex-app {
     border-color: var(--border-hover);
 }
 
-/* Clean Income Sources List */
-.source-list {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.source-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--border-subtle);
-}
-
-.source-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.source-name {
+/* Intelligence Box */
+.ai-insight-box {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-top: 16px;
     font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
+    line-height: 1.6;
+    color: var(--text-secondary);
 }
 
-.source-val {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
+.ai-insight-box strong { color: var(--text-primary); }
 
-/* 8. Activity Card Stream (Cards First, Tables Second) */
+/* Activity Cards Stream */
 .activity-stream {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
 }
 
 .activity-card-item {
@@ -354,34 +421,14 @@ body.codex-app {
     background: rgba(255, 255, 255, 0.03);
 }
 
-.activity-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.activity-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-.activity-date {
-    font-size: 12px;
-    color: var(--text-secondary);
-    opacity: 0.6;
-    margin-top: 2px;
-}
-
-.activity-val {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
+.activity-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.activity-date { font-size: 12px; color: var(--text-secondary); opacity: 0.6; margin-top: 2px; }
+.activity-val { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
 
 .text-right { text-align: right !important; }
 .text-green { color: var(--accent-emerald) !important; }
 
-/* Buttons with 6. Subtle Motion */
+/* Buttons */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -395,46 +442,19 @@ body.codex-app {
     transition: var(--transition-smooth);
 }
 
-.btn:hover {
-    transform: scale(1.02);
-}
-
-.btn-primary {
-    background-color: var(--text-primary);
-    color: var(--bg-page);
-}
-
-.btn-primary:hover {
-    background-color: #FFFFFF;
-}
-
-.btn-emerald {
-    background-color: var(--accent-emerald);
-    color: #000000;
-    font-weight: 600;
-}
-
-.btn-secondary {
-    background: var(--bg-card);
-    color: var(--text-primary);
-    border: 1px solid var(--border-subtle);
-}
-
-.btn-secondary:hover {
-    border-color: var(--border-hover);
-    background: var(--bg-card-hover);
-}
-
-.btn-sm {
-    padding: 6px 14px;
-    font-size: 13px;
-}
+.btn:hover { transform: scale(1.02); }
+.btn-primary { background-color: var(--text-primary); color: var(--bg-page); }
+.btn-primary:hover { background-color: #FFFFFF; }
+.btn-emerald { background-color: var(--accent-emerald); color: #000000; font-weight: 600; }
+.btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-subtle); }
+.btn-secondary:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
+.btn-sm { padding: 6px 14px; font-size: 13px; }
 
 /* Modals */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
@@ -446,7 +466,6 @@ body.codex-app {
 }
 
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
 .codex-modal {
     background-color: #111113;
     border: 1px solid var(--border-hover);
@@ -457,36 +476,12 @@ body.codex-app {
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8);
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.modal-header h3 {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-header h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.modal-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
 
 .form-group { margin-bottom: 16px; }
-.form-group label {
-    display: block;
-    font-size: 13px;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    margin-bottom: 6px;
-    font-weight: 500;
-}
-
+.form-group label { display: block; font-size: 13px; color: var(--text-secondary); opacity: 0.7; margin-bottom: 6px; font-weight: 500; }
 .form-input {
     width: 100%;
     background-color: var(--bg-input);
@@ -496,21 +491,16 @@ body.codex-app {
     color: var(--text-primary);
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s ease;
 }
 
-.form-input:focus {
-    border-color: var(--text-primary);
-}
-
+.form-input:focus { border-color: var(--text-primary); }
 .hidden { display: none !important; }
 
-/* Responsive Adjustments */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .app-shell { flex-direction: column; }
     .codex-sidebar { width: 100%; height: auto; position: relative; padding: 24px; }
     .codex-main { padding: 32px 20px; }
-    .section-grid { grid-template-columns: 1fr; gap: 24px; }
-    .balance-amount { font-size: 52px; }
-    .hero-title { font-size: 24px; }
+    .hero-section, .asymmetric-dashboard-grid, .intelligence-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero-title { font-size: 48px; }
+    .balance-amount { font-size: 56px; }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Cash Flow | Financial Intelligence for Modern Creators</title>
+    <title>Creator Cash Flow | Financial Intelligence for Creators</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -18,14 +18,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Cache-Busting CSS (v7.0 Masterclass System) -->
-    <link rel="stylesheet" href="style.css?v=7.0_linear_72px_masterclass">
+    <!-- Cache-Busting CSS (v8.0 Category-Defining System) -->
+    <link rel="stylesheet" href="style.css?v=8.0_category_defining">
 </head>
 <body class="codex-app">
 
     <div class="app-shell">
         
-        <!-- 4 & 6. Quieter Text Navigation (No Generic Icons) -->
+        <!-- Sidebar Navigation -->
         <aside class="codex-sidebar">
             <div class="brand-header">
                 <h2>Creator Cash Flow</h2>
@@ -47,34 +47,58 @@
             </div>
         </aside>
 
-        <!-- 3. Main Viewport with Increased Whitespace -->
+        <!-- Main Viewport -->
         <main class="codex-main">
             
-            <!-- 8. Premium Hero Section -->
+            <!-- 2. Signature Hero Section with Living Stream Visualizer -->
             <section class="hero-section">
-                <h1 class="hero-title">Financial Intelligence for Modern Creators</h1>
-                <p class="hero-subtitle">Track earnings, expenses, and growth across every platform from a single workspace.</p>
-                <div class="hero-actions">
-                    <button class="btn btn-primary" id="btn-start-tracking">Start Tracking</button>
-                    <span class="hero-stat-pill">$2.4M creator revenue tracked</span>
+                <div>
+                    <h1 class="hero-title">Financial Intelligence<br>for Creators</h1>
+                    <p class="hero-subtitle">Track revenue from every platform, understand profitability, and predict future income from a single workspace.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" id="btn-start-tracking">Start Tracking</button>
+                        <span class="hero-stat-pill">$2.4M creator revenue tracked</span>
+                    </div>
+                </div>
+
+                <!-- 2 & 7. Living Revenue Stream Flow Node Visualizer -->
+                <div class="hero-visualizer-card">
+                    <div class="visualizer-title">Live Revenue Streams</div>
+                    <div class="stream-flow-container">
+                        <div class="stream-node">
+                            <span class="stream-label">YouTube</span>
+                            <span class="stream-amount">R18,420</span>
+                        </div>
+                        <div class="stream-node">
+                            <span class="stream-label">TikTok</span>
+                            <span class="stream-amount">R4,850</span>
+                        </div>
+                        <div class="stream-node">
+                            <span class="stream-label">Instagram</span>
+                            <span class="stream-amount">R2,100</span>
+                        </div>
+                        <div class="stream-flow-arrow">↓</div>
+                        <div class="net-income-node">
+                            <span class="net-label">Net Creator Income</span>
+                            <span class="net-val">R21,840</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- TAB 1: OVERVIEW -->
             <section id="tab-overview" class="tab-pane active">
                 
-                <!-- 1 & 10. Locked-Eye Balance Hero (72px Typography + Operational Metadata) -->
+                <!-- 1 & 6. Command Center Balance (80px Typography) -->
                 <div class="balance-hero">
                     <div class="balance-top-row">
                         <div class="balance-label">Current Balance</div>
-                        <!-- 10. Operational Metadata -->
                         <div class="operational-meta">
                             <span><span class="meta-dot"></span> Last synced 2 mins ago</span>
                             <span>•</span>
                             <span>3 connected platforms</span>
                         </div>
                     </div>
-                    <!-- 1. 72px Balance -->
                     <div class="balance-amount" id="val-current-balance">R24,650</div>
                     <div class="balance-change">
                         <i data-lucide="arrow-up-right"></i>
@@ -82,46 +106,81 @@
                     </div>
                 </div>
 
-                <!-- 2 & 9. Signature Element: Revenue Timeline Chart with Custom 9. "WOW" Tooltip Interaction -->
-                <div class="signature-card">
-                    <div class="card-header">
-                        <div>
-                            <h3 class="card-title">Revenue Timeline</h3>
-                            <p class="card-subtitle">Consolidated daily earnings across connected streams.</p>
+                <!-- 3. Asymmetric Dashboard Layout (Chart Left 2fr, Creator Cards Right 1fr) -->
+                <div class="asymmetric-dashboard-grid">
+                    
+                    <!-- Left (2fr): Signature Revenue Timeline Chart -->
+                    <div class="signature-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Revenue Timeline</h3>
+                                <p class="card-subtitle">Consolidated daily earnings across connected streams.</p>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" id="btn-sync-trigger">Sync</button>
                         </div>
-                        <button class="btn btn-secondary btn-sm" id="btn-sync-trigger">Sync</button>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-revenue-timeline"></canvas>
+                        </div>
                     </div>
-                    <div class="chart-wrapper">
-                        <canvas id="chart-revenue-timeline"></canvas>
+
+                    <!-- Right (1fr): 1. Creator-Focused Platform Cards -->
+                    <div class="creator-cards-column">
+                        <div class="creator-platform-card">
+                            <div class="platform-card-top">
+                                <span class="platform-name">YouTube Earnings</span>
+                                <span class="platform-change up">↑ 12.4%</span>
+                            </div>
+                            <div class="platform-val">R18,420</div>
+                        </div>
+
+                        <div class="creator-platform-card">
+                            <div class="platform-card-top">
+                                <span class="platform-name">TikTok Earnings</span>
+                                <span class="platform-change up">↑ 8.1%</span>
+                            </div>
+                            <div class="platform-val">R4,850</div>
+                        </div>
+
+                        <div class="creator-platform-card">
+                            <div class="platform-card-top">
+                                <span class="platform-name">Instagram Earnings</span>
+                                <span class="platform-change down">↓ 3.2%</span>
+                            </div>
+                            <div class="platform-val">R2,100</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 3. Two-Column Grid with 48px Gap -->
-                <div class="section-grid">
-                    <!-- Income Sources -->
+                <!-- 4 & 5. Intelligent Insights & Predictive August Growth -->
+                <div class="intelligence-grid">
+                    
+                    <!-- 4. Predictive Earnings Chart & Confidence Score -->
                     <div class="codex-card">
                         <div class="card-header">
                             <div>
-                                <h3 class="card-title">Income Sources</h3>
-                                <p class="card-subtitle">Platform breakdown</p>
+                                <h3 class="card-title">Projected August Earnings</h3>
+                                <p class="card-subtitle">Machine learning predictive forecast</p>
                             </div>
+                            <span class="platform-change up" style="font-size: 13px;">87% Confidence</span>
                         </div>
-                        <div class="source-list" id="income-source-list">
-                            <!-- Populated dynamically by JS -->
+                        <div style="font-size: 40px; font-weight: 700; letter-spacing: -0.04em; color: var(--accent-emerald); margin-bottom: 8px;">
+                            R24,800
                         </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); opacity: 0.7;">Based on active sponsorships, YouTube CPM trends, and seasonal view patterns.</p>
                     </div>
 
-                    <!-- 8. Latest Activity (Cards First, Tables Second) -->
+                    <!-- 5. AI Intelligent Cash Flow Insights -->
                     <div class="codex-card">
                         <div class="card-header">
-                            <div>
-                                <h3 class="card-title">Latest Activity</h3>
-                                <p class="card-subtitle">Recent payouts & expenses</p>
-                            </div>
-                            <button class="btn btn-secondary btn-sm" id="btn-add-activity">+ Add</button>
+                            <h3 class="card-title">Creator Cash Flow Insights</h3>
                         </div>
-                        <div class="activity-stream" id="activity-stream-cards">
-                            <!-- Populated dynamically by JS -->
+                        
+                        <div class="ai-insight-box">
+                            <strong>📈 Revenue Insight:</strong> Your YouTube earnings increased <strong>18% faster</strong> than your TikTok earnings over the last 30 days.
+                        </div>
+
+                        <div class="ai-insight-box" style="margin-top: 12px;">
+                            <strong>⚠️ Cash Flow Warning:</strong> Based on recent gear & software expenses, your runway drops below target in <strong>42 days</strong>.
                         </div>
                     </div>
                 </div>
@@ -153,7 +212,6 @@
                     <div class="card-header">
                         <h3 class="card-title">Platform Connections</h3>
                     </div>
-                    <p class="card-subtitle" style="margin-bottom: 24px;">Connect developer mode accounts or upload CSV statements.</p>
                     <div class="source-list" id="full-sources-list"></div>
                 </div>
             </section>
