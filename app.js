@@ -1,0 +1,623 @@
+/* ==========================================================================
+   Creator Cash Flow - Application Logic & State Engine
+   ========================================================================== */
+
+// --- Application State ---
+const state = {
+    platforms: [
+        { id: 'yt', name: 'YouTube AdSense & Memberships', icon: 'youtube', color: '#FF0000', connected: true, status: 'OAuth Developer Sandbox', monthlyRevenue: 12450.00 },
+        { id: 'tt', name: 'TikTok Creator Rewards', icon: 'video', color: '#00F2FE', connected: true, status: 'Phyllo Unified Sync', monthlyRevenue: 4320.00 },
+        { id: 'tw', name: 'Twitch Subscriptions & Bits', icon: 'twitch', color: '#9146FF', connected: true, status: 'Developer App ID Connected', monthlyRevenue: 2150.00 },
+        { id: 'patreon', name: 'Patreon Memberships', icon: 'heart', color: '#FF424D', connected: false, status: 'Not Connected', monthlyRevenue: 0.00 },
+        { id: 'stripe', name: 'Stripe Direct Merch & Sponsorships', icon: 'credit-card', color: '#6366F1', connected: true, status: 'Stripe Connect API', monthlyRevenue: 3800.00 }
+    ],
+    banks: [
+        { id: 'chase', name: 'Chase Business Checking (...4920)', icon: 'landmark', balance: 18450.00, connected: true, provider: 'Plaid Sandbox' },
+        { id: 'amex', name: 'Amex Business Gold (...1024)', icon: 'credit-card', balance: -2410.00, connected: true, provider: 'Plaid Sandbox' }
+    ],
+    transactions: [
+        { id: 'tx1', date: '2026-07-21', source: 'YouTube', merchant: 'Google AdSense Payout', type: 'income', category: 'Ad Revenue', taxStatus: 'Taxable Income', amount: 8420.00 },
+        { id: 'tx2', date: '2026-07-19', source: 'Bank', merchant: 'B&H Photo Video (Camera Lens)', type: 'expense', category: 'Gear & Equipment', taxStatus: '100% Tax Write-Off', amount: 1299.00 },
+        { id: 'tx3', date: '2026-07-18', source: 'TikTok', merchant: 'TikTok Creator Fund Direct', type: 'income', category: 'Creator Fund', taxStatus: 'Taxable Income', amount: 4320.00 },
+        { id: 'tx4', date: '2026-07-15', source: 'Bank', merchant: 'Adobe Creative Cloud', type: 'expense', category: 'Software Subscriptions', taxStatus: 'Taxable Expense', amount: 54.99 },
+        { id: 'tx5', date: '2026-07-14', source: 'Bank', merchant: 'AWS Web Hosting', type: 'expense', category: 'Cloud Infrastructure', taxStatus: 'Taxable Expense', amount: 124.50 },
+        { id: 'tx6', date: '2026-07-12', source: 'Twitch', merchant: 'Twitch Interactive Payout', type: 'income', category: 'Subscriptions', taxStatus: 'Taxable Income', amount: 2150.00 },
+        { id: 'tx7', date: '2026-07-10', source: 'Bank', merchant: 'Upwork (Video Editor Contractor)', type: 'expense', category: 'Contractor Expenses', taxStatus: '1099 Write-Off', amount: 1500.00 },
+        { id: 'tx8', date: '2026-07-05', source: 'Stripe', merchant: 'Sponsor: NordVPN Sponsorship', type: 'income', category: 'Brand Deals', taxStatus: 'Taxable Income', amount: 3800.00 }
+    ],
+    parsedCsvData: null
+};
+
+// --- Chart Instances ---
+let cashflowChartInstance = null;
+let sourcesChartInstance = null;
+
+// --- Initialize App ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Setup Navigation Tabs
+    setupNavigation();
+
+    // Render Initial UI
+    renderOverview();
+    renderIntegrations();
+    renderTransactionsLedger();
+
+    // Setup Charts
+    initCharts();
+
+    // Event Listeners
+    document.getElementById('btn-sync-all').addEventListener('click', syncAllSources);
+    document.getElementById('btn-sample-data').addEventListener('click', loadSampleDemoData);
+    document.getElementById('btn-feedback').addEventListener('click', openFeedbackModal);
+    document.getElementById('btn-modal-close').addEventListener('click', closeModal);
+    document.getElementById('btn-generate-sample-csv').addEventListener('click', downloadSampleCsv);
+
+    // CSV File Importer Setup
+    setupCsvImporter();
+
+    // Filters
+    document.getElementById('filter-type').addEventListener('change', renderTransactionsLedger);
+    document.getElementById('filter-source').addEventListener('change', renderTransactionsLedger);
+});
+
+// --- Tab Navigation ---
+function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabId = item.getAttribute('data-tab');
+            switchTab(tabId);
+        });
+    });
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+
+    const selectedNav = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+    const selectedPane = document.getElementById(`tab-${tabId}`);
+
+    if (selectedNav && selectedPane) {
+        selectedNav.classList.add('active');
+        selectedPane.classList.add('active');
+    }
+
+    // Update Title Header
+    const titles = {
+        'overview': { main: 'Financial Overview', sub: 'Consolidated revenue, expenses, and net profit across platforms.' },
+        'integrations': { main: 'Connected Accounts & Platform Hub', sub: 'Connect social media earnings streams & bank accounts via APIs or Sandboxes.' },
+        'csv-importer': { main: 'Universal CSV Smart Importer', sub: 'Bypass API approvals by dragging and dropping earnings reports.' },
+        'transactions': { main: 'Consolidated Ledger & Tax Insights', sub: 'Track taxable creator income and business expense write-offs.' }
+    };
+
+    if (titles[tabId]) {
+        document.getElementById('current-tab-title').innerText = titles[tabId].main;
+        document.querySelector('.top-bar .subtitle').innerText = titles[tabId].sub;
+    }
+}
+
+// --- Render Overview Metrics & Summaries ---
+function renderOverview() {
+    const totalIncome = state.transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const totalExpenses = state.transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const netCashFlow = totalIncome - totalExpenses;
+    const estimatedTax = Math.max(0, netCashFlow * 0.30);
+
+    document.getElementById('val-net-cashflow').innerText = formatCurrency(netCashFlow);
+    document.getElementById('val-gross-revenue').innerText = formatCurrency(totalIncome);
+    document.getElementById('val-expenses').innerText = formatCurrency(totalExpenses);
+    document.getElementById('val-tax-reserve').innerText = formatCurrency(estimatedTax);
+
+    const connectedCount = state.platforms.filter(p => p.connected).length;
+    document.getElementById('platform-count-label').innerText = `${connectedCount} Platforms Connected`;
+
+    // Render Stream Summary List
+    const streamContainer = document.getElementById('stream-summary-list');
+    streamContainer.innerHTML = '';
+    state.platforms.filter(p => p.connected).forEach(p => {
+        streamContainer.innerHTML += `
+            <div class="stream-item">
+                <div class="item-left">
+                    <div class="platform-pill-icon" style="background-color: ${p.color}">
+                        ${p.name.charAt(0)}
+                    </div>
+                    <div>
+                        <div class="item-title">${p.name}</div>
+                        <div class="item-sub">${p.status}</div>
+                    </div>
+                </div>
+                <div class="item-amount text-green">+${formatCurrency(p.monthlyRevenue)}</div>
+            </div>
+        `;
+    });
+
+    // Render Bank Summary List
+    const bankContainer = document.getElementById('bank-summary-list');
+    bankContainer.innerHTML = '';
+    state.banks.forEach(b => {
+        bankContainer.innerHTML += `
+            <div class="bank-item">
+                <div class="item-left">
+                    <div class="platform-pill-icon" style="background-color: #10B981">
+                        <i data-lucide="${b.icon}"></i>
+                    </div>
+                    <div>
+                        <div class="item-title">${b.name}</div>
+                        <div class="item-sub">${b.provider}</div>
+                    </div>
+                </div>
+                <div class="item-amount ${b.balance >= 0 ? '' : 'text-red'}">${formatCurrency(b.balance)}</div>
+            </div>
+        `;
+    });
+    lucide.createIcons();
+    updateCharts();
+}
+
+// --- Render Connected Accounts & Platform Grid ---
+function renderIntegrations() {
+    const platformsGrid = document.getElementById('platforms-grid');
+    platformsGrid.innerHTML = '';
+
+    state.platforms.forEach(p => {
+        platformsGrid.innerHTML += `
+            <div class="platform-card">
+                <div>
+                    <div class="platform-card-header">
+                        <div class="platform-icon-box" style="background-color: ${p.color}">
+                            ${p.name.charAt(0)}
+                        </div>
+                        <div class="platform-card-info">
+                            <h4>${p.name}</h4>
+                            <span>${p.status}</span>
+                        </div>
+                    </div>
+                    <div class="status-indicator ${p.connected ? 'connected' : 'disconnected'}">
+                        <span class="dot"></span>
+                        <span>${p.connected ? 'Active Sync' : 'Not Connected'}</span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn ${p.connected ? 'btn-secondary' : 'btn-primary'} btn-sm" style="width: 100%" onclick="togglePlatformConnection('${p.id}')">
+                        ${p.connected ? 'Configure Connection' : 'Connect Account'}
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    const banksGrid = document.getElementById('banks-grid');
+    banksGrid.innerHTML = '';
+
+    state.banks.forEach(b => {
+        banksGrid.innerHTML += `
+            <div class="platform-card">
+                <div>
+                    <div class="platform-card-header">
+                        <div class="platform-icon-box" style="background-color: #10B981">
+                            <i data-lucide="${b.icon}"></i>
+                        </div>
+                        <div class="platform-card-info">
+                            <h4>${b.name}</h4>
+                            <span>Provider: ${b.provider}</span>
+                        </div>
+                    </div>
+                    <div class="status-indicator connected">
+                        <span class="dot"></span>
+                        <span>Linked (Plaid Sandbox)</span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-secondary btn-sm" style="width: 100%" onclick="openBankModal('${b.id}')">
+                        Manage Bank Feed
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    lucide.createIcons();
+}
+
+// --- Ledger & Transactions Table ---
+function renderTransactionsLedger() {
+    const typeFilter = document.getElementById('filter-type').value;
+    const sourceFilter = document.getElementById('filter-source').value;
+    const tbody = document.getElementById('ledger-rows');
+    tbody.innerHTML = '';
+
+    let filtered = state.transactions.filter(t => {
+        if (typeFilter !== 'all' && t.type !== typeFilter) return false;
+        if (sourceFilter !== 'all' && t.source !== sourceFilter) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No matching transactions found.</td></tr>`;
+        return;
+    }
+
+    filtered.forEach(t => {
+        const amountClass = t.type === 'income' ? 'text-green' : 'text-red';
+        const prefix = t.type === 'income' ? '+' : '-';
+        const typeBadge = `<span class="tag ${t.type === 'income' ? 'tag-income' : 'tag-expense'}">${t.type.toUpperCase()}</span>`;
+        const taxBadge = t.type === 'expense' ? `<span class="tag tax-deductible"><i data-lucide="shield"></i> ${t.taxStatus}</span>` : `<span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">${t.taxStatus}</span>`;
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${t.date}</td>
+                <td><strong>${t.merchant}</strong> <br><small style="color: var(--text-muted);">${t.source}</small></td>
+                <td>${typeBadge}</td>
+                <td>${t.category}</td>
+                <td>${taxBadge}</td>
+                <td class="text-right ${amountClass}"><strong>${prefix}${formatCurrency(t.amount)}</strong></td>
+            </tr>
+        `;
+    });
+
+    lucide.createIcons();
+}
+
+// --- Charts Logic ---
+function initCharts() {
+    const ctxCashflow = document.getElementById('chart-cashflow').getContext('2d');
+    const ctxSources = document.getElementById('chart-sources').getContext('2d');
+
+    cashflowChartInstance = new Chart(ctxCashflow, {
+        type: 'line',
+        data: {
+            labels: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            datasets: [
+                {
+                    label: 'Gross Creator Revenue',
+                    data: [12000, 14500, 16200, 18000, 21000, 22720],
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Business Expenses',
+                    data: [2100, 2800, 3100, 2400, 4200, 2978],
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#94A3B8' } }
+            },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } },
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } }
+            }
+        }
+    });
+
+    sourcesChartInstance = new Chart(ctxSources, {
+        type: 'doughnut',
+        data: {
+            labels: ['YouTube', 'TikTok', 'Twitch', 'Stripe'],
+            datasets: [{
+                data: [12450, 4320, 2150, 3800],
+                backgroundColor: ['#FF0000', '#00F2FE', '#9146FF', '#6366F1'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#94A3B8', boxWidth: 12 } }
+            }
+        }
+    });
+}
+
+function updateCharts() {
+    if (!cashflowChartInstance || !sourcesChartInstance) return;
+
+    // Recalculate totals for donut chart
+    const ytTotal = state.transactions.filter(t => t.source === 'YouTube').reduce((s, t) => s + t.amount, 0);
+    const ttTotal = state.transactions.filter(t => t.source === 'TikTok').reduce((s, t) => s + t.amount, 0);
+    const twTotal = state.transactions.filter(t => t.source === 'Twitch').reduce((s, t) => s + t.amount, 0);
+    const stripeTotal = state.transactions.filter(t => t.source === 'Stripe').reduce((s, t) => s + t.amount, 0);
+
+    sourcesChartInstance.data.datasets[0].data = [ytTotal, ttTotal, twTotal, stripeTotal];
+    sourcesChartInstance.update();
+}
+
+// --- CSV Importer Engine ---
+function setupCsvImporter() {
+    const dropzone = document.getElementById('csv-dropzone');
+    const fileInput = document.getElementById('csv-file-input');
+
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    document.getElementById('btn-confirm-import').addEventListener('click', confirmCsvImport);
+}
+
+function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const text = e.target.result;
+        parseCSVText(text);
+    };
+    reader.readAsText(file);
+}
+
+function parseCSVText(text) {
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) {
+        alert("Invalid CSV file. Please upload a file with headers and rows.");
+        return;
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const rows = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        rows.push(values);
+    }
+
+    state.parsedCsvData = { headers, rows };
+    renderCsvPreview(headers, rows);
+}
+
+function renderCsvPreview(headers, rows) {
+    const container = document.getElementById('csv-preview-container');
+    const table = document.getElementById('csv-preview-table');
+    container.classList.remove('hidden');
+
+    let theadHtml = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+    table.querySelector('thead').innerHTML = theadHtml;
+
+    let tbodyHtml = '';
+    rows.slice(0, 10).forEach(row => {
+        tbodyHtml += '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+    });
+
+    table.querySelector('tbody').innerHTML = tbodyHtml;
+}
+
+function confirmCsvImport() {
+    if (!state.parsedCsvData) return;
+
+    const { rows } = state.parsedCsvData;
+    let count = 0;
+
+    rows.forEach((row, idx) => {
+        if (row.length >= 4) {
+            const date = row[0] || '2026-07-22';
+            const merchant = row[1] || 'Imported Entry';
+            const type = (row[2] || 'income').toLowerCase().includes('expense') ? 'expense' : 'income';
+            const amount = parseFloat(row[3]) || 150.00;
+            const source = row[4] || 'CSV Upload';
+            const category = type === 'income' ? 'Creator Payout' : 'Business Expense';
+
+            state.transactions.unshift({
+                id: 'csv_' + Date.now() + '_' + idx,
+                date,
+                source,
+                merchant,
+                type,
+                category,
+                taxStatus: type === 'income' ? 'Taxable Income' : 'Tax Write-Off',
+                amount
+            });
+            count++;
+        }
+    });
+
+    alert(`Successfully imported ${count} transactions into your Cash Flow ledger!`);
+    document.getElementById('csv-preview-container').classList.add('hidden');
+    renderOverview();
+    renderTransactionsLedger();
+    switchTab('overview');
+}
+
+function downloadSampleCsv() {
+    const sampleContent = `Date,Merchant / Source,Type,Amount,Platform
+2026-07-22,YouTube Studio Payout,Income,4850.00,YouTube
+2026-07-20,Sony Electronics Microphones,Expense,420.00,Bank
+2026-07-18,Patreon Monthly Direct Deposit,Income,1800.00,Patreon
+2026-07-15,Final Cut Pro Plugin Software,Expense,129.00,Bank`;
+
+    const blob = new Blob([sampleContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'creator_cash_flow_sample.csv');
+    a.click();
+}
+
+// --- Platform Connection Modal ---
+function togglePlatformConnection(platformId) {
+    const platform = state.platforms.find(p => p.id === platformId);
+    if (!platform) return;
+
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body-content');
+
+    modalTitle.innerText = `Connect ${platform.name}`;
+    modalBody.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 54px; height: 54px; background-color: ${platform.color}; border-radius: 14px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 1.5rem; font-weight: bold;">
+                ${platform.name.charAt(0)}
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Select how you want to extract earnings data during the MVP phase:</p>
+        </div>
+
+        <div class="form-group">
+            <label>Connection Method</label>
+            <select class="form-input" id="connect-method">
+                <option value="sandbox">Option A: Developer App / Sandbox Mode (Instant)</option>
+                <option value="phyllo">Option B: Phyllo Unified Creator API Token</option>
+                <option value="extension">Option C: Browser Extension Local Extraction</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>API Key / Client Secret (Sandbox Test Token)</label>
+            <input type="text" class="form-input" value="pk_test_creator_cash_flow_${platform.id}_9827" readonly>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="savePlatformConnection('${platform.id}')">
+            Authorize & Sync Live Sandbox Data
+        </button>
+    `;
+
+    document.getElementById('modal-connect').classList.add('active');
+}
+
+function savePlatformConnection(platformId) {
+    const platform = state.platforms.find(p => p.id === platformId);
+    if (platform) {
+        platform.connected = true;
+        platform.status = 'Sandbox OAuth Connected';
+        if (platform.monthlyRevenue === 0) platform.monthlyRevenue = 2950.00;
+        
+        // Add sample payout
+        state.transactions.unshift({
+            id: 'tx_new_' + Date.now(),
+            date: '2026-07-22',
+            source: platform.name.split(' ')[0],
+            merchant: `${platform.name.split(' ')[0]} Payout Sync`,
+            type: 'income',
+            category: 'Creator Earnings',
+            taxStatus: 'Taxable Income',
+            amount: 2950.00
+        });
+    }
+
+    closeModal();
+    renderOverview();
+    renderIntegrations();
+    renderTransactionsLedger();
+}
+
+function openFeedbackModal() {
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body-content');
+
+    modalTitle.innerText = `Creator Cash Flow Beta Feedback`;
+    modalBody.innerHTML = `
+        <div style="margin-bottom: 16px;">
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Help us build the ultimate financial OS for creators! Share your thoughts or missing features below.</p>
+        </div>
+
+        <div class="form-group">
+            <label>Feedback Category</label>
+            <select class="form-input" id="fb-category">
+                <option value="platform">Missing Social Platform / Bank</option>
+                <option value="ux">User Experience / Design</option>
+                <option value="csv">CSV Import Issue</option>
+                <option value="pricing">Willingness to Pay / Pricing</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Your Feedback / Feature Request</label>
+            <textarea class="form-input" id="fb-text" rows="4" placeholder="e.g., I need auto-categorization for Patreon payouts and tax write-off export for my CPA..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="submitFeedback()">
+            Submit Feedback
+        </button>
+    `;
+
+    document.getElementById('modal-connect').classList.add('active');
+}
+
+function submitFeedback() {
+    const text = document.getElementById('fb-text').value;
+    if (!text.trim()) {
+        alert("Please enter a short comment or suggestion.");
+        return;
+    }
+    alert("Thank you for your feedback! Your insight will directly shape our v1.1 release.");
+    closeModal();
+}
+
+function openBankModal(bankId) {
+    alert("Bank connected via Plaid Sandbox Environment. All incoming debits are classified as creator business expenses.");
+}
+
+function closeModal() {
+    document.getElementById('modal-connect').classList.remove('active');
+}
+
+// --- Sync & Demo Helpers ---
+function syncAllSources() {
+    const btn = document.getElementById('btn-sync-all');
+    btn.innerHTML = `<i data-lucide="refresh-cw" class="spin"></i> Syncing...`;
+    lucide.createIcons();
+
+    setTimeout(() => {
+        btn.innerHTML = `<i data-lucide="check"></i> Synced Just Now`;
+        renderOverview();
+        lucide.createIcons();
+        setTimeout(() => {
+            btn.innerHTML = `<i data-lucide="refresh-cw"></i> <span>Sync All Sources</span>`;
+            lucide.createIcons();
+        }, 2000);
+    }, 1200);
+}
+
+function loadSampleDemoData() {
+    state.transactions.unshift({
+        id: 'tx_demo_' + Date.now(),
+        date: '2026-07-22',
+        source: 'YouTube',
+        merchant: 'YouTube Super Thanks & Memberships',
+        type: 'income',
+        category: 'Fan Funding',
+        taxStatus: 'Taxable Income',
+        amount: 1430.00
+    });
+
+    renderOverview();
+    renderTransactionsLedger();
+    alert("Demo transaction added! Dashboard metrics & tax reserves updated.");
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+}
