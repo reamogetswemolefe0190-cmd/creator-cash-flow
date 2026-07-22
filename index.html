@@ -18,10 +18,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Cache-Busting CSS (v13.0 Creator Financial OS System) -->
-    <link rel="stylesheet" href="style.css?v=13.0_financial_intelligence">
+    <!-- Cache-Busting CSS (v14.0 Motion & Depth Architecture) -->
+    <link rel="stylesheet" href="style.css?v=14.0_motion_depth">
 </head>
 <body class="codex-app">
+
+    <!-- Layer 2: Mouse Reactive Spotlight Glow -->
+    <div class="mouse-spotlight" id="spotlight-layer"></div>
 
     <!-- ==========================================================================
        VIEW 1: CLEAN MARKETING HOMEPAGE (No Sidebar)
@@ -29,7 +32,7 @@
     <div id="view-marketing" class="marketing-page-wrapper">
         
         <!-- Marketing Navigation Bar -->
-        <header class="marketing-header">
+        <header class="marketing-header" id="main-nav-header">
             <div class="marketing-brand">Creator Cash Flow</div>
             <ul class="marketing-nav-links">
                 <li><a href="#product">Product</a></li>
@@ -46,16 +49,16 @@
         <!-- Cinematic Hero Section -->
         <section class="marketing-hero" id="product">
             <div>
-                <h1 class="marketing-hero-title">Financial Intelligence<br>for Modern Creators</h1>
-                <p class="marketing-hero-subtitle">Understand where your money comes from, where it goes, and what happens next.</p>
-                <div class="marketing-hero-actions">
+                <h1 class="marketing-hero-title animate-hero-text">Financial Intelligence<br>for Modern Creators</h1>
+                <p class="marketing-hero-subtitle animate-stagger-1">Understand where your money comes from, where it goes, and what happens next.</p>
+                <div class="marketing-hero-actions animate-stagger-2">
                     <button class="btn btn-emerald" onclick="switchView('app')">Start Free</button>
                     <button class="btn btn-secondary" onclick="switchView('app')">Watch Demo →</button>
                 </div>
             </div>
 
             <!-- Signature Visual: Animated Stream Flow Visualizer -->
-            <div class="marketing-stream-card">
+            <div class="marketing-stream-card animate-stagger-3">
                 <div style="font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 16px;">Live Creator Cash Flow Stream</div>
                 
                 <div class="stream-visual-node">
@@ -91,7 +94,7 @@
             <div class="three-cards-grid">
                 <div class="large-stat-card">
                     <div class="large-stat-label">Earnings</div>
-                    <div class="large-stat-val">R24,650</div>
+                    <div class="large-stat-val" id="marketing-val-earnings">R0</div>
                 </div>
 
                 <div class="large-stat-card">
@@ -107,8 +110,8 @@
             </div>
         </section>
 
-        <!-- Section 3: Platform Breakdown Horizontal Stream -->
-        <section class="marketing-section">
+        <!-- Section 3: Platform Breakdown Animated Horizontal Stream -->
+        <section class="marketing-section" id="platform-breakdown-section">
             <h2 class="marketing-section-headline" style="font-size: 32px; margin-bottom: 24px;">Platform Breakdown</h2>
             <div class="horizontal-stream-card">
                 <div class="stream-bar-row">
@@ -117,7 +120,7 @@
                         <span style="color: var(--accent-emerald);">62%</span>
                     </div>
                     <div class="stream-bar-track">
-                        <div class="stream-bar-fill" style="width: 62%;"></div>
+                        <div class="stream-bar-fill" data-width="62%"></div>
                     </div>
                 </div>
 
@@ -127,7 +130,7 @@
                         <span>21%</span>
                     </div>
                     <div class="stream-bar-track">
-                        <div class="stream-bar-fill" style="width: 21%; opacity: 0.8;"></div>
+                        <div class="stream-bar-fill" data-width="21%" style="opacity: 0.8;"></div>
                     </div>
                 </div>
 
@@ -137,7 +140,7 @@
                         <span>10%</span>
                     </div>
                     <div class="stream-bar-track">
-                        <div class="stream-bar-fill" style="width: 10%; opacity: 0.6;"></div>
+                        <div class="stream-bar-fill" data-width="10%" style="opacity: 0.6;"></div>
                     </div>
                 </div>
 
@@ -147,30 +150,30 @@
                         <span>7%</span>
                     </div>
                     <div class="stream-bar-track">
-                        <div class="stream-bar-fill" style="width: 7%; opacity: 0.4;"></div>
+                        <div class="stream-bar-fill" data-width="7%" style="opacity: 0.4;"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 4: AI Insights -->
+        <!-- Section 4: AI Insights (Staggered Content Animation) -->
         <section class="marketing-section" style="padding-bottom: 128px;">
             <h2 class="marketing-section-headline" style="font-size: 32px; margin-bottom: 32px;">Automated Intelligence</h2>
             
             <div class="three-cards-grid">
                 <div class="large-stat-card">
                     <div style="font-size: 14px; font-weight: 600; color: var(--accent-emerald); margin-bottom: 8px;">📈 Revenue Acceleration</div>
-                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">Your YouTube earnings grew 14% faster than last month.</p>
+                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">Your YouTube earnings grew <span class="ai-slide-text" style="color: var(--accent-emerald);">14% faster</span> than last month.</p>
                 </div>
 
                 <div class="large-stat-card">
                     <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">⚠️ Risk Alert</div>
-                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">82% of your creator income comes from one platform.</p>
+                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;"><span class="ai-slide-text">82% of your income</span> comes from one platform.</p>
                 </div>
 
                 <div class="large-stat-card">
                     <div style="font-size: 14px; font-weight: 600; color: var(--accent-emerald); margin-bottom: 8px;">🔮 Forecast</div>
-                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">Expected August revenue: <span style="color: var(--accent-emerald);">R28,400</span></p>
+                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 600; line-height: 1.4;">Expected August revenue: <span class="ai-slide-text" style="color: var(--accent-emerald);">R28,400</span></p>
                 </div>
             </div>
         </section>
@@ -209,11 +212,11 @@
             <!-- TAB 1: OVERVIEW -->
             <section id="tab-overview" class="tab-pane active">
                 
-                <!-- Date & Balance Header (No Top Cards / No 4-Card Grid!) -->
+                <!-- Date & Balance Header (Smooth 1.2s Count Up) -->
                 <div class="dashboard-balance-header">
                     <div class="dashboard-date-label">July 2026 Cash Flow</div>
-                    <div class="dashboard-balance-amount" id="val-current-balance">R24,650</div>
-                    <div class="dashboard-change-badge">+14.8% this month</div>
+                    <div class="dashboard-balance-amount" id="val-current-balance">R0</div>
+                    <div class="dashboard-change-badge" id="val-change-badge">+14.8% this month</div>
                 </div>
 
                 <!-- One Massive Chart: Revenue Intelligence Timeline -->

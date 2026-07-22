@@ -1,31 +1,26 @@
 /* ==========================================================================
-   Creator Cash Flow - Financial Intelligence for the Creator Economy
-   Strict 80px/56px/32px/18px/14px System | #050505 Black | 24px Radius Everywhere
+   Creator Cash Flow - 5-Layer Ambient Depth & Arc/Apple Motion Architecture
    ========================================================================== */
 
 :root {
-    /* Pure Black & Card Palette */
     --bg-page: #050505;
     --bg-card: #0B0B0B;
     --bg-card-hover: #121214;
     --bg-input: #141416;
     
-    /* Strict Borders & Radius Rules */
-    --border-card: 1px solid rgba(255, 255, 255, 0.08);
-    --border-hover: 1px solid rgba(255, 255, 255, 0.16);
+    --border-card: 1px solid rgba(255, 255, 255, 0.06);
+    --border-hover: 1px solid rgba(255, 255, 255, 0.14);
     --radius-strict: 24px;
     --radius-sm: 12px;
     
-    /* Typography Colors */
     --text-primary: #FFFFFF;
     --text-secondary: #8E8E93;
     --text-muted: #636366;
     
-    /* One Accent Color Only (#22C55E) */
     --accent-emerald: #22C55E;
-    --accent-emerald-subtle: rgba(34, 197, 94, 0.1);
+    --accent-emerald-subtle: rgba(34, 197, 94, 0.12);
 
-    --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-smooth: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -34,32 +29,106 @@
     box-sizing: border-box;
 }
 
+/* ==========================================================================
+   LAYER 1 & LAYER 2: 5-LAYER AMBIENT DEPTH SYSTEM
+   ========================================================================== */
+
 body.codex-app {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     background-color: var(--bg-page);
-    background-image: radial-gradient(circle at top center, rgba(255, 255, 255, 0.04), transparent 55%);
     color: var(--text-primary);
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    position: relative;
+}
+
+/* Layer 1: Blurred Ambient Glow Behind Everything */
+body.codex-app::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 600px;
+    background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), rgba(34, 197, 94, 0.08), transparent 70%);
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Layer 2: Mouse Reactive Cursor Spotlight Layer */
+.mouse-spotlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.035), transparent 40%);
+    z-index: 1;
+}
+
+/* Ensure content sits above glow layers */
+.marketing-page-wrapper, .app-shell, .modal-overlay {
+    position: relative;
+    z-index: 2;
 }
 
 /* ==========================================================================
-   MARKETING LANDING PAGE ARCHITECTURE (No Sidebar)
+   ENTRANCE ANIMATIONS (Apple & Arc Style)
+   ========================================================================== */
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes drawWidth {
+    from { width: 0%; }
+    to { width: var(--target-width, 100%); }
+}
+
+.animate-hero-text {
+    animation: fadeSlideUp 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-stagger-1 { animation: fadeSlideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 100ms forwards; }
+.animate-stagger-2 { animation: fadeSlideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards; }
+.animate-stagger-3 { animation: fadeSlideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards; }
+
+/* ==========================================================================
+   NAVBAR SCROLL SHRINK & BLUR
    ========================================================================== */
 
 .marketing-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 64px;
+    padding: 0 64px;
+    height: 72px;
     border-bottom: var(--border-card);
-    background-color: rgba(5, 5, 5, 0.8);
-    backdrop-filter: blur(12px);
+    background-color: rgba(5, 5, 5, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     position: sticky;
     top: 0;
     z-index: 50;
+    transition: height 250ms cubic-bezier(0.16, 1, 0.3, 1), background-color 250ms ease;
+}
+
+.marketing-header.scrolled {
+    height: 56px;
+    background-color: rgba(5, 5, 5, 0.85);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
 
 .marketing-brand {
@@ -83,9 +152,7 @@ body.codex-app {
     transition: var(--transition-smooth);
 }
 
-.marketing-nav-links a:hover {
-    color: var(--text-primary);
-}
+.marketing-nav-links a:hover { color: var(--text-primary); }
 
 .marketing-auth-btns {
     display: flex;
@@ -93,7 +160,10 @@ body.codex-app {
     gap: 16px;
 }
 
-/* Marketing Hero Section */
+/* ==========================================================================
+   HERO & CARDS WITH TACTILE HOVER STATES
+   ========================================================================== */
+
 .marketing-hero {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
@@ -104,7 +174,6 @@ body.codex-app {
     margin: 0 auto;
 }
 
-/* 80px Scale Headline */
 .marketing-hero-title {
     font-size: 80px;
     font-weight: 700;
@@ -134,7 +203,12 @@ body.codex-app {
     border: var(--border-card);
     border-radius: var(--radius-strict);
     padding: 36px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+    transition: var(--transition-smooth);
+}
+
+.marketing-stream-card:hover {
+    transform: translateY(-3px);
+    border: var(--border-hover);
 }
 
 .stream-visual-node {
@@ -147,6 +221,12 @@ body.codex-app {
     border-radius: var(--radius-sm);
     margin-bottom: 10px;
     font-size: 14px;
+    transition: var(--transition-smooth);
+}
+
+.stream-visual-node:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.14);
 }
 
 .stream-arrow {
@@ -166,14 +246,13 @@ body.codex-app {
     align-items: center;
 }
 
-/* Section 2: Revenue Intelligence (56px Headline + 3 Large Cards) */
+/* Section 2: Revenue Intelligence */
 .marketing-section {
     padding: 80px 64px;
     max-width: 1280px;
     margin: 0 auto;
 }
 
-/* 56px Headline Scale */
 .marketing-section-headline {
     font-size: 56px;
     font-weight: 700;
@@ -210,7 +289,6 @@ body.codex-app {
     margin-bottom: 12px;
 }
 
-/* 56px / 80px Large Card Number */
 .large-stat-val {
     font-size: 56px;
     font-weight: 700;
@@ -221,13 +299,19 @@ body.codex-app {
 
 .large-stat-val.emerald { color: var(--accent-emerald); }
 
-/* Section 3: Platform Breakdown Horizontal Stream */
+/* Section 3: Animated Stream Bars */
 .horizontal-stream-card {
     background: var(--bg-card);
     border: var(--border-card);
     border-radius: var(--radius-strict);
     padding: 48px;
     margin-top: 32px;
+    transition: var(--transition-smooth);
+}
+
+.horizontal-stream-card:hover {
+    transform: translateY(-3px);
+    border: var(--border-hover);
 }
 
 .stream-bar-row {
@@ -249,14 +333,17 @@ body.codex-app {
     overflow: hidden;
 }
 
+/* 4. Stream Bar Growth Animation */
 .stream-bar-fill {
     height: 100%;
     background: var(--accent-emerald);
     border-radius: 5px;
+    width: 0%;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
-   LOGGED-IN DASHBOARD ARCHITECTURE (Clean Software Workspace)
+   LOGGED-IN DASHBOARD ARCHITECTURE
    ========================================================================== */
 
 .app-shell {
@@ -264,7 +351,6 @@ body.codex-app {
     min-height: 100vh;
 }
 
-/* Sidebar */
 .codex-sidebar {
     width: 250px;
     background-color: var(--bg-page);
@@ -287,7 +373,6 @@ body.codex-app {
     width: 100%;
 }
 
-/* Date & Balance Top Header (No Top Cards!) */
 .dashboard-balance-header {
     margin-bottom: 48px;
 }
@@ -301,7 +386,6 @@ body.codex-app {
     margin-bottom: 8px;
 }
 
-/* 80px Dashboard Balance Number */
 .dashboard-balance-amount {
     font-size: 80px;
     font-weight: 700;
@@ -315,9 +399,16 @@ body.codex-app {
     font-size: 14px;
     font-weight: 500;
     color: var(--accent-emerald);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: var(--transition-smooth);
 }
 
-/* One Massive Hero Chart Canvas */
+.dashboard-change-badge.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .massive-chart-card {
     background: var(--bg-card);
     border: var(--border-card);
@@ -328,7 +419,7 @@ body.codex-app {
 }
 
 .massive-chart-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     border: var(--border-hover);
 }
 
@@ -338,7 +429,6 @@ body.codex-app {
     width: 100%;
 }
 
-/* Side-by-side Revenue Sources & AI Insights */
 .dashboard-two-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -355,11 +445,10 @@ body.codex-app {
 }
 
 .codex-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     border: var(--border-hover);
 }
 
-/* 32px Section Title Scale */
 .section-title-32 {
     font-size: 32px;
     font-weight: 700;
@@ -368,7 +457,6 @@ body.codex-app {
     margin-bottom: 24px;
 }
 
-/* SIGNATURE FEATURE: Creator Revenue Engine */
 .signature-engine-card {
     background: var(--bg-card);
     border: var(--border-card);
@@ -379,7 +467,7 @@ body.codex-app {
 }
 
 .signature-engine-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     border: var(--border-hover);
 }
 
@@ -398,6 +486,12 @@ body.codex-app {
     border-radius: var(--radius-strict);
     padding: 24px;
     text-align: center;
+    transition: var(--transition-smooth);
+}
+
+.engine-source-box:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.14);
 }
 
 .engine-source-title { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
@@ -481,6 +575,6 @@ body.codex-app {
     .marketing-hero, .three-cards-grid, .dashboard-two-column, .engine-stream-pipeline { grid-template-columns: 1fr; flex-direction: column; }
     .marketing-hero-title { font-size: 48px; }
     .dashboard-balance-amount { font-size: 56px; }
-    .marketing-header { padding: 18px 24px; }
+    .marketing-header { padding: 0 24px; }
     .marketing-hero { padding: 48px 24px; }
 }

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Creator Cash Flow - Financial Intelligence Engine & View Switcher
+   Creator Cash Flow - Motion, Depth, & Interactive Engine
    ========================================================================== */
 
 const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
@@ -36,6 +36,9 @@ let intelligenceChartInstance = null;
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
 
+    setupMouseSpotlight();
+    setupNavbarScroll();
+    setupStreamBarsObserver();
     setupNavigation();
     setupAuthModalTrigger();
 
@@ -43,10 +46,52 @@ document.addEventListener('DOMContentLoaded', () => {
     initIntelligenceChart();
     animateCounter();
 
-    // Event Listeners
     const syncBtn = document.getElementById('btn-sync-trigger');
     if (syncBtn) syncBtn.addEventListener('click', syncData);
 });
+
+// 6. Mouse Reactive Cursor Spotlight Glow
+function setupMouseSpotlight() {
+    window.addEventListener('mousemove', (e) => {
+        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+    });
+}
+
+// 7. Sticky Navbar Scroll Shrink & Blur (72px -> 56px)
+function setupNavbarScroll() {
+    const nav = document.getElementById('main-nav-header');
+    if (!nav) return;
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    });
+}
+
+// 4. Animated Stream Bars Observer
+function setupStreamBarsObserver() {
+    const section = document.getElementById('platform-breakdown-section');
+    if (!section) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const bars = section.querySelectorAll('.stream-bar-fill');
+                bars.forEach(bar => {
+                    const targetWidth = bar.getAttribute('data-width') || '100%';
+                    bar.style.width = targetWidth;
+                });
+                observer.unobserve(section);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    observer.observe(section);
+}
 
 // View Switcher (Marketing Landing Page vs Logged-In App)
 function switchView(mode) {
@@ -92,22 +137,29 @@ function switchTab(tabId) {
     }
 }
 
-// 80px Balance Counter Animation (0 -> R24,650)
+// 3. Smooth 1.2s Counter Animation (0 -> R24,650)
 function animateCounter() {
     const target = state.balance;
     const element = document.getElementById('val-current-balance');
-    if (!element) return;
+    const mktElement = document.getElementById('marketing-val-earnings');
+    const badge = document.getElementById('val-change-badge');
+
     let current = 0;
-    const step = Math.ceil(target / 35);
+    const duration = 1200; // 1.2s
+    const steps = 40;
+    const stepVal = Math.ceil(target / steps);
+    const stepTime = duration / steps;
 
     const timer = setInterval(() => {
-        current += step;
+        current += stepVal;
         if (current >= target) {
             current = target;
             clearInterval(timer);
+            if (badge) badge.classList.add('visible');
         }
-        element.innerText = `R${current.toLocaleString()}`;
-    }, 20);
+        if (element) element.innerText = `R${current.toLocaleString()}`;
+        if (mktElement) mktElement.innerText = `R${current.toLocaleString()}`;
+    }, stepTime);
 }
 
 // Render Dashboard Streams
