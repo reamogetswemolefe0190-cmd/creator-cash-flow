@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Creator Cash Flow - Executive Masterclass Application Engine
+   Creator Cash Flow - Storytelling & Artwork Chart Engine
    ========================================================================== */
 
 const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
@@ -7,12 +7,6 @@ const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
 // State Management
 const state = {
     user: { name: 'Reamogetswe', email: 'reamogetswe@creator.co.za' },
-    balance: 24650,
-    sources: [
-        { name: 'YouTube Studio', amount: 13550, percent: '55%' },
-        { name: 'TikTok Creator Rewards', amount: 6160, percent: '25%' },
-        { name: 'Instagram Sponsorships', amount: 4940, percent: '20%' }
-    ],
     timelineData: [
         { date: 'Jul 1', rev: 4200, exp: 500, profit: 3700 },
         { date: 'Jul 5', rev: 8900, exp: 1200, profit: 7700 },
@@ -22,15 +16,15 @@ const state = {
         { date: 'Jul 21', rev: 24650, exp: 4200, profit: 20450 }
     ],
     activities: [
-        { date: 'Jul 21', desc: 'YouTube AdSense Payout', type: 'income', amount: 13550 },
-        { date: 'Jul 19', desc: 'Orms Direct (Sony Alpha)', type: 'expense', amount: 4200 },
-        { date: 'Jul 18', desc: 'TikTok Creator Rewards ZAR', type: 'income', amount: 6160 },
-        { date: 'Jul 15', desc: 'Canva Subscription', type: 'expense', amount: 149 },
-        { date: 'Jul 14', desc: 'Woolworths SA Sponsorship', type: 'income', amount: 4940 }
+        { date: 'Jul 21', desc: 'Google AdSense South Africa Payout', type: 'income', amount: 18420 },
+        { date: 'Jul 19', desc: 'Orms Direct (Sony Alpha Lens)', type: 'expense', amount: 4200 },
+        { date: 'Jul 18', desc: 'TikTok Creator Rewards ZAR', type: 'income', amount: 4850 },
+        { date: 'Jul 15', desc: 'Adobe Creative Cloud SA', type: 'expense', amount: 950 },
+        { date: 'Jul 14', desc: 'Woolworths SA Brand Deal', type: 'income', amount: 2100 }
     ]
 };
 
-let timelineChartInstance = null;
+let artworkChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
@@ -39,11 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAuthModalTrigger();
 
     renderDashboardData();
-    initTimelineChart();
-    animateCounter();
+    initArtworkChart();
 
     // Event Listeners
-    document.getElementById('btn-start-tracking').addEventListener('click', () => switchTab('sources'));
     document.getElementById('btn-sync-trigger').addEventListener('click', syncData);
     document.getElementById('btn-add-activity').addEventListener('click', openAddActivityModal);
 });
@@ -74,54 +66,21 @@ function switchTab(tabId) {
     }
 }
 
-// 1. 72px Hero Balance Counter Animation (0 -> R 24,650)
-function animateCounter() {
-    const target = state.balance;
-    const element = document.getElementById('val-current-balance');
-    if (!element) return;
-    let current = 0;
-    const step = Math.ceil(target / 35);
-
-    const timer = setInterval(() => {
-        current += step;
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        element.innerText = `R ${current.toLocaleString()}`;
-    }, 20);
-}
-
-// Render Data
+// Render Data & Activity Lists
 function renderDashboardData() {
-    // Render Income Sources
-    const sourceContainer = document.getElementById('income-source-list');
-    if (sourceContainer) {
-        sourceContainer.innerHTML = '';
-        state.sources.forEach(s => {
-            sourceContainer.innerHTML += `
-                <div class="source-item">
-                    <span class="source-name">${s.name}</span>
-                    <span class="source-val text-green">R${s.amount.toLocaleString()}</span>
-                </div>
-            `;
-        });
-    }
-
-    // 8. Card-Based Activity Stream (Cards First, Tables Second)
-    const activityStream = document.getElementById('activity-stream-cards');
+    const activityStream = document.getElementById('activity-stream-list');
     if (activityStream) {
         activityStream.innerHTML = '';
-        state.activities.slice(0, 5).forEach(a => {
-            const amountClass = a.type === 'income' ? 'text-green' : '';
+        state.activities.forEach(a => {
+            const amountClass = a.type === 'income' ? 'text-emerald' : '';
             const prefix = a.type === 'income' ? '+' : '-';
             activityStream.innerHTML += `
-                <div class="activity-card-item">
-                    <div class="activity-info">
-                        <span class="activity-title">${a.desc}</span>
-                        <span class="activity-date">${a.date}</span>
+                <div class="activity-item">
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.88rem;">${a.desc}</div>
+                        <div style="font-size: 0.76rem; color: var(--text-secondary);">${a.date} • Verified Sync</div>
                     </div>
-                    <span class="activity-val ${amountClass}">${prefix}R${a.amount.toLocaleString()}</span>
+                    <div class="${amountClass}" style="font-weight: 800; font-size: 0.95rem;">${prefix}R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -136,12 +95,12 @@ function renderFullStreams() {
         revStream.innerHTML = '';
         state.activities.filter(a => a.type === 'income').forEach(a => {
             revStream.innerHTML += `
-                <div class="activity-card-item">
-                    <div class="activity-info">
-                        <span class="activity-title">${a.desc}</span>
-                        <span class="activity-date">${a.date} • Verified Sync</span>
+                <div class="activity-item">
+                    <div>
+                        <div style="font-weight: 700;">${a.desc}</div>
+                        <div style="font-size: 0.76rem; color: var(--text-secondary);">${a.date}</div>
                     </div>
-                    <span class="activity-val text-green">+R${a.amount.toLocaleString()}</span>
+                    <div class="text-emerald" style="font-weight: 800;">+R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -152,58 +111,42 @@ function renderFullStreams() {
         expStream.innerHTML = '';
         state.activities.filter(a => a.type === 'expense').forEach(a => {
             expStream.innerHTML += `
-                <div class="activity-card-item">
-                    <div class="activity-info">
-                        <span class="activity-title">${a.desc}</span>
-                        <span class="activity-date">${a.date} • 100% Tax Write-Off</span>
-                    </div>
-                    <span class="activity-val">-R${a.amount.toLocaleString()}</span>
-                </div>
-            `;
-        });
-    }
-
-    const sourcesBody = document.getElementById('full-sources-list');
-    if (sourcesBody) {
-        sourcesBody.innerHTML = '';
-        state.sources.forEach(s => {
-            sourcesBody.innerHTML += `
-                <div class="source-item">
+                <div class="activity-item">
                     <div>
-                        <div class="source-name">${s.name}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary); opacity: 0.6;">Connected API Sandbox</div>
+                        <div style="font-weight: 700;">${a.desc}</div>
+                        <div style="font-size: 0.76rem; color: var(--text-secondary);">${a.date} • 100% Tax Write-Off</div>
                     </div>
-                    <span class="source-val text-green">R${s.amount.toLocaleString()}</span>
+                    <div style="font-weight: 800;">-R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
     }
 }
 
-// 2 & 9. Signature Chart Upgrade & "WOW" Interaction
-function initTimelineChart() {
-    const ctx = document.getElementById('chart-revenue-timeline').getContext('2d');
+// 2. Make the Chart the Artwork
+function initArtworkChart() {
+    const ctx = document.getElementById('chart-revenue-artwork').getContext('2d');
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.18)');
-    gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
 
-    timelineChartInstance = new Chart(ctx, {
+    artworkChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: state.timelineData.map(d => d.date),
             datasets: [{
-                label: 'Revenue Timeline',
+                label: 'Revenue Trajectory',
                 data: state.timelineData.map(d => d.rev),
-                borderColor: '#22C55E',
-                borderWidth: 3,
+                borderColor: '#10B981',
+                borderWidth: 3.5,
                 backgroundColor: gradient,
                 fill: true,
                 tension: 0.4,
                 pointRadius: 4,
                 pointHoverRadius: 8,
-                pointBackgroundColor: '#22C55E',
-                pointBorderColor: '#09090B',
+                pointBackgroundColor: '#10B981',
+                pointBorderColor: '#080B10',
                 pointBorderWidth: 2
             }]
         },
@@ -216,21 +159,17 @@ function initTimelineChart() {
             },
             plugins: {
                 legend: { display: false },
-                // 9. "WOW" Tooltip Interaction (Date, Revenue, Expenses, Net Profit)
                 tooltip: {
-                    backgroundColor: '#111113',
-                    titleColor: '#FAFAFA',
-                    bodyColor: '#A1A1AA',
-                    borderColor: '#27272A',
+                    backgroundColor: '#121722',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#10B981',
+                    borderColor: 'rgba(255, 255, 255, 0.16)',
                     borderWidth: 1,
                     displayColors: false,
                     padding: 14,
-                    titleFont: { family: 'Inter', size: 13, weight: '600' },
-                    bodyFont: { family: 'Inter', size: 13 },
+                    titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: '700' },
+                    bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
                     callbacks: {
-                        title: function(items) {
-                            return items[0].label;
-                        },
                         label: function(context) {
                             const idx = context.dataIndex;
                             const item = state.timelineData[idx];
@@ -246,13 +185,13 @@ function initTimelineChart() {
             scales: {
                 x: {
                     grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                    ticks: { color: '#71717A', font: { family: 'Inter', size: 12 } }
+                    ticks: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 12 } }
                 },
                 y: {
                     grid: { color: 'rgba(255, 255, 255, 0.04)' },
                     ticks: {
-                        color: '#71717A',
-                        font: { family: 'Inter', size: 12 },
+                        color: '#94A3B8',
+                        font: { family: 'Plus Jakarta Sans', size: 12 },
                         callback: function(value) {
                             return 'R' + (value / 1000) + 'k';
                         }
@@ -265,12 +204,15 @@ function initTimelineChart() {
 
 function syncData() {
     const btn = document.getElementById('btn-sync-trigger');
-    btn.innerHTML = `Syncing...`;
+    btn.innerHTML = `<i data-lucide="refresh-cw" class="spin"></i> Syncing...`;
+    lucide.createIcons();
 
     setTimeout(() => {
-        btn.innerHTML = `Synced`;
+        btn.innerHTML = `<i data-lucide="check"></i> Synced`;
+        lucide.createIcons();
         setTimeout(() => {
-            btn.innerHTML = `Sync`;
+            btn.innerHTML = `<i data-lucide="refresh-cw"></i> Sync`;
+            lucide.createIcons();
         }, 2000);
     }, 1000);
 }
@@ -308,14 +250,7 @@ function submitActivity() {
         amount
     });
 
-    if (type === 'income') {
-        state.balance += amount;
-    } else {
-        state.balance -= amount;
-    }
-
     renderDashboardData();
-    animateCounter();
     closeModal();
 }
 
@@ -351,6 +286,7 @@ function openModal(title, html) {
     document.getElementById('modal-title').innerText = title;
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-app').classList.add('active');
+    lucide.createIcons();
 }
 
 function closeModal() {
