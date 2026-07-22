@@ -1,30 +1,37 @@
 /* ==========================================================================
-   Creator Cash Flow - Category-Defining Design System
-   80px Balance | 72px Headline | 32px Section Titles | Asymmetric Grid
+   Creator Cash Flow - Luxury Software Design Language (9.5/10 Edition)
+   Inspired by Apple, Linear, Stripe, and Vercel
    ========================================================================== */
 
 :root {
-    --bg-page: #09090B;
-    --bg-card: rgba(255, 255, 255, 0.02);
+    /* 3. True Deep Black Palette */
+    --bg-page: #050505;
+    --bg-card: #0B0B0B;
+    --bg-card-glass: rgba(255, 255, 255, 0.02);
     --bg-card-hover: rgba(255, 255, 255, 0.04);
-    --bg-input: rgba(255, 255, 255, 0.03);
+    --bg-input: #121214;
     
+    /* 6 & 11. Depth Contrast Borders */
     --border-subtle: rgba(255, 255, 255, 0.06);
-    --border-hover: rgba(255, 255, 255, 0.14);
+    --border-hover: rgba(255, 255, 255, 0.12);
     
+    /* Typography Colors */
     --text-primary: #FAFAFA;
     --text-secondary: #A1A1AA;
     --text-muted: #71717A;
     
+    /* 11. One Accent Color */
     --accent-emerald: #22C55E;
-    --accent-coral: #EF4444;
-    --accent-blue: #38BDF8;
+    --accent-emerald-subtle: rgba(34, 197, 94, 0.1);
 
-    --radius-card: 20px;
-    --radius-btn: 10px;
+    /* 11. Strict Radii & Spacing Rules */
+    --radius-card: 24px;
+    --radius-btn: 12px;
     --radius-sm: 8px;
     
-    --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --spacing-section: 72px;
+    
+    --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -34,14 +41,21 @@
 }
 
 body.codex-app {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Geist', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-page);
-    background-image: radial-gradient(circle at top center, rgba(34, 197, 94, 0.08), transparent 50%);
+    /* 4. Atmospheric Lighting (Apple Glow) */
+    background-image: radial-gradient(circle at top center, rgba(255, 255, 255, 0.05), transparent 50%);
     color: var(--text-primary);
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+}
+
+/* 10. Motion Stagger Entrance Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* App Shell Layout */
@@ -50,7 +64,7 @@ body.codex-app {
     min-height: 100vh;
 }
 
-/* Sidebar */
+/* Sidebar Navigation */
 .codex-sidebar {
     width: 250px;
     background-color: var(--bg-page);
@@ -66,26 +80,27 @@ body.codex-app {
 }
 
 .brand-header { margin-bottom: 48px; }
-.brand-header h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-primary); }
+.brand-header h2 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
 .brand-header p { font-size: 13px; color: var(--text-secondary); opacity: 0.6; margin-top: 2px; }
 
 .codex-nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
 .nav-item {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
     color: var(--text-primary);
-    opacity: 0.5;
+    opacity: 0.6;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     border-radius: var(--radius-btn);
     transition: var(--transition-smooth);
 }
 
-.nav-item:hover { opacity: 0.85; background-color: var(--bg-card); }
-.nav-item.active { opacity: 1; font-weight: 600; background-color: var(--bg-card); }
+.nav-item:hover { opacity: 0.9; background-color: var(--bg-card-glass); }
+.nav-item.active { opacity: 1; font-weight: 600; background-color: var(--bg-card-glass); }
 
 .sidebar-footer { padding-top: 24px; border-top: 1px solid var(--border-subtle); }
 
@@ -93,106 +108,91 @@ body.codex-app {
 .codex-main {
     flex: 1;
     padding: 64px 80px;
-    max-width: 1240px;
+    max-width: 1140px;
     margin: 0 auto;
     width: 100%;
 }
 
-/* 6 & 2. World-Class Typography & Hero Section */
-.hero-section {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 48px;
+/* 1. Single Visual Hero Section (First 5 Seconds = "Wow, that's clean") */
+.single-visual-hero {
+    margin-bottom: var(--spacing-section);
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-meta-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 64px;
+    margin-bottom: 12px;
 }
 
-/* 6. 72px Headline */
-.hero-title {
-    font-size: 72px;
-    font-weight: 700;
-    letter-spacing: -0.05em;
-    line-height: 1.05;
-    color: var(--text-primary);
-    margin-bottom: 16px;
-}
-
-.hero-subtitle {
-    font-size: 15px;
+.hero-label {
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text-secondary);
-    opacity: 0.7;
-    line-height: 1.6;
-    margin-bottom: 24px;
-    max-width: 520px;
-}
-
-.hero-actions { display: flex; align-items: center; gap: 18px; }
-.hero-stat-pill { font-size: 13px; color: var(--text-secondary); opacity: 0.6; }
-
-/* 2 & 7. Category-Defining "WHOA" Living Revenue Stream Visualizer */
-.hero-visualizer-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-card);
-    padding: 32px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-}
-
-.visualizer-title {
-    font-size: 12px;
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
+}
+
+.sync-status {
+    font-size: 13px;
     color: var(--text-secondary);
     opacity: 0.6;
-    margin-bottom: 20px;
-}
-
-.stream-flow-container {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.stream-node {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.015);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
+    gap: 8px;
 }
 
-.stream-label { font-weight: 500; }
-.stream-amount { font-weight: 600; color: var(--accent-emerald); }
+.sync-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--accent-emerald);
+    border-radius: 50%;
+}
 
-.stream-flow-arrow {
-    text-align: center;
-    color: var(--accent-emerald);
+/* 2. Strict Typography: 72px Balance */
+.hero-balance {
+    font-size: 72px;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.hero-change {
     font-size: 16px;
-    margin: 4px 0;
-    opacity: 0.8;
+    font-weight: 500;
+    color: var(--accent-emerald);
+    margin-bottom: 32px;
+    display: inline-block;
 }
 
-.net-income-node {
-    background: rgba(34, 197, 94, 0.08);
-    border: 1px solid rgba(34, 197, 94, 0.25);
-    border-radius: var(--radius-sm);
-    padding: 14px;
+/* 7. Full-Width Signature Chart Canvas */
+.fullwidth-chart-card {
+    background: var(--bg-card-glass);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    padding: 36px;
+    margin-bottom: var(--spacing-section);
+    transition: var(--transition-smooth);
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fullwidth-chart-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+}
+
+.chart-header-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    margin-bottom: 24px;
 }
 
-.net-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.net-val { font-size: 20px; font-weight: 700; color: var(--accent-emerald); }
-
-/* 6. Section Titles (32px) */
-.section-title {
+/* 2. Strict 32px Section Headline */
+.section-headline {
     font-size: 32px;
     font-weight: 700;
     letter-spacing: -0.04em;
@@ -200,182 +200,97 @@ body.codex-app {
     margin-bottom: 24px;
 }
 
-/* 6. 80px Balance Typography */
-.balance-hero {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-card);
-    padding: 40px;
-    margin-bottom: 48px;
-    transition: var(--transition-smooth);
-}
-
-.balance-hero:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-hover);
-}
-
-.balance-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12px;
-}
-
-.balance-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    opacity: 0.6;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.operational-meta {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    opacity: 0.6;
-}
-
-.meta-dot {
-    width: 6px;
-    height: 6px;
-    background-color: var(--accent-emerald);
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.balance-amount {
-    font-size: 80px;
-    font-weight: 700;
-    letter-spacing: -0.06em;
-    color: var(--text-primary);
-    line-height: 1;
-    margin-bottom: 16px;
-}
-
-.balance-change {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--accent-emerald);
-}
-
-/* 3. Asymmetric Dashboard Layout (Chart Left, Cards Right) */
-.asymmetric-dashboard-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 32px;
-    margin-bottom: 48px;
-}
-
-/* Signature Timeline Card */
-.signature-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-card);
-    padding: 36px;
-    transition: var(--transition-smooth);
-}
-
-.signature-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-hover);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 24px;
-}
-
-.card-title {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
-
-.card-subtitle {
-    font-size: 13px;
-    color: var(--text-secondary);
-    opacity: 0.6;
-    margin-top: 2px;
-}
-
 .chart-wrapper {
     position: relative;
-    height: 340px;
+    height: 360px;
     width: 100%;
 }
 
-/* 1. Creator-Focused Platform Cards (Right Column) */
-.creator-cards-column {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.creator-platform-card {
-    background: var(--bg-card);
+/* 9. Signature Element: Revenue Flow Node Visualizer */
+.signature-flow-card {
+    background: var(--bg-card-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 20px 24px;
+    padding: 40px;
+    margin-bottom: var(--spacing-section);
     transition: var(--transition-smooth);
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.creator-platform-card:hover {
+.signature-flow-card:hover {
     transform: translateY(-2px);
     border-color: var(--border-hover);
 }
 
-.platform-card-top {
+.flow-diagram-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    margin-top: 24px;
+}
+
+.flow-sources-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.flow-source-pill {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-btn);
+    padding: 12px 18px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 500;
 }
 
-.platform-name {
+.flow-connector {
+    font-size: 24px;
+    color: var(--accent-emerald);
+    opacity: 0.8;
+}
+
+.flow-target-node {
+    background: var(--accent-emerald-subtle);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: var(--radius-card);
+    padding: 28px 36px;
+    text-align: center;
+    flex: 1;
+}
+
+.flow-target-label {
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-secondary);
-    opacity: 0.7;
+    color: var(--accent-emerald);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
 }
 
-.platform-change {
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.platform-change.up { color: var(--accent-emerald); }
-.platform-change.down { color: var(--accent-coral); }
-
-.platform-val {
-    font-size: 28px;
+.flow-target-val {
+    font-size: 32px;
     font-weight: 700;
-    letter-spacing: -0.04em;
     color: var(--text-primary);
 }
 
-/* 4 & 5. AI Intelligent Insights & Predictions */
-.intelligence-grid {
+/* Section Grid */
+.content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    margin-bottom: 48px;
+    gap: 40px;
+    margin-bottom: var(--spacing-section);
 }
 
 .codex-card {
-    background: var(--bg-card);
+    background: var(--bg-card-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 32px;
+    padding: 36px;
     transition: var(--transition-smooth);
 }
 
@@ -384,58 +299,43 @@ body.codex-app {
     border-color: var(--border-hover);
 }
 
-/* Intelligence Box */
-.ai-insight-box {
-    background: rgba(255, 255, 255, 0.015);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    margin-top: 16px;
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--text-secondary);
-}
-
-.ai-insight-box strong { color: var(--text-primary); }
-
-/* Activity Cards Stream */
-.activity-stream {
+/* Activity List */
+.activity-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
-.activity-card-item {
+.activity-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 14px 18px;
     background: rgba(255, 255, 255, 0.015);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-btn);
     transition: var(--transition-smooth);
 }
 
-.activity-card-item:hover {
+.activity-item:hover {
     border-color: var(--border-hover);
     background: rgba(255, 255, 255, 0.03);
 }
 
-.activity-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
-.activity-date { font-size: 12px; color: var(--text-secondary); opacity: 0.6; margin-top: 2px; }
-.activity-val { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+.activity-desc { font-size: 13px; font-weight: 500; }
+.activity-sub { font-size: 13px; color: var(--text-secondary); opacity: 0.6; }
+.activity-val { font-size: 16px; font-weight: 600; }
 
-.text-right { text-align: right !important; }
-.text-green { color: var(--accent-emerald) !important; }
+.text-emerald { color: var(--accent-emerald) !important; }
 
-/* Buttons */
+/* Buttons with 10. Motion Scale */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
     border-radius: var(--radius-btn);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     border: none;
     cursor: pointer;
@@ -443,12 +343,9 @@ body.codex-app {
 }
 
 .btn:hover { transform: scale(1.02); }
-.btn-primary { background-color: var(--text-primary); color: var(--bg-page); }
-.btn-primary:hover { background-color: #FFFFFF; }
 .btn-emerald { background-color: var(--accent-emerald); color: #000000; font-weight: 600; }
-.btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-subtle); }
+.btn-secondary { background: var(--bg-card-glass); color: var(--text-primary); border: 1px solid var(--border-subtle); }
 .btn-secondary:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
-.btn-sm { padding: 6px 14px; font-size: 13px; }
 
 /* Modals */
 .modal-overlay {
@@ -467,21 +364,19 @@ body.codex-app {
 
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 .codex-modal {
-    background-color: #111113;
+    background-color: var(--bg-card);
     border: 1px solid var(--border-hover);
     border-radius: var(--radius-card);
     width: 90%;
     max-width: 440px;
     padding: 32px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8);
 }
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.modal-header h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
 .modal-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
 
 .form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 13px; color: var(--text-secondary); opacity: 0.7; margin-bottom: 6px; font-weight: 500; }
+.form-group label { display: block; font-size: 13px; color: var(--text-secondary); opacity: 0.6; margin-bottom: 6px; }
 .form-input {
     width: 100%;
     background-color: var(--bg-input);
@@ -496,11 +391,10 @@ body.codex-app {
 .form-input:focus { border-color: var(--text-primary); }
 .hidden { display: none !important; }
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
     .app-shell { flex-direction: column; }
     .codex-sidebar { width: 100%; height: auto; position: relative; padding: 24px; }
     .codex-main { padding: 32px 20px; }
-    .hero-section, .asymmetric-dashboard-grid, .intelligence-grid { grid-template-columns: 1fr; gap: 24px; }
-    .hero-title { font-size: 48px; }
-    .balance-amount { font-size: 56px; }
+    .content-grid, .flow-diagram-wrapper { grid-template-columns: 1fr; flex-direction: column; }
+    .hero-balance { font-size: 52px; }
 }

@@ -74,7 +74,7 @@ function switchTab(tabId) {
     }
 }
 
-// 1. 80px Balance Counter Animation (0 -> R24,650)
+// 1. 72px Hero Balance Counter Animation (0 -> R 24,650)
 function animateCounter() {
     const target = state.balance;
     const element = document.getElementById('val-current-balance');
@@ -88,7 +88,7 @@ function animateCounter() {
             current = target;
             clearInterval(timer);
         }
-        element.innerText = `R${current.toLocaleString()}`;
+        element.innerText = `R ${current.toLocaleString()}`;
     }, 20);
 }
 
