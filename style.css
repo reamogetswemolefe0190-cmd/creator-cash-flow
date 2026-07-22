@@ -1,44 +1,41 @@
 /* ==========================================================================
-   Creator Cash Flow - Franc App & Discovery SA Software Design System
+   Creator Cash Flow - Executive FinTech Palette (Stripe & Revolut Inspired)
    ========================================================================== */
 
 :root {
-    /* Color Palette - Franc & Discovery Palette */
-    --bg-app: #0B0F19;
-    --bg-sidebar: #111827;
-    --bg-card: #151D2A;
-    --bg-card-hover: #1E293B;
-    --bg-input: #1F293D;
+    /* Executive Color Palette */
+    --bg-app: #080B11;
+    --bg-sidebar: #0E131F;
+    --bg-card: #131926;
+    --bg-card-hover: #192132;
+    --bg-input: #171E2D;
     
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-highlight: rgba(255, 255, 255, 0.16);
+    --border-color: rgba(255, 255, 255, 0.07);
+    --border-highlight: rgba(255, 255, 255, 0.14);
     
-    /* Text Colors */
+    /* Executive Typography Colors */
     --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --text-dim: #64748B;
+    --text-secondary: #8E9BAE;
+    --text-dim: #526075;
     
-    /* Brand Accents */
-    --emerald: #10B981;
-    --emerald-dark: #059669;
-    --emerald-glow: rgba(16, 185, 129, 0.2);
+    /* High-Trust Financial Accents */
+    --accent-emerald: #10B981;
+    --accent-emerald-dark: #047857;
+    --accent-emerald-glow: rgba(16, 185, 129, 0.12);
     
-    --indigo: #6366F1;
-    --indigo-dark: #4F46E5;
-    --indigo-glow: rgba(99, 102, 241, 0.25);
+    --accent-slate-blue: #475569;
+    --accent-indigo: #6366F1;
+    --accent-amber: #D97706;
+    --accent-coral: #E11D48;
     
-    --coral: #F43F5E;
-    --amber: #F59E0B;
-    --blue: #3B82F6;
-
-    /* Software Curves & Elevation */
-    --radius-sm: 10px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
+    /* Software Elevation & Curves */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
     --radius-full: 9999px;
     
-    --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -57,7 +54,7 @@ body.software-app {
     -webkit-font-smoothing: antialiased;
 }
 
-/* App Shell (Desktop Software Viewport) */
+/* App Shell Framework */
 .app-shell {
     display: flex;
     height: 100vh;
@@ -65,9 +62,9 @@ body.software-app {
     overflow: hidden;
 }
 
-/* Franc Soft Sidebar */
+/* Executive Sidebar */
 .franc-sidebar {
-    width: 290px;
+    width: 280px;
     background-color: var(--bg-sidebar);
     border-right: 1px solid var(--border-color);
     display: flex;
@@ -85,46 +82,45 @@ body.software-app {
 }
 
 .brand-logo {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, var(--emerald), var(--indigo));
-    border-radius: 14px;
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #1E293B, #0F172A);
+    border: 1px solid var(--border-highlight);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #FFF;
-    font-size: 1.3rem;
-    box-shadow: 0 0 20px var(--emerald-glow);
+    color: var(--accent-emerald);
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .brand-info h2 {
     font-size: 1.05rem;
     font-weight: 800;
-    letter-spacing: -0.3px;
-    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: var(--text-primary);
 }
 
 .software-tag {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    color: var(--emerald);
-    background: rgba(16, 185, 129, 0.12);
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
     padding: 2px 8px;
     border-radius: var(--radius-full);
     display: inline-flex;
     align-items: center;
     gap: 4px;
     margin-top: 3px;
+    border: 1px solid var(--border-color);
 }
 
-.icon-tiny {
-    width: 12px;
-    height: 12px;
-}
+.icon-tiny { width: 12px; height: 12px; }
 
-/* User Franc Account Pill Card */
+/* User Account Pill */
 .account-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 12px 14px;
@@ -135,26 +131,22 @@ body.software-app {
 }
 
 .user-avatar {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--indigo);
-}
-
-.account-details {
-    display: flex;
-    flex-direction: column;
+    border: 1.5px solid var(--border-highlight);
 }
 
 .account-details .name {
     font-size: 0.88rem;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 .tier-badge {
     font-size: 0.72rem;
-    color: var(--indigo);
+    color: var(--text-secondary);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -163,53 +155,57 @@ body.software-app {
 
 .tier-badge i { width: 12px; height: 12px; }
 
-/* Franc Navigation Links */
+/* Executive Sidebar Navigation */
 .franc-nav {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     flex: 1;
 }
 
 .franc-nav-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 11px 16px;
     color: var(--text-secondary);
     text-decoration: none;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     font-weight: 600;
     border-radius: var(--radius-md);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s ease;
 }
 
 .franc-nav-item i {
-    width: 20px;
-    height: 20px;
-    transition: transform 0.2s ease;
+    width: 18px;
+    height: 18px;
+    color: var(--text-dim);
+    transition: color 0.15s ease;
 }
 
 .franc-nav-item:hover {
     color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .franc-nav-item:hover i {
-    transform: translateX(2px);
+    color: var(--text-primary);
 }
 
 .franc-nav-item.active {
     color: #FFF;
-    background: linear-gradient(90deg, rgba(79, 70, 229, 0.25), rgba(79, 70, 229, 0.05));
-    border-left: 4px solid var(--indigo);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    border-left: 3px solid var(--accent-emerald);
 }
 
-/* Discovery Health Card Widget */
+.franc-nav-item.active i {
+    color: var(--accent-emerald);
+}
+
+/* Executive Financial Health Score */
 .health-card {
-    background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(17, 24, 39, 0.8));
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 16px;
 }
@@ -218,20 +214,21 @@ body.software-app {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
     font-weight: 600;
     margin-bottom: 8px;
 }
 
 .health-score {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 800;
+    color: var(--accent-emerald);
 }
 
 .progress-bar-bg {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 5px;
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -239,9 +236,8 @@ body.software-app {
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--emerald), #34D399);
+    background: var(--accent-emerald);
     border-radius: 3px;
-    transition: width 0.8s ease;
 }
 
 .health-sub {
@@ -251,7 +247,7 @@ body.software-app {
     line-height: 1.3;
 }
 
-/* Main Viewport Header & Search Bar */
+/* Main Viewport & Top Bar */
 .software-viewport {
     flex: 1;
     overflow-y: auto;
@@ -274,14 +270,9 @@ body.software-app {
     gap: 10px;
     background-color: var(--bg-input);
     border: 1px solid var(--border-color);
-    padding: 10px 16px;
-    border-radius: var(--radius-full);
-    width: 380px;
-    transition: border-color 0.2s ease;
-}
-
-.search-command:focus-within {
-    border-color: var(--indigo);
+    padding: 9px 16px;
+    border-radius: var(--radius-md);
+    width: 360px;
 }
 
 .search-command input {
@@ -294,21 +285,20 @@ body.software-app {
 }
 
 .search-command kbd {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
     padding: 2px 6px;
     border-radius: 4px;
-    font-size: 0.7rem;
-    font-family: inherit;
+    font-size: 0.68rem;
 }
 
-/* Segmented Control Buttons (Discovery Style) */
+/* Executive Segmented Controls */
 .segmented-control {
     display: flex;
     background-color: var(--bg-sidebar);
-    padding: 4px;
-    border-radius: var(--radius-full);
+    padding: 3px;
+    border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
 }
 
@@ -316,48 +306,42 @@ body.software-app {
     background: none;
     border: none;
     color: var(--text-secondary);
-    padding: 8px 16px;
-    border-radius: var(--radius-full);
-    font-size: 0.82rem;
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .seg-btn.active {
-    background-color: var(--indigo);
+    background-color: rgba(255, 255, 255, 0.08);
     color: #FFF;
-    box-shadow: 0 2px 10px var(--indigo-glow);
 }
 
-.action-buttons {
-    display: flex;
-    gap: 10px;
-}
+.action-buttons { display: flex; gap: 10px; }
 
 /* Buttons */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
-    border-radius: var(--radius-full);
-    font-size: 0.88rem;
-    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: var(--radius-md);
+    font-size: 0.86rem;
+    font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .btn-emerald {
-    background-color: var(--emerald);
+    background-color: var(--accent-emerald-dark);
     color: #FFF;
-    box-shadow: 0 4px 14px var(--emerald-glow);
 }
 
 .btn-emerald:hover {
-    background-color: var(--emerald-dark);
-    transform: translateY(-1px);
+    background-color: var(--accent-emerald);
 }
 
 .btn-secondary {
@@ -374,34 +358,31 @@ body.software-app {
 .btn-text {
     background: none;
     border: none;
-    color: var(--emerald);
-    font-weight: 700;
-    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.84rem;
     cursor: pointer;
 }
 
-.btn-text:hover { text-decoration: underline; }
+.btn-text:hover { color: var(--text-primary); text-decoration: underline; }
 
-.btn-sm {
-    padding: 6px 14px;
-    font-size: 0.8rem;
-}
+.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
 
-/* Franc Hero Banner */
+/* Executive Hero Financial Banner */
 .hero-financial-banner {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    background: var(--bg-card);
     border: 1px solid var(--border-highlight);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    padding: 28px 32px;
     box-shadow: var(--shadow-card);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .banner-label {
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     color: var(--text-secondary);
     font-weight: 600;
     text-transform: uppercase;
@@ -409,74 +390,50 @@ body.software-app {
 }
 
 .net-amount {
-    font-size: 2.8rem;
+    font-size: 2.6rem;
     font-weight: 800;
-    letter-spacing: -1px;
-    margin: 6px 0 14px;
-    background: linear-gradient(90deg, #FFFFFF, #E2E8F0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.8px;
+    margin: 4px 0 12px;
+    color: #FFFFFF;
 }
 
-.banner-pill-group {
-    display: flex;
-    gap: 10px;
-}
+.banner-pill-group { display: flex; gap: 10px; }
 
 .pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 14px;
-    border-radius: var(--radius-full);
-    font-size: 0.78rem;
-    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.76rem;
+    font-weight: 600;
 }
 
-.pill-green { background: rgba(16, 185, 129, 0.15); color: var(--emerald); }
-.pill-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+.pill-green { background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.2); }
+.pill-blue { background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid var(--border-color); }
 
 .banner-metrics {
     display: flex;
     align-items: center;
-    gap: 28px;
-    background: rgba(0, 0, 0, 0.25);
-    padding: 20px 28px;
+    gap: 24px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 18px 24px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
 }
 
-.mini-stat {
-    display: flex;
-    flex-direction: column;
-}
+.mini-stat { display: flex; flex-direction: column; }
+.stat-label { font-size: 0.76rem; color: var(--text-secondary); font-weight: 500; }
+.stat-value { font-size: 1.25rem; font-weight: 800; margin-top: 4px; }
+.stat-divider { width: 1px; height: 32px; background-color: var(--border-color); }
 
-.stat-label {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-
-}
-
-.stat-value {
-    font-size: 1.35rem;
-    font-weight: 800;
-    margin-top: 4px;
-}
-
-.stat-divider {
-    width: 1px;
-    height: 36px;
-    background-color: var(--border-color);
-}
-
-/* Franc Card Containers */
+/* Executive Cards & Layout */
 .franc-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 24px;
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-soft);
     margin-bottom: 24px;
 }
 
@@ -484,119 +441,69 @@ body.software-app {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
-.franc-card-header h3 {
-    font-size: 1.1rem;
-    font-weight: 800;
-}
+.franc-card-header h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.card-sub { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
 
-.card-sub {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    margin-top: 2px;
-}
-
-.grid-2-1 {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-}
-
-.grid-1-1 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-}
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+.grid-1-1 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 .flex-2 { flex: 2; }
 .flex-1 { flex: 1; }
 
-.chart-box {
-    position: relative;
-    height: 280px;
-    width: 100%;
-}
+.chart-box { position: relative; height: 270px; width: 100%; }
 
 /* Lists & Items */
-.franc-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
+.franc-list { display: flex; flex-direction: column; gap: 10px; }
 
 .franc-list-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    transition: transform 0.2s ease;
-}
-
-.franc-list-item:hover {
-    transform: translateX(3px);
-    background: rgba(255, 255, 255, 0.04);
 }
 
 .item-badge {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
+    font-weight: 700;
     color: #FFF;
 }
 
-/* Franc Cards Grid */
-.section-group {
-    margin-bottom: 36px;
-}
-
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    margin-bottom: 16px;
-}
-
-.franc-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-}
+/* Vault Cards */
+.section-group { margin-bottom: 32px; }
+.section-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 14px; }
+.franc-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; }
 
 .vault-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 24px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: var(--shadow-soft);
 }
 
-.vault-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 20px;
-}
-
+.vault-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .vault-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #FFF;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
 }
 
@@ -604,113 +511,79 @@ body.software-app {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    margin-bottom: 16px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--text-secondary);
 }
 
-.status-dot.active { color: var(--emerald); }
+.status-dot.active { color: var(--accent-emerald); }
 .status-dot.active::before {
     content: '';
-    width: 8px;
-    height: 8px;
-    background-color: var(--emerald);
+    width: 6px;
+    height: 6px;
+    background-color: var(--accent-emerald);
     border-radius: 50%;
-    box-shadow: 0 0 8px var(--emerald);
 }
 
 /* CSV Dropzone */
 .franc-dropzone {
-    border: 2px dashed var(--border-color);
+    border: 1.5px dashed var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 56px 24px;
+    padding: 48px 24px;
     text-align: center;
     background: rgba(255, 255, 255, 0.01);
-    transition: all 0.2s ease;
-}
-
-.franc-dropzone.dragover, .franc-dropzone:hover {
-    border-color: var(--emerald);
-    background: rgba(16, 185, 129, 0.03);
 }
 
 .drop-circle {
-    width: 64px;
-    height: 64px;
-    background: rgba(16, 185, 129, 0.12);
-    color: var(--emerald);
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
+    margin: 0 auto 14px;
+    border: 1px solid var(--border-color);
 }
 
-.drop-circle i { width: 32px; height: 32px; }
+.drop-actions { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
 
-.drop-actions {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 24px;
-}
-
-/* Franc Data Table */
+/* Table */
 .table-container { overflow-x: auto; }
-
-.franc-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-}
-
-.franc-table th, .franc-table td {
-    padding: 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.franc-table th {
-    color: var(--text-secondary);
-    font-weight: 700;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.franc-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.02);
-}
+.franc-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.franc-table th, .franc-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+.franc-table th { color: var(--text-secondary); font-weight: 600; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
 .tag {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 10px;
-    border-radius: var(--radius-full);
-    font-size: 0.75rem;
-    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.72rem;
+    font-weight: 600;
 }
 
-.tag-income { background: rgba(16, 185, 129, 0.15); color: var(--emerald); }
-.tag-expense { background: rgba(244, 63, 94, 0.15); color: var(--coral); }
-.tag-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); }
-.tag-write-off { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+.tag-income { background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); }
+.tag-expense { background: rgba(225, 29, 72, 0.1); color: var(--accent-coral); }
+.tag-write-off { background: rgba(217, 119, 6, 0.15); color: var(--accent-amber); }
 
 .franc-select {
     background: var(--bg-input);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    padding: 8px 16px;
-    border-radius: var(--radius-full);
-    font-size: 0.84rem;
+    padding: 7px 14px;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
     outline: none;
 }
 
 .text-right { text-align: right !important; }
-.text-emerald { color: var(--emerald) !important; }
-.text-coral { color: var(--coral) !important; }
-.text-amber { color: var(--amber) !important; }
+.text-emerald { color: var(--accent-emerald) !important; }
+.text-coral { color: var(--accent-coral) !important; }
+.text-amber { color: var(--accent-amber) !important; }
 .cursor-pointer { cursor: pointer; }
 .hidden { display: none !important; }
 
@@ -718,8 +591,8 @@ body.software-app {
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -729,58 +602,36 @@ body.software-app {
     transition: opacity 0.2s ease;
 }
 
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
 
 .franc-modal {
     background: var(--bg-sidebar);
     border: 1px solid var(--border-highlight);
     border-radius: var(--radius-lg);
     width: 90%;
-    max-width: 480px;
-    padding: 28px;
+    max-width: 460px;
+    padding: 24px;
     box-shadow: var(--shadow-card);
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.modal-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
 
-.modal-close {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-}
-
-.form-group { margin-bottom: 16px; }
-.form-group label {
-    display: block;
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
 .form-input {
     width: 100%;
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 10px 16px;
+    padding: 9px 14px;
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     outline: none;
 }
 
-.form-input:focus { border-color: var(--indigo); }
+.form-input:focus { border-color: var(--border-highlight); }
 
-/* Responsive adjustments */
 @media (max-width: 1024px) {
     .app-shell { flex-direction: column; overflow-y: auto; }
     .franc-sidebar { width: 100%; height: auto; }
