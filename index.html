@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Cash Flow | Financial Intelligence & Storytelling</title>
+    <title>Creator Financial OS | Category-Defining Software</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#080B10">
+    <meta name="theme-color" content="#050505">
 
-    <!-- Fonts -->
+    <!-- Fonts: Inter / SF Pro Display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
     
     <!-- Chart.js & Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Cache-Busting CSS (v11.0 Auth System) -->
-    <link rel="stylesheet" href="style.css?v=11.0_auth_activated">
+    <!-- Cache-Busting CSS (v12.0 Creator Financial OS System) -->
+    <link rel="stylesheet" href="style.css?v=12.0_creator_financial_os">
 </head>
 <body class="codex-app">
 
@@ -28,40 +28,21 @@
         <!-- Sidebar Navigation -->
         <aside class="codex-sidebar">
             <div class="brand-header">
-                <div class="brand-logo"><i data-lucide="zap"></i></div>
-                <div>
-                    <h2>Creator Cash Flow</h2>
-                    <p>Verified Beta v2.0</p>
-                </div>
+                <h2>Creator Financial OS</h2>
+                <p>Verified Session</p>
             </div>
 
             <nav class="codex-nav">
-                <a href="#overview" class="nav-item active" data-tab="overview">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#revenue" class="nav-item" data-tab="revenue">
-                    <i data-lucide="dollar-sign"></i>
-                    <span>Revenue</span>
-                </a>
-                <a href="#expenses" class="nav-item" data-tab="expenses">
-                    <i data-lucide="trending-down"></i>
-                    <span>Expenses</span>
-                </a>
-                <a href="#sources" class="nav-item" data-tab="sources">
-                    <i data-lucide="link"></i>
-                    <span>Sources</span>
-                </a>
-                <a href="#settings" class="nav-item" data-tab="settings">
-                    <i data-lucide="settings"></i>
-                    <span>Settings</span>
-                </a>
+                <a href="#overview" class="nav-item active" data-tab="overview">Dashboard</a>
+                <a href="#revenue" class="nav-item" data-tab="revenue">Revenue</a>
+                <a href="#dependence" class="nav-item" data-tab="dependence">Dependence</a>
+                <a href="#expenses" class="nav-item" data-tab="expenses">Expenses</a>
+                <a href="#settings" class="nav-item" data-tab="settings">Settings</a>
             </nav>
 
             <div class="sidebar-footer">
                 <button class="btn btn-secondary" id="btn-auth-modal" style="width: 100%;">
-                    <i data-lucide="user"></i>
-                    <span id="nav-user-label">Sign In / Verify</span>
+                    <span id="nav-user-label">Sign In</span>
                 </button>
             </div>
         </aside>
@@ -69,174 +50,136 @@
         <!-- Main Viewport -->
         <main class="codex-main">
             
-            <!-- 5. Visual Storytelling Header -->
-            <section class="hero-story-header">
-                <span class="hero-meta-badge"><i data-lucide="sparkles" style="width: 14px;"></i> Financial Intelligence for Creators</span>
-                <h1 class="hero-title">Consolidated Creator Income & Runway</h1>
-                <p class="hero-subtitle">Track earnings across YouTube, TikTok, and Instagram while discovering automatic tax write-offs and projected monthly growth.</p>
-            </section>
-
-            <!-- TAB 1: OVERVIEW DASHBOARD -->
+            <!-- TAB 1: OVERVIEW -->
             <section id="tab-overview" class="tab-pane active">
                 
-                <!-- 3. Asymmetric 70% / 30% Grid Layout (Artwork Chart Left 70%, Storytelling Panel Right 30%) -->
-                <div class="asymmetric-story-grid">
-                    
-                    <!-- Left (70%): 2. Artwork Chart Floating Card -->
-                    <div class="artwork-chart-card">
-                        <div class="chart-header">
+                <!-- 1. Almost Empty First Screen (Oversized 96px Balance + Giant Chart) -->
+                <div class="hero-minimal-screen">
+                    <div class="brand-category-tag">✦ Creator Financial OS</div>
+                    <div class="absurd-balance" id="val-current-balance">R24,650</div>
+                    <div class="hero-change-label">+14.8% this month</div>
+
+                    <!-- Giant Artwork Chart Canvas -->
+                    <div class="giant-chart-card">
+                        <div class="section-header" style="margin-bottom: 20px;">
                             <div>
-                                <h3 class="chart-title">Revenue Timeline</h3>
-                                <p class="chart-sub">Daily earnings trajectory across all connected platform APIs.</p>
+                                <h3 style="font-size: 16px; font-weight: 600;">Revenue Acceleration Trajectory</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary);">Consolidated daily cash flow across connected platform APIs.</p>
                             </div>
-                            <button class="btn btn-secondary btn-sm" id="btn-sync-trigger">
-                                <i data-lucide="refresh-cw"></i> Sync
-                            </button>
+                            <button class="btn btn-secondary btn-sm" id="btn-sync-trigger">Sync</button>
                         </div>
                         <div class="chart-wrapper">
-                            <canvas id="chart-revenue-artwork"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Right (30%): 5. Creator Storytelling Side Panel -->
-                    <div class="storytelling-panel">
-                        <!-- Story 1: YouTube Growth -->
-                        <div class="story-card">
-                            <div class="story-card-top">
-                                <span class="story-label">YouTube Studio</span>
-                                <span class="story-tag up">↑ 18.4%</span>
-                            </div>
-                            <div class="story-number text-emerald">R18,420</div>
-                            <p class="story-desc">YouTube earnings grew <strong>18.4% faster</strong> than TikTok over the last 30 days due to higher AdSense RPM.</p>
-                        </div>
-
-                        <!-- Story 2: TikTok Momentum -->
-                        <div class="story-card">
-                            <div class="story-card-top">
-                                <span class="story-label">TikTok Creator Fund</span>
-                                <span class="story-tag up">↑ 8.1%</span>
-                            </div>
-                            <div class="story-number">R4,850</div>
-                            <p class="story-desc">Creator Rewards payout settled directly into your linked Discovery Bank account.</p>
-                        </div>
-
-                        <!-- Story 3: Instagram Payout -->
-                        <div class="story-card">
-                            <div class="story-card-top">
-                                <span class="story-label">Instagram Sponsorships</span>
-                                <span class="story-tag down">↓ 3.2%</span>
-                            </div>
-                            <div class="story-number">R2,100</div>
-                            <p class="story-desc">Woolworths SA sponsorship invoice paid. Next payout scheduled for August 15.</p>
+                            <canvas id="chart-revenue-os"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- 1. Visual Layers & Node Stream Diagram -->
-                <div class="living-stream-card">
-                    <div class="chart-header" style="margin-bottom: 12px;">
+                <!-- 7. The Feature Nobody Expects: Revenue Dependence & Platform Risk Index -->
+                <div class="dependence-section">
+                    <div class="section-header">
                         <div>
-                            <h3 class="chart-title">Automated Revenue Stream Pipelines</h3>
-                            <p class="chart-sub">Real-time flow from connected social developer vaults into net creator cash flow.</p>
+                            <h2 class="section-title">Revenue Dependence</h2>
+                            <p style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">Monetization concentration across social media algorithms.</p>
+                        </div>
+                        <span class="risk-badge">⚠️ Risk Level: High</span>
+                    </div>
+
+                    <div class="dependence-bars">
+                        <!-- YouTube Bar -->
+                        <div class="bar-row">
+                            <div class="bar-meta">
+                                <span>YouTube Studio (AdSense & Memberships)</span>
+                                <span style="color: var(--accent-emerald);">82%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 82%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- TikTok Bar -->
+                        <div class="bar-row">
+                            <div class="bar-meta">
+                                <span>TikTok Creator Rewards</span>
+                                <span>11%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 11%; background: var(--text-secondary);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Instagram Bar -->
+                        <div class="bar-row">
+                            <div class="bar-meta">
+                                <span>Instagram Sponsorships</span>
+                                <span>7%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 7%; background: var(--text-muted);"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="stream-nodes-grid">
-                        <div class="node-box">
-                            <span class="node-title">YouTube AdSense</span>
-                            <span class="node-val">R18,420</span>
-                        </div>
-                        <div class="node-box">
-                            <span class="node-title">TikTok Rewards</span>
-                            <span class="node-val">R4,850</span>
-                        </div>
-                        <div class="node-box">
-                            <span class="node-title">Instagram Deals</span>
-                            <span class="node-val">R2,100</span>
-                        </div>
-                        <div class="node-box">
-                            <span class="node-title">Substack Members</span>
-                            <span class="node-val">R1,800</span>
-                        </div>
-                    </div>
-
-                    <div class="consolidated-net-banner">
-                        <div>
-                            <div class="net-title">Total Consolidated Net Income</div>
-                            <small style="color: var(--text-secondary);">After camera equipment & software tax write-offs</small>
-                        </div>
-                        <div class="net-amount">R21,840</div>
+                    <div class="risk-insight-text">
+                        <strong>⚡ Investor-Grade Risk Insight:</strong> Your cash flow is heavily reliant on YouTube monetization (82%). An algorithm shift or monetization policy change would impact R20,210 of your monthly creator income. <em>Recommendation: Expand brand sponsorships or Substack paid newsletters to lower platform risk.</em>
                     </div>
                 </div>
 
-                <!-- Bottom Activity Stream & Predictive Forecast -->
-                <div class="bottom-grid">
-                    <!-- Activity Stream -->
-                    <div class="artwork-chart-card">
-                        <div class="chart-header">
-                            <div>
-                                <h3 class="chart-title">Latest Cash Flow Activity</h3>
-                                <p class="chart-sub">Recent revenue payouts & tax write-offs.</p>
-                            </div>
-                            <button class="btn btn-secondary btn-sm" id="btn-add-activity">+ Add Entry</button>
+                <!-- 2 & 5. Premium Creator Questions & Narrative Intelligence Grid -->
+                <div class="intelligence-grid">
+                    
+                    <!-- Answers: Which platform is carrying me? & August Forecast -->
+                    <div class="codex-card">
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Predictive Creator Forecast</h3>
+                        <div style="font-size: 40px; font-weight: 700; color: var(--accent-emerald); letter-spacing: -0.04em;">
+                            R24,800
                         </div>
-                        <div class="activity-list" id="activity-stream-list"></div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Projected August Income (87% Confidence)</div>
+
+                        <div class="story-box">
+                            <strong>📈 Platform Story:</strong> Revenue is accelerating (+18.4% compared to last month). YouTube Studio is currently carrying 82% of your monthly cash flow.
+                        </div>
                     </div>
 
-                    <!-- Forecast Card -->
-                    <div class="artwork-chart-card">
-                        <div class="chart-header">
-                            <div>
-                                <h3 class="chart-title">Predictive Monthly Forecast</h3>
-                                <p class="chart-sub">Machine learning revenue predictions.</p>
-                            </div>
-                            <span class="story-tag up">87% Confidence</span>
+                    <!-- Recent Activity Stream -->
+                    <div class="codex-card">
+                        <div class="section-header" style="margin-bottom: 20px;">
+                            <h3 style="font-size: 16px; font-weight: 600;">Latest Payouts & Write-Offs</h3>
+                            <button class="btn btn-secondary btn-sm" id="btn-add-activity">+ Add</button>
                         </div>
-                        <div style="margin-top: 16px;">
-                            <div class="story-number text-emerald" style="font-size: 2.4rem;">R24,800</div>
-                            <p class="story-desc" style="font-size: 0.9rem; margin-top: 8px;">Forecasted August income based on active brand deals, historical RPM rates, and view seasonality.</p>
-                        </div>
+                        <div class="activity-list" id="activity-stream-os"></div>
                     </div>
                 </div>
             </section>
 
             <!-- TAB 2: REVENUE -->
             <section id="tab-revenue" class="tab-pane hidden">
-                <div class="artwork-chart-card">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Revenue Transactions</h3>
-                    </div>
+                <div class="codex-card">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Revenue Transactions</h3>
                     <div class="activity-list" id="full-revenue-stream"></div>
                 </div>
             </section>
 
-            <!-- TAB 3: EXPENSES -->
-            <section id="tab-expenses" class="tab-pane hidden">
-                <div class="artwork-chart-card">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Expense Write-Offs</h3>
-                    </div>
-                    <div class="activity-list" id="full-expense-stream"></div>
+            <!-- TAB 3: DEPENDENCE -->
+            <section id="tab-dependence" class="tab-pane hidden">
+                <div class="codex-card">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Algorithm Risk Index</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Detailed platform dependency metrics.</p>
                 </div>
             </section>
 
-            <!-- TAB 4: SOURCES -->
-            <section id="tab-sources" class="tab-pane hidden">
-                <div class="artwork-chart-card">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Platform Connections</h3>
-                    </div>
-                    <div class="activity-list" id="full-sources-list"></div>
+            <!-- TAB 4: EXPENSES -->
+            <section id="tab-expenses" class="tab-pane hidden">
+                <div class="codex-card">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Expense Write-Offs</h3>
+                    <div class="activity-list" id="full-expense-stream"></div>
                 </div>
             </section>
 
             <!-- TAB 5: SETTINGS -->
             <section id="tab-settings" class="tab-pane hidden">
-                <div class="artwork-chart-card">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Workspace Settings</h3>
-                    </div>
-                    <p class="chart-sub">API connection secrets, Plaid tokens, and security authentication.</p>
+                <div class="codex-card">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Workspace Settings</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Currency, security API credentials, and account settings.</p>
                 </div>
             </section>
         </main>
@@ -246,7 +189,7 @@
     <div class="modal-overlay" id="modal-app">
         <div class="codex-modal">
             <div class="modal-header">
-                <h3 id="modal-title" style="font-size: 1.1rem; font-weight: 800;">Modal Title</h3>
+                <h3 id="modal-title" style="font-size: 16px; font-weight: 600;">Modal Title</h3>
                 <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body" id="modal-body"></div>

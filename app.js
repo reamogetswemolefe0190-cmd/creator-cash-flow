@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Creator Cash Flow - Storytelling & Artwork Chart Engine
+   Creator Financial OS - Engine & Chart Artwork
    ========================================================================== */
 
 const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
@@ -7,6 +7,7 @@ const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
 // State Management
 const state = {
     user: { name: 'Reamogetswe', email: 'reamogetswe@creator.co.za' },
+    balance: 24650,
     timelineData: [
         { date: 'Jul 1', rev: 4200, exp: 500, profit: 3700 },
         { date: 'Jul 5', rev: 8900, exp: 1200, profit: 7700 },
@@ -24,7 +25,7 @@ const state = {
     ]
 };
 
-let artworkChartInstance = null;
+let osChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
@@ -33,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAuthModalTrigger();
 
     renderDashboardData();
-    initArtworkChart();
+    initOSChart();
+    animateCounter();
 
     // Event Listeners
     document.getElementById('btn-sync-trigger').addEventListener('click', syncData);
@@ -66,21 +68,39 @@ function switchTab(tabId) {
     }
 }
 
-// Render Data & Activity Lists
+// 1. Absurd 96px Balance Counter Animation (0 -> R24,650)
+function animateCounter() {
+    const target = state.balance;
+    const element = document.getElementById('val-current-balance');
+    if (!element) return;
+    let current = 0;
+    const step = Math.ceil(target / 35);
+
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        element.innerText = `R${current.toLocaleString()}`;
+    }, 20);
+}
+
+// Render Data & Activity Streams
 function renderDashboardData() {
-    const activityStream = document.getElementById('activity-stream-list');
+    const activityStream = document.getElementById('activity-stream-os');
     if (activityStream) {
         activityStream.innerHTML = '';
-        state.activities.forEach(a => {
-            const amountClass = a.type === 'income' ? 'text-emerald' : '';
+        state.activities.slice(0, 4).forEach(a => {
+            const amountClass = a.type === 'income' ? 'style="color: var(--accent-emerald); font-weight: 700;"' : 'style="font-weight: 600;"';
             const prefix = a.type === 'income' ? '+' : '-';
             activityStream.innerHTML += `
                 <div class="activity-item">
                     <div>
-                        <div style="font-weight: 700; font-size: 0.88rem;">${a.desc}</div>
-                        <div style="font-size: 0.76rem; color: var(--text-secondary);">${a.date} • Verified Sync</div>
+                        <div style="font-weight: 600; font-size: 13px;">${a.desc}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); opacity: 0.6;">${a.date} • Verified Sync</div>
                     </div>
-                    <div class="${amountClass}" style="font-weight: 800; font-size: 0.95rem;">${prefix}R${a.amount.toLocaleString()}</div>
+                    <div ${amountClass} font-size: 14px;">${prefix}R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -97,10 +117,10 @@ function renderFullStreams() {
             revStream.innerHTML += `
                 <div class="activity-item">
                     <div>
-                        <div style="font-weight: 700;">${a.desc}</div>
-                        <div style="font-size: 0.76rem; color: var(--text-secondary);">${a.date}</div>
+                        <div style="font-weight: 600;">${a.desc}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">${a.date}</div>
                     </div>
-                    <div class="text-emerald" style="font-weight: 800;">+R${a.amount.toLocaleString()}</div>
+                    <div style="color: var(--accent-emerald); font-weight: 700;">+R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -113,40 +133,42 @@ function renderFullStreams() {
             expStream.innerHTML += `
                 <div class="activity-item">
                     <div>
-                        <div style="font-weight: 700;">${a.desc}</div>
-                        <div style="font-size: 0.76rem; color: var(--text-secondary);">${a.date} • 100% Tax Write-Off</div>
+                        <div style="font-weight: 600;">${a.desc}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">${a.date} • 100% Tax Write-Off</div>
                     </div>
-                    <div style="font-weight: 800;">-R${a.amount.toLocaleString()}</div>
+                    <div style="font-weight: 600;">-R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
     }
 }
 
-// 2. Make the Chart the Artwork
-function initArtworkChart() {
-    const ctx = document.getElementById('chart-revenue-artwork').getContext('2d');
+// Giant Artwork Chart Canvas
+function initOSChart() {
+    const canvas = document.getElementById('chart-revenue-os');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 320);
-    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 340);
+    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.18)');
+    gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
 
-    artworkChartInstance = new Chart(ctx, {
+    osChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: state.timelineData.map(d => d.date),
             datasets: [{
-                label: 'Revenue Trajectory',
+                label: 'Cash Flow Trajectory',
                 data: state.timelineData.map(d => d.rev),
-                borderColor: '#10B981',
-                borderWidth: 3.5,
+                borderColor: '#22C55E',
+                borderWidth: 3,
                 backgroundColor: gradient,
                 fill: true,
                 tension: 0.4,
                 pointRadius: 4,
                 pointHoverRadius: 8,
-                pointBackgroundColor: '#10B981',
-                pointBorderColor: '#080B10',
+                pointBackgroundColor: '#22C55E',
+                pointBorderColor: '#050505',
                 pointBorderWidth: 2
             }]
         },
@@ -160,15 +182,15 @@ function initArtworkChart() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#121722',
+                    backgroundColor: '#0A0A0C',
                     titleColor: '#FFFFFF',
-                    bodyColor: '#10B981',
-                    borderColor: 'rgba(255, 255, 255, 0.16)',
+                    bodyColor: '#22C55E',
+                    borderColor: 'rgba(255, 255, 255, 0.14)',
                     borderWidth: 1,
                     displayColors: false,
                     padding: 14,
-                    titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: '700' },
-                    bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
+                    titleFont: { family: 'Inter', size: 13, weight: '600' },
+                    bodyFont: { family: 'Inter', size: 13 },
                     callbacks: {
                         label: function(context) {
                             const idx = context.dataIndex;
@@ -185,13 +207,13 @@ function initArtworkChart() {
             scales: {
                 x: {
                     grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                    ticks: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 12 } }
+                    ticks: { color: '#8E8E93', font: { family: 'Inter', size: 12 } }
                 },
                 y: {
                     grid: { color: 'rgba(255, 255, 255, 0.04)' },
                     ticks: {
-                        color: '#94A3B8',
-                        font: { family: 'Plus Jakarta Sans', size: 12 },
+                        color: '#8E8E93',
+                        font: { family: 'Inter', size: 12 },
                         callback: function(value) {
                             return 'R' + (value / 1000) + 'k';
                         }
@@ -204,24 +226,21 @@ function initArtworkChart() {
 
 function syncData() {
     const btn = document.getElementById('btn-sync-trigger');
-    btn.innerHTML = `<i data-lucide="refresh-cw" class="spin"></i> Syncing...`;
-    lucide.createIcons();
+    btn.innerText = `Syncing...`;
 
     setTimeout(() => {
-        btn.innerHTML = `<i data-lucide="check"></i> Synced`;
-        lucide.createIcons();
+        btn.innerText = `Synced`;
         setTimeout(() => {
-            btn.innerHTML = `<i data-lucide="refresh-cw"></i> Sync`;
-            lucide.createIcons();
+            btn.innerText = `Sync`;
         }, 2000);
     }, 1000);
 }
 
 function openAddActivityModal() {
-    openModal('Add Activity', `
+    openModal('Add Cash Flow Entry', `
         <div class="form-group">
             <label>Description</label>
-            <input type="text" id="act-desc" class="form-input" placeholder="e.g. YouTube Studio Payout">
+            <input type="text" id="act-desc" class="form-input" placeholder="e.g. YouTube AdSense Payout">
         </div>
         <div class="form-group">
             <label>Type</label>
@@ -250,7 +269,11 @@ function submitActivity() {
         amount
     });
 
+    if (type === 'income') state.balance += amount;
+    else state.balance -= amount;
+
     renderDashboardData();
+    animateCounter();
     closeModal();
 }
 
@@ -262,7 +285,7 @@ function setupAuthModalTrigger() {
 }
 
 function openAccountAuthModal() {
-    openModal('Creator Account & Security Login', `
+    openModal('Creator Account & Session Login', `
         <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: var(--radius-sm);">
             <button class="btn btn-emerald btn-sm" id="auth-tab-signup" style="flex:1;" onclick="switchAuthTab('signup')">Create Account</button>
             <button class="btn btn-secondary btn-sm" id="auth-tab-login" style="flex:1;" onclick="switchAuthTab('login')">Sign In</button>
@@ -299,8 +322,6 @@ function openAccountAuthModal() {
                 Sign In To Workspace
             </button>
         </div>
-
-        <div id="auth-status-msg" style="margin-top: 14px; font-size: 0.82rem; text-align: center; color: var(--text-secondary);"></div>
     `);
 }
 
@@ -325,43 +346,14 @@ function switchAuthTab(tab) {
 
 async function executeCreateAccount() {
     const name = document.getElementById('reg-name').value.trim() || 'Reamogetswe Molefe';
-    const email = document.getElementById('reg-email').value.trim();
-    const password = document.getElementById('reg-pass').value.trim();
+    const email = document.getElementById('reg-email').value.trim() || 'reamogetswe@creator.co.za';
 
-    if (!email) {
-        alert("Please enter a valid email address.");
-        return;
-    }
+    const userData = { id: 'usr_' + Date.now(), name, email, verified: true };
+    localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
 
-    const msgBox = document.getElementById('auth-status-msg');
-    if (msgBox) msgBox.innerHTML = `<span style="color: var(--accent-emerald);">⚡ Connecting to live security API server...</span>`;
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/auth/signup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password: password || 'CreatorPass2026!' })
-        });
-        const data = await res.json();
-
-        const userData = { id: data.userId || 'usr_' + Date.now(), name, email, verified: true };
-        localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
-
-        if (msgBox) msgBox.innerHTML = `<span style="color: var(--accent-emerald);">🎉 Account Activated! Verification email sent to ${email}</span>`;
-
-        setTimeout(() => {
-            document.getElementById('nav-user-label').innerText = name.split(' ')[0];
-            closeModal();
-            alert(`🎉 Creator Account Successfully Activated for ${name} (${email})!\n\nYour session is verified and saved across devices.`);
-        }, 800);
-    } catch (err) {
-        // High-reliability local backup session
-        const userData = { id: 'usr_' + Date.now(), name, email, verified: true };
-        localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
-        document.getElementById('nav-user-label').innerText = name.split(' ')[0];
-        closeModal();
-        alert(`🎉 Account Activated for ${name} (${email})!\n\nSession verified.`);
-    }
+    document.getElementById('nav-user-label').innerText = name.split(' ')[0];
+    closeModal();
+    alert(`🎉 Creator Account Successfully Activated for ${name} (${email})!\n\nYour session is active.`);
 }
 
 async function executeLogin() {

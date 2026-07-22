@@ -1,34 +1,32 @@
 /* ==========================================================================
-   Creator Cash Flow - Visual Layers & Storytelling Design System
-   70% / 30% Asymmetric Grid, Subtle Grid Texture, & Chart Artwork
+   Creator Cash Flow - Creator Financial OS (Category-Defining Architecture)
    ========================================================================== */
 
 :root {
-    --bg-page: #080B10;
-    --bg-card: #121722;
-    --bg-card-elevated: #161D2B;
-    --bg-input: #171F2E;
+    /* Pure Black & Monochrome System */
+    --bg-page: #050505;
+    --bg-card: #0A0A0C;
+    --bg-card-glass: rgba(255, 255, 255, 0.018);
+    --bg-input: #121214;
     
-    --border-subtle: rgba(255, 255, 255, 0.07);
-    --border-glow: rgba(34, 197, 94, 0.25);
-    --border-hover: rgba(255, 255, 255, 0.16);
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(255, 255, 255, 0.14);
     
+    /* Typography */
     --text-primary: #FFFFFF;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
+    --text-secondary: #8E8E93;
+    --text-muted: #636366;
     
-    /* Vibrant Identity Palette */
-    --accent-emerald: #10B981;
-    --accent-emerald-glow: rgba(16, 185, 129, 0.2);
-    --accent-blue: #38BDF8;
-    --accent-coral: #F43F5E;
-    --accent-amber: #F59E0B;
+    /* Single Accent Color (Mercury & Apple Discipline) */
+    --accent-emerald: #22C55E;
+    --accent-emerald-subtle: rgba(34, 197, 94, 0.1);
+    --accent-warning: #F59E0B;
+    --accent-warning-subtle: rgba(245, 158, 11, 0.1);
 
-    --radius-card: 22px;
+    --radius-card: 24px;
     --radius-btn: 12px;
     --radius-sm: 8px;
     
-    --shadow-depth: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
     --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -39,13 +37,9 @@
 }
 
 body.codex-app {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     background-color: var(--bg-page);
-    /* 1. Subtle Grid Texture + Soft Ambient Glow Layer */
-    background-image: 
-        radial-gradient(circle at 50% 15%, rgba(16, 185, 129, 0.12), transparent 50%),
-        radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 100% 100%, 24px 24px;
+    background-image: radial-gradient(circle at top center, rgba(255, 255, 255, 0.04), transparent 55%);
     color: var(--text-primary);
     line-height: 1.5;
     min-height: 100vh;
@@ -61,12 +55,12 @@ body.codex-app {
 
 /* Sidebar Navigation */
 .codex-sidebar {
-    width: 260px;
-    background-color: rgba(13, 17, 26, 0.95);
+    width: 250px;
+    background-color: var(--bg-page);
     border-right: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
-    padding: 32px 20px;
+    padding: 40px 24px;
     flex-shrink: 0;
     position: sticky;
     top: 0;
@@ -74,246 +68,224 @@ body.codex-app {
     z-index: 40;
 }
 
-.brand-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 40px;
-}
-
-.brand-logo {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, var(--accent-emerald), var(--accent-blue));
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FFF;
-    font-size: 1.1rem;
-    box-shadow: 0 0 20px var(--accent-emerald-glow);
-}
-
-.brand-header h2 { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.3px; }
-.brand-header p { font-size: 0.76rem; color: var(--accent-emerald); font-weight: 700; margin-top: 2px; }
+.brand-header { margin-bottom: 48px; }
+.brand-header h2 { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+.brand-header p { font-size: 12px; color: var(--accent-emerald); font-weight: 600; margin-top: 2px; }
 
 .codex-nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
 
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 11px 16px;
-    color: var(--text-secondary);
+    gap: 10px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+    opacity: 0.5;
     text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     border-radius: var(--radius-btn);
     transition: var(--transition-smooth);
 }
 
-.nav-item:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.04); }
-.nav-item.active {
-    color: #FFF;
-    background: linear-gradient(90deg, rgba(16, 185, 129, 0.15), transparent);
-    border-left: 3.5px solid var(--accent-emerald);
-}
+.nav-item:hover { opacity: 0.85; background-color: var(--bg-card-glass); }
+.nav-item.active { opacity: 1; font-weight: 600; background-color: var(--bg-card-glass); }
 
-.sidebar-footer { padding-top: 20px; border-top: 1px solid var(--border-subtle); }
+.sidebar-footer { padding-top: 24px; border-top: 1px solid var(--border-subtle); }
 
 /* Main Viewport */
 .codex-main {
     flex: 1;
-    padding: 48px 60px;
-    max-width: 1280px;
+    padding: 64px 80px;
+    max-width: 1180px;
     margin: 0 auto;
     width: 100%;
 }
 
-/* Hero Section */
-.hero-story-header {
-    margin-bottom: 36px;
+/* 1. Almost Empty First Screen */
+.hero-minimal-screen {
+    margin-bottom: 72px;
 }
 
-.hero-meta-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.78rem;
+.brand-category-tag {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+/* 1. Absurdly Large Balance Typography (96px) */
+.absurd-balance {
+    font-size: 96px;
     font-weight: 700;
-    color: var(--accent-emerald);
-    background: rgba(16, 185, 129, 0.1);
-    padding: 4px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    letter-spacing: -0.06em;
+    color: var(--text-primary);
+    line-height: 1;
     margin-bottom: 12px;
 }
 
-.hero-title {
-    font-size: 2.8rem;
-    font-weight: 800;
-    letter-spacing: -0.8px;
-    line-height: 1.1;
-    margin-bottom: 8px;
+.hero-change-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent-emerald);
+    margin-bottom: 48px;
+    display: inline-block;
 }
 
-.hero-subtitle {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    max-width: 680px;
-}
-
-/* 3. Asymmetric 70% / 30% Grid Layout */
-.asymmetric-story-grid {
-    display: grid;
-    grid-template-columns: 2.2fr 1fr;
-    gap: 28px;
-    margin-bottom: 40px;
-}
-
-/* 2. Floating Artwork Chart Card */
-.artwork-chart-card {
-    background: var(--bg-card);
+/* Giant Artwork Chart */
+.giant-chart-card {
+    background: var(--bg-card-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 32px;
-    box-shadow: var(--shadow-depth);
-    position: relative;
+    padding: 40px;
+    margin-bottom: 72px;
     transition: var(--transition-smooth);
 }
 
-.artwork-chart-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--border-glow);
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 24px;
-}
-
-.chart-title { font-size: 1.2rem; font-weight: 800; }
-.chart-sub { font-size: 0.84rem; color: var(--text-secondary); margin-top: 2px; }
-
-.chart-wrapper {
-    position: relative;
-    height: 340px;
-    width: 100%;
-}
-
-/* 5. Creator Storytelling Side Panel (30% Column) */
-.storytelling-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.story-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-card);
-    padding: 20px;
-    transition: var(--transition-smooth);
-}
-
-.story-card:hover {
+.giant-chart-card:hover {
     transform: translateY(-2px);
     border-color: var(--border-hover);
 }
 
-.story-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+.chart-wrapper {
+    position: relative;
+    height: 380px;
+    width: 100%;
 }
 
-.story-label { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); }
-.story-tag { font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: var(--radius-sm); }
-.story-tag.up { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
-.story-tag.down { background: rgba(244, 63, 94, 0.15); color: var(--accent-coral); }
-
-.story-number { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
-.story-desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
-
-/* 1. Visual Layers & Node Stream Diagram */
-.living-stream-card {
-    background: var(--bg-card);
+/* 7. The Feature Nobody Expects: Revenue Dependence & Risk Index */
+.dependence-section {
+    background: var(--bg-card-glass);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 32px;
-    margin-bottom: 40px;
-    box-shadow: var(--shadow-depth);
+    padding: 40px;
+    margin-bottom: 72px;
     transition: var(--transition-smooth);
 }
 
-.living-stream-card:hover {
-    transform: translateY(-3px);
+.dependence-section:hover {
+    transform: translateY(-2px);
     border-color: var(--border-hover);
 }
 
-.stream-nodes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin: 24px 0;
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
 }
 
-.node-box {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-subtle);
+.section-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+}
+
+.risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-warning);
+    background: var(--accent-warning-subtle);
+    padding: 6px 14px;
     border-radius: var(--radius-sm);
-    padding: 16px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.dependence-bars {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bar-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.bar-track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: var(--accent-emerald);
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+
+.risk-insight-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* 2 & 5. Premium Creator Intelligence Grid */
+.intelligence-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.codex-card {
+    background: var(--bg-card-glass);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    padding: 36px;
     transition: var(--transition-smooth);
 }
 
-.node-box:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: var(--accent-emerald);
+.codex-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
 }
 
-.node-title { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); }
-.node-val { font-size: 1.25rem; font-weight: 800; color: var(--accent-emerald); }
-
-.consolidated-net-banner {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.1));
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    border-radius: var(--radius-card);
-    padding: 24px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.story-box {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
 
-.net-title { font-size: 0.88rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
-.net-amount { font-size: 2.2rem; font-weight: 800; color: #FFF; letter-spacing: -0.5px; }
+.story-box strong { color: var(--text-primary); }
 
-/* Grid Bottom Section */
-.bottom-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 28px;
-}
-
-.activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-list { display: flex; flex-direction: column; gap: 12px; }
 
 .activity-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.02);
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.015);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-btn);
     transition: var(--transition-smooth);
 }
 
-.activity-item:hover { background: rgba(255, 255, 255, 0.04); border-color: var(--border-hover); }
+.activity-item:hover { border-color: var(--border-hover); background: rgba(255, 255, 255, 0.03); }
 
 /* Buttons */
 .btn {
@@ -322,18 +294,17 @@ body.codex-app {
     gap: 8px;
     padding: 10px 20px;
     border-radius: var(--radius-btn);
-    font-size: 0.86rem;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 500;
     border: none;
     cursor: pointer;
     transition: var(--transition-smooth);
 }
 
-.btn:hover { transform: translateY(-1px); }
-.btn-emerald { background: var(--accent-emerald); color: #FFF; box-shadow: 0 4px 16px var(--accent-emerald-glow); }
-.btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-subtle); }
-.btn-secondary:hover { border-color: var(--border-hover); background: var(--bg-card-elevated); }
-.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+.btn:hover { transform: scale(1.02); }
+.btn-emerald { background-color: var(--accent-emerald); color: #000000; font-weight: 600; }
+.btn-secondary { background: var(--bg-card-glass); color: var(--text-primary); border: 1px solid var(--border-subtle); }
+.btn-secondary:hover { border-color: var(--border-hover); }
 
 /* Modals */
 .modal-overlay {
@@ -352,38 +323,37 @@ body.codex-app {
 
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 .codex-modal {
-    background: var(--bg-card-elevated);
+    background-color: var(--bg-card);
     border: 1px solid var(--border-hover);
     border-radius: var(--radius-card);
     width: 90%;
     max-width: 440px;
-    padding: 28px;
-    box-shadow: var(--shadow-depth);
+    padding: 32px;
 }
 
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
 
-.form-group { margin-bottom: 14px; }
-.form-group label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
 .form-input {
     width: 100%;
-    background: var(--bg-input);
+    background-color: var(--bg-input);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    padding: 9px 14px;
+    border-radius: var(--radius-btn);
+    padding: 10px 14px;
     color: var(--text-primary);
-    font-size: 0.88rem;
+    font-size: 14px;
     outline: none;
 }
 
-.form-input:focus { border-color: var(--accent-emerald); }
+.form-input:focus { border-color: var(--text-primary); }
 .hidden { display: none !important; }
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
     .app-shell { flex-direction: column; }
-    .codex-sidebar { width: 100%; height: auto; position: relative; padding: 20px; }
-    .codex-main { padding: 24px 18px; }
-    .asymmetric-story-grid, .bottom-grid { grid-template-columns: 1fr; gap: 20px; }
-    .hero-title { font-size: 2.2rem; }
+    .codex-sidebar { width: 100%; height: auto; position: relative; padding: 24px; }
+    .codex-main { padding: 32px 20px; }
+    .intelligence-grid { grid-template-columns: 1fr; gap: 24px; }
+    .absurd-balance { font-size: 60px; }
 }
