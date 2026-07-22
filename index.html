@@ -18,14 +18,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Cache-Busting CSS (v6.0 Linear Monochrome System) -->
-    <link rel="stylesheet" href="style.css?v=6.0_linear_force_refresh">
+    <!-- Cache-Busting CSS (v7.0 Masterclass System) -->
+    <link rel="stylesheet" href="style.css?v=7.0_linear_72px_masterclass">
 </head>
 <body class="codex-app">
 
     <div class="app-shell">
         
-        <!-- 2. Clean Sidebar Navigation -->
+        <!-- 4 & 6. Quieter Text Navigation (No Generic Icons) -->
         <aside class="codex-sidebar">
             <div class="brand-header">
                 <h2>Creator Cash Flow</h2>
@@ -33,37 +33,21 @@
             </div>
 
             <nav class="codex-nav">
-                <a href="#overview" class="nav-item active" data-tab="overview">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#revenue" class="nav-item" data-tab="revenue">
-                    <i data-lucide="trending-up"></i>
-                    <span>Revenue</span>
-                </a>
-                <a href="#expenses" class="nav-item" data-tab="expenses">
-                    <i data-lucide="arrow-up-right"></i>
-                    <span>Expenses</span>
-                </a>
-                <a href="#sources" class="nav-item" data-tab="sources">
-                    <i data-lucide="pie-chart"></i>
-                    <span>Sources</span>
-                </a>
-                <a href="#settings" class="nav-item" data-tab="settings">
-                    <i data-lucide="sliders"></i>
-                    <span>Settings</span>
-                </a>
+                <a href="#overview" class="nav-item active" data-tab="overview">Dashboard</a>
+                <a href="#revenue" class="nav-item" data-tab="revenue">Revenue</a>
+                <a href="#expenses" class="nav-item" data-tab="expenses">Expenses</a>
+                <a href="#sources" class="nav-item" data-tab="sources">Sources</a>
+                <a href="#settings" class="nav-item" data-tab="settings">Settings</a>
             </nav>
 
             <div class="sidebar-footer">
                 <button class="btn btn-secondary style-btn" id="btn-auth-modal" style="width: 100%;">
-                    <i data-lucide="user"></i>
                     <span id="nav-user-label">Sign In</span>
                 </button>
             </div>
         </aside>
 
-        <!-- Main Viewport -->
+        <!-- 3. Main Viewport with Increased Whitespace -->
         <main class="codex-main">
             
             <!-- 8. Premium Hero Section -->
@@ -79,9 +63,18 @@
             <!-- TAB 1: OVERVIEW -->
             <section id="tab-overview" class="tab-pane active">
                 
-                <!-- 5. Current Balance Card -->
+                <!-- 1 & 10. Locked-Eye Balance Hero (72px Typography + Operational Metadata) -->
                 <div class="balance-hero">
-                    <div class="balance-label">Current Balance</div>
+                    <div class="balance-top-row">
+                        <div class="balance-label">Current Balance</div>
+                        <!-- 10. Operational Metadata -->
+                        <div class="operational-meta">
+                            <span><span class="meta-dot"></span> Last synced 2 mins ago</span>
+                            <span>•</span>
+                            <span>3 connected platforms</span>
+                        </div>
+                    </div>
+                    <!-- 1. 72px Balance -->
                     <div class="balance-amount" id="val-current-balance">R24,650</div>
                     <div class="balance-change">
                         <i data-lucide="arrow-up-right"></i>
@@ -89,23 +82,21 @@
                     </div>
                 </div>
 
-                <!-- 9. Signature Element: Full-Width Revenue Timeline Chart -->
+                <!-- 2 & 9. Signature Element: Revenue Timeline Chart with Custom 9. "WOW" Tooltip Interaction -->
                 <div class="signature-card">
                     <div class="card-header">
                         <div>
                             <h3 class="card-title">Revenue Timeline</h3>
                             <p class="card-subtitle">Consolidated daily earnings across connected streams.</p>
                         </div>
-                        <button class="btn btn-secondary btn-sm" id="btn-sync-trigger">
-                            <i data-lucide="refresh-cw"></i> Sync
-                        </button>
+                        <button class="btn btn-secondary btn-sm" id="btn-sync-trigger">Sync</button>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="chart-revenue-timeline"></canvas>
                     </div>
                 </div>
 
-                <!-- 10. Two-Column Grid: Income Sources & Recent Activity -->
+                <!-- 3. Two-Column Grid with 48px Gap -->
                 <div class="section-grid">
                     <!-- Income Sources -->
                     <div class="codex-card">
@@ -120,27 +111,18 @@
                         </div>
                     </div>
 
-                    <!-- Recent Activity -->
+                    <!-- 8. Latest Activity (Cards First, Tables Second) -->
                     <div class="codex-card">
                         <div class="card-header">
                             <div>
-                                <h3 class="card-title">Recent Activity</h3>
-                                <p class="card-subtitle">Latest payouts & expenses</p>
+                                <h3 class="card-title">Latest Activity</h3>
+                                <p class="card-subtitle">Recent payouts & expenses</p>
                             </div>
                             <button class="btn btn-secondary btn-sm" id="btn-add-activity">+ Add</button>
                         </div>
-                        <table class="codex-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Description</th>
-                                    <th class="text-right">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activity-table-rows">
-                                <!-- Populated dynamically by JS -->
-                            </tbody>
-                        </table>
+                        <div class="activity-stream" id="activity-stream-cards">
+                            <!-- Populated dynamically by JS -->
+                        </div>
                     </div>
                 </div>
             </section>
@@ -151,17 +133,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Revenue Transactions</h3>
                     </div>
-                    <table class="codex-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Platform</th>
-                                <th>Description</th>
-                                <th class="text-right">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="full-revenue-rows"></tbody>
-                    </table>
+                    <div class="activity-stream" id="full-revenue-stream"></div>
                 </div>
             </section>
 
@@ -171,17 +143,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Expense Transactions</h3>
                     </div>
-                    <table class="codex-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Merchant</th>
-                                <th>Category</th>
-                                <th class="text-right">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="full-expense-rows"></tbody>
-                    </table>
+                    <div class="activity-stream" id="full-expense-stream"></div>
                 </div>
             </section>
 

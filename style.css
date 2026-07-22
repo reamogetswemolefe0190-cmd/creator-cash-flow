@@ -1,27 +1,26 @@
 /* ==========================================================================
-   Creator Cash Flow - Linear / Vercel / Codex Design System
-   Strict Monochrome (#09090B) + Emerald (#22C55E)
+   Creator Cash Flow - Executive Masterclass Design System (Linear / Vercel)
    ========================================================================== */
 
 :root {
-    /* Monochrome Palette */
+    /* Pure Deep Dark Mode */
     --bg-page: #09090B;
-    --bg-surface: #111113;
-    --bg-surface-hover: #161618;
-    --bg-subtle: #18181B;
-    --bg-input: #18181B;
+    --bg-card: rgba(255, 255, 255, 0.02);
+    --bg-card-hover: rgba(255, 255, 255, 0.04);
+    --bg-input: rgba(255, 255, 255, 0.03);
     
-    --border-subtle: #27272A;
-    --border-hover: #3F3F46;
+    /* 5. Lifted Depth Borders */
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(255, 255, 255, 0.14);
     
     /* Typography Colors */
     --text-primary: #FAFAFA;
     --text-secondary: #A1A1AA;
     --text-muted: #71717A;
     
-    /* Single Accent Color */
-    --accent-green: #22C55E;
-    --accent-green-subtle: rgba(34, 197, 94, 0.1);
+    /* Single Accent */
+    --accent-emerald: #22C55E;
+    --accent-emerald-glow: rgba(34, 197, 94, 0.12);
 
     /* Radii & Spacing */
     --radius-card: 20px;
@@ -40,6 +39,8 @@
 body.codex-app {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Geist', sans-serif;
     background-color: var(--bg-page);
+    /* 7. Subtle Ambient Lighting (Stripe / Vercel Style) */
+    background-image: radial-gradient(circle at top center, rgba(34, 197, 94, 0.07), transparent 55%);
     color: var(--text-primary);
     line-height: 1.5;
     min-height: 100vh;
@@ -53,14 +54,14 @@ body.codex-app {
     min-height: 100vh;
 }
 
-/* Sidebar Navigation - Clean Contrast */
+/* 6. Quieter Navigation Sidebar */
 .codex-sidebar {
-    width: 260px;
+    width: 250px;
     background-color: var(--bg-page);
     border-right: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
-    padding: 32px 24px;
+    padding: 40px 24px;
     flex-shrink: 0;
     position: sticky;
     top: 0;
@@ -69,11 +70,11 @@ body.codex-app {
 }
 
 .brand-header {
-    margin-bottom: 40px;
+    margin-bottom: 48px;
 }
 
 .brand-header h2 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--text-primary);
@@ -82,22 +83,25 @@ body.codex-app {
 .brand-header p {
     font-size: 13px;
     color: var(--text-secondary);
+    opacity: 0.6;
     margin-top: 2px;
 }
 
 .codex-nav {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     flex: 1;
 }
 
+/* 6. Quieter Navigation Items (Opacity hierarchy) */
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     padding: 10px 14px;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    opacity: 0.5;
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
@@ -105,25 +109,15 @@ body.codex-app {
     transition: var(--transition-smooth);
 }
 
-.nav-item i {
-    width: 18px;
-    height: 18px;
-    opacity: 0.7;
-}
-
 .nav-item:hover {
-    color: var(--text-primary);
-    background-color: var(--bg-surface);
+    opacity: 0.85;
+    background-color: var(--bg-card);
 }
 
 .nav-item.active {
-    color: var(--text-primary);
-    background-color: var(--bg-surface);
-}
-
-.nav-item.active i {
     opacity: 1;
-    color: var(--accent-green);
+    font-weight: 600;
+    background-color: var(--bg-card);
 }
 
 .sidebar-footer {
@@ -131,18 +125,18 @@ body.codex-app {
     border-top: 1px solid var(--border-subtle);
 }
 
-/* Main Viewport */
+/* 3. Main Viewport with 20-30% Increased Whitespace */
 .codex-main {
     flex: 1;
-    padding: 48px 64px;
-    max-width: 1200px;
+    padding: 64px 80px;
+    max-width: 1180px;
     margin: 0 auto;
     width: 100%;
 }
 
 /* 8. Upgraded Hero Section */
 .hero-section {
-    margin-bottom: 48px;
+    margin-bottom: 56px;
 }
 
 .hero-title {
@@ -156,6 +150,7 @@ body.codex-app {
 .hero-subtitle {
     font-size: 15px;
     color: var(--text-secondary);
+    opacity: 0.7;
     max-width: 600px;
     line-height: 1.6;
     margin-bottom: 24px;
@@ -164,41 +159,72 @@ body.codex-app {
 .hero-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 18px;
 }
 
 .hero-stat-pill {
     font-size: 13px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
+    opacity: 0.6;
 }
 
-/* 5 & 10. Command Center Balance Hero */
+/* 1. Locked Eye Balance Hero (72px Typography) */
 .balance-hero {
-    background-color: var(--bg-surface);
+    background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 32px;
-    margin-bottom: 40px;
+    padding: 40px;
+    margin-bottom: 48px;
     transition: var(--transition-smooth);
+}
+
+.balance-hero:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+}
+
+.balance-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
 }
 
 .balance-label {
     font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
+    opacity: 0.6;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 8px;
 }
 
+/* 10. Operational Operational Details (Last synced 2 mins ago) */
+.operational-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.meta-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--accent-emerald);
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* 1. 72px Balance Typography */
 .balance-amount {
-    font-size: 48px;
-    font-weight: 600;
-    letter-spacing: -0.04em;
+    font-size: 72px;
+    font-weight: 700;
+    letter-spacing: -0.06em;
     color: var(--text-primary);
-    line-height: 1.1;
-    margin-bottom: 12px;
+    line-height: 1;
+    margin-bottom: 16px;
 }
 
 .balance-change {
@@ -206,21 +232,21 @@ body.codex-app {
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    font-weight: 500;
-    color: var(--accent-green);
+    font-weight: 600;
+    color: var(--accent-emerald);
 }
 
-/* 9. Signature Element: Full-Width Revenue Timeline Chart */
+/* 2. Signature Element: Full-Width Revenue Timeline Chart Card */
 .signature-card {
-    background-color: var(--bg-surface);
+    background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 32px;
-    margin-bottom: 40px;
+    padding: 40px;
+    margin-bottom: 48px;
     transition: var(--transition-smooth);
 }
 
-.signature-card:hover, .balance-hero:hover, .codex-card:hover {
+.signature-card:hover {
     transform: translateY(-2px);
     border-color: var(--border-hover);
 }
@@ -229,7 +255,7 @@ body.codex-app {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 .card-title {
@@ -241,6 +267,7 @@ body.codex-app {
 .card-subtitle {
     font-size: 13px;
     color: var(--text-secondary);
+    opacity: 0.6;
     margin-top: 2px;
 }
 
@@ -250,34 +277,40 @@ body.codex-app {
     width: 100%;
 }
 
-/* 10. Grid Layout for Income Sources & Recent Activity */
+/* 3. Section Grid with 48px Gap */
 .section-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    margin-bottom: 40px;
+    gap: 48px;
+    margin-bottom: 48px;
 }
 
+/* 5. Card Lifted Depth Effect */
 .codex-card {
-    background-color: var(--bg-surface);
+    background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 32px;
+    padding: 36px;
     transition: var(--transition-smooth);
 }
 
-/* Clean Minimal Income Sources List */
+.codex-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+}
+
+/* Clean Income Sources List */
 .source-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
 }
 
 .source-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 12px;
+    padding-bottom: 14px;
     border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -298,35 +331,55 @@ body.codex-app {
     letter-spacing: -0.02em;
 }
 
-/* Clean Recent Transactions Table */
-.codex-table {
-    width: 100%;
-    border-collapse: collapse;
+/* 8. Activity Card Stream (Cards First, Tables Second) */
+.activity-stream {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.activity-card-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    transition: var(--transition-smooth);
+}
+
+.activity-card-item:hover {
+    border-color: var(--border-hover);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.activity-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-title {
     font-size: 14px;
-}
-
-.codex-table th {
-    text-align: left;
-    font-size: 12px;
     font-weight: 500;
+    color: var(--text-primary);
+}
+
+.activity-date {
+    font-size: 12px;
     color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-subtle);
+    opacity: 0.6;
+    margin-top: 2px;
 }
 
-.codex-table td {
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border-subtle);
-}
-
-.codex-table tr:last-child td {
-    border-bottom: none;
+.activity-val {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
 }
 
 .text-right { text-align: right !important; }
-.text-green { color: var(--accent-green) !important; }
+.text-green { color: var(--accent-emerald) !important; }
 
 /* Buttons with 6. Subtle Motion */
 .btn {
@@ -356,24 +409,24 @@ body.codex-app {
 }
 
 .btn-emerald {
-    background-color: var(--accent-green);
+    background-color: var(--accent-emerald);
     color: #000000;
     font-weight: 600;
 }
 
 .btn-secondary {
-    background-color: var(--bg-subtle);
+    background: var(--bg-card);
     color: var(--text-primary);
     border: 1px solid var(--border-subtle);
 }
 
 .btn-secondary:hover {
     border-color: var(--border-hover);
-    background-color: var(--bg-surface-hover);
+    background: var(--bg-card-hover);
 }
 
 .btn-sm {
-    padding: 6px 12px;
+    padding: 6px 14px;
     font-size: 13px;
 }
 
@@ -381,8 +434,8 @@ body.codex-app {
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -395,8 +448,8 @@ body.codex-app {
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
 .codex-modal {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
+    background-color: #111113;
+    border: 1px solid var(--border-hover);
     border-radius: var(--radius-card);
     width: 90%;
     max-width: 440px;
@@ -429,6 +482,7 @@ body.codex-app {
     display: block;
     font-size: 13px;
     color: var(--text-secondary);
+    opacity: 0.7;
     margin-bottom: 6px;
     font-weight: 500;
 }
@@ -455,8 +509,8 @@ body.codex-app {
 @media (max-width: 900px) {
     .app-shell { flex-direction: column; }
     .codex-sidebar { width: 100%; height: auto; position: relative; padding: 24px; }
-    .codex-main { padding: 24px 20px; }
+    .codex-main { padding: 32px 20px; }
     .section-grid { grid-template-columns: 1fr; gap: 24px; }
-    .balance-amount { font-size: 36px; }
+    .balance-amount { font-size: 52px; }
     .hero-title { font-size: 24px; }
 }

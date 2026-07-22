@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Creator Cash Flow - Linear / Vercel / Codex Application Engine
+   Creator Cash Flow - Executive Masterclass Application Engine
    ========================================================================== */
 
 const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
@@ -13,11 +13,19 @@ const state = {
         { name: 'TikTok Creator Rewards', amount: 6160, percent: '25%' },
         { name: 'Instagram Sponsorships', amount: 4940, percent: '20%' }
     ],
-    transactions: [
-        { date: 'Jul 21', desc: 'Google AdSense Payout', type: 'income', amount: 13550 },
-        { date: 'Jul 19', desc: 'Orms Direct (Sony Alpha Camera)', type: 'expense', amount: 4200 },
+    timelineData: [
+        { date: 'Jul 1', rev: 4200, exp: 500, profit: 3700 },
+        { date: 'Jul 5', rev: 8900, exp: 1200, profit: 7700 },
+        { date: 'Jul 10', rev: 12400, exp: 2100, profit: 10300 },
+        { date: 'Jul 14', rev: 16800, exp: 2900, profit: 13900 },
+        { date: 'Jul 18', rev: 20900, exp: 3850, profit: 17050 },
+        { date: 'Jul 21', rev: 24650, exp: 4200, profit: 20450 }
+    ],
+    activities: [
+        { date: 'Jul 21', desc: 'YouTube AdSense Payout', type: 'income', amount: 13550 },
+        { date: 'Jul 19', desc: 'Orms Direct (Sony Alpha)', type: 'expense', amount: 4200 },
         { date: 'Jul 18', desc: 'TikTok Creator Rewards ZAR', type: 'income', amount: 6160 },
-        { date: 'Jul 15', desc: 'Adobe Creative Cloud', type: 'expense', amount: 950 },
+        { date: 'Jul 15', desc: 'Canva Subscription', type: 'expense', amount: 149 },
         { date: 'Jul 14', desc: 'Woolworths SA Sponsorship', type: 'income', amount: 4940 }
     ]
 };
@@ -66,12 +74,12 @@ function switchTab(tabId) {
     }
 }
 
-// 6. Motion: Number Counter Animation (0 -> R24,650)
+// 1. 72px Balance Counter Animation (0 -> R24,650)
 function animateCounter() {
     const target = state.balance;
     const element = document.getElementById('val-current-balance');
     let current = 0;
-    const step = Math.ceil(target / 40);
+    const step = Math.ceil(target / 35);
 
     const timer = setInterval(() => {
         current += step;
@@ -99,54 +107,57 @@ function renderDashboardData() {
         });
     }
 
-    // Render Recent Activity Table
-    const tableBody = document.getElementById('activity-table-rows');
-    if (tableBody) {
-        tableBody.innerHTML = '';
-        state.transactions.slice(0, 5).forEach(t => {
-            const amountClass = t.type === 'income' ? 'text-green' : '';
-            const prefix = t.type === 'income' ? '+' : '-';
-            tableBody.innerHTML += `
-                <tr>
-                    <td>${t.date}</td>
-                    <td>${t.desc}</td>
-                    <td class="text-right ${amountClass}">${prefix}R${t.amount.toLocaleString()}</td>
-                </tr>
+    // 8. Card-Based Activity Stream (Cards First, Tables Second)
+    const activityStream = document.getElementById('activity-stream-cards');
+    if (activityStream) {
+        activityStream.innerHTML = '';
+        state.activities.slice(0, 5).forEach(a => {
+            const amountClass = a.type === 'income' ? 'text-green' : '';
+            const prefix = a.type === 'income' ? '+' : '-';
+            activityStream.innerHTML += `
+                <div class="activity-card-item">
+                    <div class="activity-info">
+                        <span class="activity-title">${a.desc}</span>
+                        <span class="activity-date">${a.date}</span>
+                    </div>
+                    <span class="activity-val ${amountClass}">${prefix}R${a.amount.toLocaleString()}</span>
+                </div>
             `;
         });
     }
 
-    // Full Tables Render
-    renderFullTables();
+    renderFullStreams();
 }
 
-function renderFullTables() {
-    const revBody = document.getElementById('full-revenue-rows');
-    if (revBody) {
-        revBody.innerHTML = '';
-        state.transactions.filter(t => t.type === 'income').forEach(t => {
-            revBody.innerHTML += `
-                <tr>
-                    <td>${t.date}</td>
-                    <td>YouTube / TikTok</td>
-                    <td>${t.desc}</td>
-                    <td class="text-right text-green">+R${t.amount.toLocaleString()}</td>
-                </tr>
+function renderFullStreams() {
+    const revStream = document.getElementById('full-revenue-stream');
+    if (revStream) {
+        revStream.innerHTML = '';
+        state.activities.filter(a => a.type === 'income').forEach(a => {
+            revStream.innerHTML += `
+                <div class="activity-card-item">
+                    <div class="activity-info">
+                        <span class="activity-title">${a.desc}</span>
+                        <span class="activity-date">${a.date} • Verified Sync</span>
+                    </div>
+                    <span class="activity-val text-green">+R${a.amount.toLocaleString()}</span>
+                </div>
             `;
         });
     }
 
-    const expBody = document.getElementById('full-expense-rows');
-    if (expBody) {
-        expBody.innerHTML = '';
-        state.transactions.filter(t => t.type === 'expense').forEach(t => {
-            expBody.innerHTML += `
-                <tr>
-                    <td>${t.date}</td>
-                    <td>${t.desc}</td>
-                    <td>Equipment / Software</td>
-                    <td class="text-right">-R${t.amount.toLocaleString()}</td>
-                </tr>
+    const expStream = document.getElementById('full-expense-stream');
+    if (expStream) {
+        expStream.innerHTML = '';
+        state.activities.filter(a => a.type === 'expense').forEach(a => {
+            expStream.innerHTML += `
+                <div class="activity-card-item">
+                    <div class="activity-info">
+                        <span class="activity-title">${a.desc}</span>
+                        <span class="activity-date">${a.date} • 100% Tax Write-Off</span>
+                    </div>
+                    <span class="activity-val">-R${a.amount.toLocaleString()}</span>
+                </div>
             `;
         });
     }
@@ -159,7 +170,7 @@ function renderFullTables() {
                 <div class="source-item">
                     <div>
                         <div class="source-name">${s.name}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary);">Connected API Sandbox</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); opacity: 0.6;">Connected API Sandbox</div>
                     </div>
                     <span class="source-val text-green">R${s.amount.toLocaleString()}</span>
                 </div>
@@ -168,60 +179,78 @@ function renderFullTables() {
     }
 }
 
-// 9. Signature Element: Full-Width Revenue Timeline Chart
+// 2 & 9. Signature Chart Upgrade & "WOW" Interaction
 function initTimelineChart() {
     const ctx = document.getElementById('chart-revenue-timeline').getContext('2d');
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.15)');
+    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.18)');
     gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
 
     timelineChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jul 1', 'Jul 5', 'Jul 10', 'Jul 14', 'Jul 18', 'Jul 21'],
+            labels: state.timelineData.map(d => d.date),
             datasets: [{
-                label: 'Revenue Timeline (ZAR)',
-                data: [4200, 8900, 12400, 16800, 20900, 24650],
+                label: 'Revenue Timeline',
+                data: state.timelineData.map(d => d.rev),
                 borderColor: '#22C55E',
-                borderWidth: 2,
+                borderWidth: 3,
                 backgroundColor: gradient,
                 fill: true,
-                tension: 0.35,
-                pointRadius: 3,
-                pointHoverRadius: 6,
-                pointBackgroundColor: '#22C55E'
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#22C55E',
+                pointBorderColor: '#09090B',
+                pointBorderWidth: 2
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 1200,
+                easing: 'easeInOutQuart'
+            },
             plugins: {
                 legend: { display: false },
+                // 9. "WOW" Tooltip Interaction (Date, Revenue, Expenses, Net Profit)
                 tooltip: {
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#111113',
                     titleColor: '#FAFAFA',
-                    bodyColor: '#22C55E',
+                    bodyColor: '#A1A1AA',
                     borderColor: '#27272A',
                     borderWidth: 1,
                     displayColors: false,
-                    padding: 10,
+                    padding: 14,
+                    titleFont: { family: 'Inter', size: 13, weight: '600' },
+                    bodyFont: { family: 'Inter', size: 13 },
                     callbacks: {
+                        title: function(items) {
+                            return items[0].label;
+                        },
                         label: function(context) {
-                            return `Revenue: R${context.raw.toLocaleString()}`;
+                            const idx = context.dataIndex;
+                            const item = state.timelineData[idx];
+                            return [
+                                `Revenue:  R${item.rev.toLocaleString()}`,
+                                `Expenses: R${item.exp.toLocaleString()}`,
+                                `Net Profit: R${item.profit.toLocaleString()}`
+                            ];
                         }
                     }
                 }
             },
             scales: {
                 x: {
-                    grid: { color: 'rgba(39, 39, 42, 0.5)' },
-                    ticks: { color: '#A1A1AA', font: { family: 'Inter', size: 12 } }
+                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                    ticks: { color: '#71717A', font: { family: 'Inter', size: 12 } }
                 },
                 y: {
-                    grid: { color: 'rgba(39, 39, 42, 0.5)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
                     ticks: {
-                        color: '#A1A1AA',
+                        color: '#71717A',
                         font: { family: 'Inter', size: 12 },
                         callback: function(value) {
                             return 'R' + (value / 1000) + 'k';
@@ -235,15 +264,12 @@ function initTimelineChart() {
 
 function syncData() {
     const btn = document.getElementById('btn-sync-trigger');
-    btn.innerHTML = `<i data-lucide="refresh-cw" class="spin"></i> Syncing...`;
-    lucide.createIcons();
+    btn.innerHTML = `Syncing...`;
 
     setTimeout(() => {
-        btn.innerHTML = `<i data-lucide="check"></i> Synced`;
-        lucide.createIcons();
+        btn.innerHTML = `Synced`;
         setTimeout(() => {
-            btn.innerHTML = `<i data-lucide="refresh-cw"></i> Sync`;
-            lucide.createIcons();
+            btn.innerHTML = `Sync`;
         }, 2000);
     }, 1000);
 }
@@ -252,7 +278,7 @@ function openAddActivityModal() {
     openModal('Add Activity', `
         <div class="form-group">
             <label>Description</label>
-            <input type="text" id="act-desc" class="form-input" placeholder="e.g. YouTube AdSense Payout">
+            <input type="text" id="act-desc" class="form-input" placeholder="e.g. YouTube Studio Payout">
         </div>
         <div class="form-group">
             <label>Type</label>
@@ -270,11 +296,11 @@ function openAddActivityModal() {
 }
 
 function submitActivity() {
-    const desc = document.getElementById('act-desc').value || 'New Transaction';
+    const desc = document.getElementById('act-desc').value || 'New Entry';
     const type = document.getElementById('act-type').value;
     const amount = parseFloat(document.getElementById('act-amount').value) || 2500;
 
-    state.transactions.unshift({
+    state.activities.unshift({
         date: 'Today',
         desc,
         type,
@@ -324,7 +350,6 @@ function openModal(title, html) {
     document.getElementById('modal-title').innerText = title;
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-app').classList.add('active');
-    lucide.createIcons();
 }
 
 function closeModal() {
