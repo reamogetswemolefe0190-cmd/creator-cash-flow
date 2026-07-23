@@ -223,14 +223,22 @@ function simulatePlatformConnect(element, platform) {
             return;
         }
 
-        // Initialize live Phyllo Connect SDK (Staging environment)
-        const phylloConnect = PhylloConnect.initialize({
+        const config = {
             clientDisplayName: "Creator Cash Flow",
             environment: "staging",
             userId: data.phylloUserId,
-            token: data.sdkToken, // Correct property key is "token"
-            workPlatformId: getWorkPlatformId(platform)
-        });
+            token: data.sdkToken
+        };
+
+        const platformId = getWorkPlatformId(platform);
+        if (platformId) {
+            config.workPlatformId = platformId;
+        }
+
+        console.log('[PHYLLO CONFIG DEBUG]', config);
+
+        // Initialize live Phyllo Connect SDK (Staging environment)
+        const phylloConnect = PhylloConnect.initialize(config);
 
         // Event listeners are bound directly to the returned phylloConnect instance
         phylloConnect.on("accountConnected", (accountId, workPlatformId, userId) => {
