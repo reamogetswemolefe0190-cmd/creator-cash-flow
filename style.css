@@ -782,3 +782,39 @@ body.codex-app::before {
     .onboarding-card { padding: 24px; }
     .codex-main { padding: 32px 20px; }
 }
+
+/* ==========================================================================
+   PHYLLO CONNECT MODAL STYLING OVERRIDES (PREMIUM OVERLAYS)
+   ========================================================================== */
+.modal-phyllo {
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(16px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+.modal-phyllo iframe {
+    max-width: 480px !important;
+    max-height: 780px !important;
+    width: 100% !important;
+    height: 90vh !important;
+    border-radius: 28px !important;
+    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background-color: #0b0b0b !important;
+    animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
