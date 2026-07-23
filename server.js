@@ -136,7 +136,7 @@ app.post('/api/auth/signup', async (req, res) => {
         await seedDefaultTransactions(userId);
 
         // 3. Dispatch Live Transactional Email via Resend
-        const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_SndXCwm1_PSg6tBxKRT4iqBMWafGf2uQU';
+        const RESEND_API_KEY = process.env.RESEND_API_KEY;
         if (RESEND_API_KEY) {
             console.log(`[RESEND] Sending welcome verification email to: ${email}`);
             try {
@@ -363,10 +363,14 @@ app.post('/api/onboarding/save', authenticateToken, async (req, res) => {
 // PHYLLO INTEGRATIONS ENDPOINT
 // ==========================================================================
 
-const PHYLLO_AUTH_HEADER = process.env.PHYLLO_AUTH_HEADER || 'Basic Y2RhMDhiZDEtZTg2MC00ZmEyLWJkMzktOThjNWY5Nl4NDdkOjRmM2QxYmQ5LTE3OTctNDlhZi1hZDIlWkNWMC0NmlwN2I0MTBhNg==';
+const PHYLLO_AUTH_HEADER = process.env.PHYLLO_AUTH_HEADER;
 
 app.post('/api/integrations/phyllo/token', async (req, res) => {
     try {
+        if (!PHYLLO_AUTH_HEADER) {
+            console.error('[PHYLLO CONFIG ERROR] PHYLLO_AUTH_HEADER environment variable is missing.');
+            return res.status(500).json({ error: 'Server configuration error: Phyllo credentials missing. Please set PHYLLO_AUTH_HEADER in Render dashboard.' });
+        }
         let userId = null;
         let userName = null;
 
