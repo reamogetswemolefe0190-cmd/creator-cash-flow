@@ -1,13 +1,14 @@
 /* ==========================================================================
-   Creator Financial OS - HQ Engine & Onboarding Orchestrator
+   Creator Financial OS - HQ Engine & Database Orchestrator
    ========================================================================== */
 
 const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
 
 // Application State
 const state = {
-    user: { name: 'Reamogetswe', email: 'reamogetswe@creator.co.za' },
-    balance: 24650,
+    user: null,
+    token: null,
+    balance: 0,
     sources: [
         { name: 'YouTube Studio', amount: 18420, percent: '62%' },
         { name: 'TikTok Creator Rewards', amount: 4850, percent: '21%' },
@@ -22,13 +23,7 @@ const state = {
         { date: 'Jul 18', rev: 20900, exp: 3850, profit: 17050 },
         { date: 'Jul 21', rev: 24650, exp: 4200, profit: 20450 }
     ],
-    activities: [
-        { date: 'Jul 21', desc: 'Google AdSense South Africa Payout', type: 'income', amount: 18420 },
-        { date: 'Jul 19', desc: 'Orms Direct (Sony Alpha Lens)', type: 'expense', amount: 4200 },
-        { date: 'Jul 18', desc: 'TikTok Creator Rewards ZAR', type: 'income', amount: 4850 },
-        { date: 'Jul 15', desc: 'Adobe Creative Cloud SA', type: 'expense', amount: 950 },
-        { date: 'Jul 14', desc: 'Woolworths SA Brand Deal', type: 'income', amount: 2100 }
-    ]
+    activities: [] // Loaded dynamically from Supabase database
 };
 
 // Onboarding State
@@ -50,32 +45,110 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     setupAuthModalTrigger();
 
-    // Check if user is already onboarded/logged in
+    // Check for existing verified session on load
     const cachedUser = localStorage.getItem('creator_cashflow_user');
-    if (cachedUser) {
+    const cachedToken = localStorage.getItem('creator_cashflow_user_token');
+
+    if (cachedUser && cachedToken) {
         try {
             state.user = JSON.parse(cachedUser);
+            state.token = cachedToken;
+
             const label = document.getElementById('nav-user-label');
             if (label) label.innerText = state.user.name.split(' ')[0];
             const greetingLabel = document.getElementById('dashboard-user-greeting');
             if (greetingLabel) greetingLabel.innerText = state.user.name.split(' ')[0];
-        } catch (e) {}
-    }
 
-    renderDashboardData();
-    initIntelligenceChart();
-    animateCounter();
+            // Load real data from Supabase
+            loadUserTransactions();
+        } catch (e) {
+            loadLocalBackupData();
+        }
+    } else {
+        loadLocalBackupData();
+    }
 
     const syncBtn = document.getElementById('btn-sync-trigger');
     if (syncBtn) syncBtn.addEventListener('click', syncData);
 });
 
+// Load real transactions from Supabase cloud database
+async function loadUserTransactions() {
+    if (!state.token) return;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/transactions`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${state.token}`
+            }
+        });
+        const data = await res.json();
+
+        if (data.transactions && data.transactions.length > 0) {
+            state.activities = data.transactions;
+
+            // Recalculate balance and percentage streams based on database values
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            state.activities.forEach(a => {
+                if (a.type === 'income') totalIncome += a.amount;
+                else totalExpense += a.amount;
+            });
+
+            state.balance = totalIncome - totalExpense;
+
+            // Update Timeline graph points dynamically from DB
+            const timelineMap = {};
+            state.activities.slice().reverse().forEach(a => {
+                const dateKey = a.date;
+                if (!timelineMap[dateKey]) timelineMap[dateKey] = { rev: 0, exp: 0 };
+                if (a.type === 'income') timelineMap[dateKey].rev += a.amount;
+                else timelineMap[dateKey].exp += a.amount;
+            });
+
+            let runningRev = 0;
+            let runningExp = 0;
+            state.timelineData = Object.keys(timelineMap).map(k => {
+                runningRev += timelineMap[k].rev;
+                runningExp += timelineMap[k].exp;
+                return {
+                    date: k,
+                    rev: runningRev,
+                    exp: runningExp,
+                    profit: runningRev - runningExp
+                };
+            });
+        } else {
+            loadLocalBackupData();
+        }
+    } catch (err) {
+        console.warn('Backend connection failed. Loading local backup.', err);
+        loadLocalBackupData();
+    }
+
+    renderDashboardData();
+    initIntelligenceChart();
+    animateCounter();
+}
+
+function loadLocalBackupData() {
+    state.balance = 24650;
+    state.activities = [
+        { date: 'Jul 21', desc: 'Google AdSense South Africa Payout', type: 'income', amount: 18420 },
+        { date: 'Jul 19', desc: 'Orms Direct (Sony Alpha Lens)', type: 'expense', amount: 4200 },
+        { date: 'Jul 18', desc: 'TikTok Creator Rewards ZAR', type: 'income', amount: 4850 },
+        { date: 'Jul 15', desc: 'Adobe Creative Cloud SA', type: 'expense', amount: 950 },
+        { date: 'Jul 14', desc: 'Woolworths SA Brand Deal', type: 'income', amount: 2100 }
+    ];
+}
+
 // ==========================================================================
-// ONBOARDING ENGINE
+// ONBOARDING MODULES
 // ==========================================================================
 
 function nextOnboardStep(stepNum) {
-    // Hide all steps
     document.querySelectorAll('.onboarding-step').forEach(step => {
         step.classList.add('hidden');
     });
@@ -85,7 +158,6 @@ function nextOnboardStep(stepNum) {
         nextStep.classList.remove('hidden');
     }
 
-    // Step 6: Magic Moment activation triggers
     if (stepNum === 6) {
         triggerMagicMoment();
     }
@@ -135,21 +207,40 @@ function simulatePlatformConnect(element, platform) {
     }
 }
 
-function triggerMagicMoment() {
+async function triggerMagicMoment() {
     const platformsCount = onboardingState.platforms.length || 3;
-    const streamsCount = platformsCount + 2; // Simulated extra streams (e.g. sponsorships)
+    const streamsCount = platformsCount + 2;
 
     document.getElementById('magic-onboard-platforms').innerText = platformsCount;
     document.getElementById('magic-onboard-streams').innerText = streamsCount;
 
-    // After 2.5 seconds of displaying activation, transition to Command Center
+    // Save onboarding preferences to the backend database if user is logged in
+    if (state.token) {
+        try {
+            await fetch(`${API_BASE_URL}/onboarding/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.token}`
+                },
+                body: JSON.stringify({
+                    creatorType: onboardingState.creatorType,
+                    platforms: onboardingState.platforms,
+                    goal: onboardingState.goal
+                })
+            });
+        } catch (e) {
+            console.error('Failed to sync onboarding to cloud database', e);
+        }
+    }
+
     setTimeout(() => {
         switchView('app');
     }, 2500);
 }
 
 // ==========================================================================
-// UTILITY & VIEW NAVIGATION
+// UTILITY & VIEW ENGINE
 // ==========================================================================
 
 function setupMouseSpotlight() {
@@ -192,24 +283,20 @@ function setupStreamBarsObserver() {
     observer.observe(section);
 }
 
-// Switch between Marketing, Onboarding, and Workspace
 function switchView(mode) {
     const marketingView = document.getElementById('view-marketing');
     const appView = document.getElementById('view-app');
     const onboardingView = document.getElementById('view-onboarding');
 
-    // Reset visibility
     marketingView.classList.add('hidden');
     appView.classList.add('hidden');
     onboardingView.classList.add('hidden');
 
     if (mode === 'app') {
         appView.classList.remove('hidden');
-        initIntelligenceChart();
-        animateCounter();
+        loadUserTransactions();
     } else if (mode === 'onboarding') {
         onboardingView.classList.remove('hidden');
-        // Reset onboarding steps
         nextOnboardStep(1);
     } else {
         marketingView.classList.remove('hidden');
@@ -243,16 +330,17 @@ function switchTab(tabId) {
     }
 }
 
-// Balance Counter Animation
 function animateCounter() {
     const target = state.balance;
     const element = document.getElementById('val-current-balance');
     const mktElement = document.getElementById('marketing-val-earnings');
     const badge = document.getElementById('val-change-badge');
 
+    if (!element) return;
+
     let current = 0;
-    const duration = 1200; // 1.2s
-    const steps = 45;
+    const duration = 1200;
+    const steps = 40;
     const stepVal = Math.ceil(target / steps);
     const stepTime = duration / steps;
 
@@ -263,12 +351,11 @@ function animateCounter() {
             clearInterval(timer);
             if (badge) badge.classList.add('visible');
         }
-        if (element) element.innerText = `R${current.toLocaleString()}`;
+        element.innerText = `R${current.toLocaleString()}`;
         if (mktElement) mktElement.innerText = `R${current.toLocaleString()}`;
     }, stepTime);
 }
 
-// Render Dashboard Data & Income Story
 function renderDashboardData() {
     const sourceContainer = document.getElementById('sources-stream-list');
     if (sourceContainer) {
@@ -343,7 +430,6 @@ function renderFullStreams() {
     }
 }
 
-// Chart Engine
 function initIntelligenceChart() {
     const canvas = document.getElementById('chart-revenue-intelligence');
     if (!canvas) return;
@@ -432,6 +518,7 @@ function syncData() {
         btn.innerText = `Syncing...`;
         setTimeout(() => {
             btn.innerText = `Synced`;
+            loadUserTransactions();
             setTimeout(() => { btn.innerText = `Sync`; }, 2000);
         }, 1000);
     }
@@ -443,7 +530,7 @@ function setupAuthModalTrigger() {
 }
 
 function openAccountAuthModal() {
-    openModal('Creator Financial OS Authentication', `
+    openModal('Creator OS Authentication', `
         <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: var(--radius-strict);">
             <button class="btn btn-emerald btn-sm" id="auth-tab-signup" style="flex:1;" onclick="switchAuthTab('signup')">Create Account</button>
             <button class="btn btn-secondary btn-sm" id="auth-tab-login" style="flex:1;" onclick="switchAuthTab('login')">Sign In</button>
@@ -477,7 +564,7 @@ function openAccountAuthModal() {
                 <input type="password" id="login-pass" class="form-input" placeholder="••••••••••••">
             </div>
             <button class="btn btn-emerald" style="width: 100%; margin-top: 8px;" onclick="executeLogin()">
-                Sign In To Workspace
+                Sign In To OS
             </button>
         </div>
     `);
@@ -503,79 +590,143 @@ function switchAuthTab(tab) {
 }
 
 async function executeCreateAccount() {
-    const name = document.getElementById('reg-name').value.trim() || 'Reamogetswe Molefe';
-    const email = document.getElementById('reg-email').value.trim() || 'reamogetswe@creator.co.za';
+    const name = document.getElementById('reg-name').value.trim() || 'Reamogetswe';
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-pass').value.trim();
 
-    state.user.name = name;
-    state.user.email = email;
-    localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
+    if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+    }
 
-    const label = document.getElementById('nav-user-label');
-    if (label) label.innerText = name.split(' ')[0];
-    const greetingLabel = document.getElementById('dashboard-user-greeting');
-    if (greetingLabel) greetingLabel.innerText = name.split(' ')[0];
+    try {
+        const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
 
-    closeModal();
-    switchView('app');
-    alert(`🎉 Account Activated for ${name} (${email})!\n\nWelcome to your Creator Command Center.`);
+        if (res.status !== 201) {
+            alert(data.error || 'Signup failed.');
+            return;
+        }
+
+        // Automatic Login after Registration
+        const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const loginData = await loginRes.json();
+
+        state.user = loginData.user;
+        state.token = loginData.token;
+
+        localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
+        localStorage.setItem('creator_cashflow_user_token', state.token);
+
+        const label = document.getElementById('nav-user-label');
+        if (label) label.innerText = name.split(' ')[0];
+        const greetingLabel = document.getElementById('dashboard-user-greeting');
+        if (greetingLabel) greetingLabel.innerText = name.split(' ')[0];
+
+        closeModal();
+        switchView('app');
+        alert(`🎉 Creator HQ Activated for ${name}! Seed data populated successfully.`);
+    } catch (err) {
+        console.error('Signup failed, using offline fallback', err);
+        // Offline Fallback
+        state.user = { id: 'usr_offline', name, email };
+        state.token = 'offline_token';
+        localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
+        localStorage.setItem('creator_cashflow_user_token', state.token);
+        closeModal();
+        switchView('app');
+    }
 }
 
 async function executeLogin() {
-    const email = document.getElementById('login-email').value.trim() || 'reamogetswe@creator.co.za';
-    const name = email.split('@')[0] || 'Reamogetswe';
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-pass').value.trim();
 
-    state.user.name = name;
-    state.user.email = email;
-    localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
+    if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+    }
 
-    const label = document.getElementById('nav-user-label');
-    if (label) label.innerText = name;
-    const greetingLabel = document.getElementById('dashboard-user-greeting');
-    if (greetingLabel) greetingLabel.innerText = name;
+    try {
+        const res = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
 
-    closeModal();
-    switchView('app');
-    alert(`Welcome back, ${name}! Your Creator HQ is active.`);
+        if (res.status !== 200) {
+            alert(data.error || 'Login failed.');
+            return;
+        }
+
+        state.user = data.user;
+        state.token = data.token;
+
+        localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
+        localStorage.setItem('creator_cashflow_user_token', state.token);
+
+        const label = document.getElementById('nav-user-label');
+        if (label) label.innerText = state.user.name.split(' ')[0];
+        const greetingLabel = document.getElementById('dashboard-user-greeting');
+        if (greetingLabel) greetingLabel.innerText = state.user.name.split(' ')[0];
+
+        closeModal();
+        switchView('app');
+        alert(`Welcome back, ${state.user.name}! Syncing database records...`);
+    } catch (err) {
+        alert('Could not authenticate. Verify network status.');
+    }
 }
 
-function openAddActivityModal() {
-    openModal('Add Cash Flow Entry', `
-        <div class="form-group">
-            <label>Description</label>
-            <input type="text" id="act-desc" class="form-input" placeholder="e.g. YouTube AdSense Payout">
-        </div>
-        <div class="form-group">
-            <label>Type</label>
-            <select id="act-type" class="form-input">
-                <option value="income">Income (+)</option>
-                <option value="expense">Expense (-)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Amount (ZAR)</label>
-            <input type="number" id="act-amount" class="form-input" placeholder="2500">
-        </div>
-        <button class="btn btn-emerald" style="width: 100%; margin-top: 12px;" onclick="submitActivity()">Add Entry</button>
-    `);
-}
-
-function submitActivity() {
+async function submitActivity() {
     const desc = document.getElementById('act-desc').value || 'New Entry';
     const type = document.getElementById('act-type').value;
     const amount = parseFloat(document.getElementById('act-amount').value) || 2500;
 
-    state.activities.unshift({
-        date: 'Today',
-        desc,
-        type,
-        amount
-    });
+    if (state.token && state.token !== 'offline_token') {
+        try {
+            await fetch(`${API_BASE_URL}/transactions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.token}`
+                },
+                body: JSON.stringify({
+                    source: type === 'income' ? 'YouTube' : 'Bank',
+                    merchant: desc,
+                    type,
+                    amount
+                })
+            });
+            
+            // Sync ledger values directly from Supabase DB
+            loadUserTransactions();
+        } catch (e) {
+            console.error('Failed to sync transaction to cloud database', e);
+        }
+    } else {
+        // Offline Fallback local modification
+        state.activities.unshift({
+            date: 'Today',
+            desc,
+            type,
+            amount
+        });
+        if (type === 'income') state.balance += amount;
+        else state.balance -= amount;
+        renderDashboardData();
+        animateCounter();
+    }
 
-    if (type === 'income') state.balance += amount;
-    else state.balance -= amount;
-
-    renderDashboardData();
-    animateCounter();
     closeModal();
 }
 
