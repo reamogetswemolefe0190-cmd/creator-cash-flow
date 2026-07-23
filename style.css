@@ -818,3 +818,20 @@ body.codex-app::before {
         transform: translateY(0) scale(1);
     }
 }
+
+/* Responsive adjustments for mobile screens */
+@media (max-width: 767px) {
+    .modal-phyllo {
+        padding: 0 !important;
+    }
+    
+    .modal-phyllo iframe {
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        animation: none !important;
+    }
+}
