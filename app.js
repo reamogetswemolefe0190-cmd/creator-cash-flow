@@ -230,7 +230,8 @@ function simulatePlatformConnect(element, platform) {
             token: data.sdkToken
         };
 
-        const platformId = getWorkPlatformId(platform);
+        // Dynamically locate the correct platform ID from the active backend list
+        const platformId = findPlatformId(platform, data.platforms);
         if (platformId) {
             config.workPlatformId = platformId;
         }
@@ -286,10 +287,19 @@ function simulatePlatformConnect(element, platform) {
     });
 }
 
-function getWorkPlatformId(platform) {
-    // Map to default sandbox platform IDs or return undefined to show the catalog search menu
-    if (platform === 'YouTube') return '9bb11b30-383f-422f-a404-00d69355b2e3'; // YouTube Sandbox
-    return undefined; // catalog menu loads
+function findPlatformId(platformName, platformMap) {
+    if (!platformMap || typeof platformMap !== 'object') return undefined;
+    
+    const search = platformName.toLowerCase();
+    
+    // Perform fuzzy/prefix match to handle "YouTube", "YouTube Sandbox", "Instagram Business", etc.
+    for (const name of Object.keys(platformMap)) {
+        const nameLower = name.toLowerCase();
+        if (nameLower.includes(search) || search.includes(nameLower)) {
+            return platformMap[name];
+        }
+    }
+    return undefined;
 }
 
 async function triggerMagicMoment() {

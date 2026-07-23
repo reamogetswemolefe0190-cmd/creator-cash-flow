@@ -480,9 +480,35 @@ app.post('/api/integrations/phyllo/token', async (req, res) => {
             return res.status(tokenResponse.status).json({ error: 'Failed to generate SDK token in Phyllo staging.', details: tokenData });
         }
 
+        // 4. Fetch active work platforms to map names to IDs dynamically
+        let platformMap = {};
+        try {
+            console.log('[PHYLLO] Fetching active work platforms...');
+            const platformResponse = await fetch('https://api.staging.getphyllo.com/v1/work-platforms', {
+                method: 'GET',
+                headers: {
+                    'Authorization': PHYLLO_AUTH_HEADER
+                }
+            });
+            const platformData = await platformResponse.json();
+            if (platformResponse.ok && platformData.data) {
+                platformData.data.forEach(p => {
+                    platformMap[p.name] = p.id;
+                });
+            } else if (platformResponse.ok && Array.isArray(platformData)) {
+                platformData.forEach(p => {
+                    platformMap[p.name] = p.id;
+                });
+            }
+            console.log(`[PHYLLO] Map: ${JSON.stringify(platformMap)}`);
+        } catch (e) {
+            console.error('[PHYLLO PLATFORMS FETCH ERROR]', e);
+        }
+
         res.json({
             sdkToken: tokenData.sdk_token,
-            phylloUserId: phylloUserId
+            phylloUserId: phylloUserId,
+            platforms: platformMap
         });
 
     } catch (err) {
