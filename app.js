@@ -224,7 +224,7 @@ function simulatePlatformConnect(element, platform) {
         }
 
         // Initialize live Phyllo Connect SDK (Staging environment)
-        PhylloConnect.initialize({
+        const phylloConnect = PhylloConnect.initialize({
             clientDisplayName: "Creator Cash Flow",
             environment: "staging",
             userId: data.phylloUserId,
@@ -232,8 +232,8 @@ function simulatePlatformConnect(element, platform) {
             workPlatformId: getWorkPlatformId(platform)
         });
 
-        // Event listeners are bound directly to the global PhylloConnect object
-        PhylloConnect.on("accountConnected", (accountId, workPlatformId, userId) => {
+        // Event listeners are bound directly to the returned phylloConnect instance
+        phylloConnect.on("accountConnected", (accountId, workPlatformId, userId) => {
             console.log(`[PHYLLO SUCCESS] Linked Account: ${accountId} for platform: ${workPlatformId}`);
             element.classList.add('connected');
             if (badge) badge.innerText = 'Connected';
@@ -242,19 +242,19 @@ function simulatePlatformConnect(element, platform) {
             }
         });
 
-        PhylloConnect.on("accountError", (error) => {
+        phylloConnect.on("accountError", (error) => {
             console.error('[PHYLLO SDK ERROR]', error);
             if (badge) badge.innerText = 'Connect';
         });
 
-        PhylloConnect.on("exit", (reason, userId) => {
+        phylloConnect.on("exit", (reason, userId) => {
             console.log("[PHYLLO SDK EXIT] Flow closed:", reason);
             if (!element.classList.contains('connected')) {
                 if (badge) badge.innerText = 'Connect';
             }
         });
 
-        PhylloConnect.open();
+        phylloConnect.open();
     })
     .catch(err => {
         console.warn('Backend connection failed. Reverting to mock connect simulation.', err);
