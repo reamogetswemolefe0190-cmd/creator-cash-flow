@@ -261,8 +261,8 @@ function simulatePlatformConnect(element, platform) {
             console.warn(`[PHYLLO TOKEN EXPIRED] User: ${userId}`);
         });
 
-        phylloConnect.on("accountError", (error) => {
-            console.error('[PHYLLO SDK ERROR]', error);
+        phylloConnect.on("connectionFailure", (reason, workPlatformId, userId) => {
+            console.error('[PHYLLO SDK ERROR]', reason, workPlatformId, userId);
             if (badge) badge.innerText = 'Connect';
         });
 
