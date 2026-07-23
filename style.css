@@ -811,7 +811,7 @@ body.codex-app::before {
 }
 
 /* Desktop Override: Centered card layout with glassmorphic blur for tablet/desktop screens */
-@media (min-width: 600px) {
+@media (min-width: 992px) {
     .modal-phyllo {
         background: rgba(0, 0, 0, 0.75) !important;
         backdrop-filter: blur(16px) !important;
