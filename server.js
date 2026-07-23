@@ -481,7 +481,7 @@ app.post('/api/integrations/phyllo/token', async (req, res) => {
         }
 
         res.json({
-            sdkToken: tokenData.value,
+            sdkToken: tokenData.sdk_token,
             phylloUserId: phylloUserId
         });
 
