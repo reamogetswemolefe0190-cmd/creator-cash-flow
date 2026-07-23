@@ -193,18 +193,83 @@ function selectGoal(element) {
 }
 
 function simulatePlatformConnect(element, platform) {
-    element.classList.toggle('connected');
-    const badge = document.getElementById(`connect-${platform}`);
-    
+    // If already connected, toggle it off
     if (element.classList.contains('connected')) {
+        element.classList.remove('connected');
+        const badge = document.getElementById(`connect-${platform}`);
+        if (badge) badge.innerText = 'Connect';
+        onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
+        return;
+    }
+
+    const badge = document.getElementById(`connect-${platform}`);
+    if (badge) badge.innerText = 'Linking...';
+
+    // Assemble auth headers if token is present
+    const headers = {};
+    if (state.token) {
+        headers['Authorization'] = `Bearer ${state.token}`;
+    }
+
+    fetch(`${API_BASE_URL}/integrations/phyllo/token`, {
+        method: 'POST',
+        headers: headers
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.sdkToken) {
+            alert('Failed to initialize connection token. Check server configurations.');
+            if (badge) badge.innerText = 'Connect';
+            return;
+        }
+
+        // Initialize live Phyllo Connect SDK (Staging environment)
+        const phylloConnect = PhylloConnect.initialize({
+            clientDisplayName: "Creator Cash Flow",
+            environment: "staging",
+            userId: data.phylloUserId,
+            userToken: data.sdkToken,
+            workPlatformId: getWorkPlatformId(platform)
+        });
+
+        phylloConnect.on("account:connected", (accountId, userId, workPlatformId) => {
+            console.log(`[PHYLLO SUCCESS] Linked Account: ${accountId} for platform: ${workPlatformId}`);
+            element.classList.add('connected');
+            if (badge) badge.innerText = 'Connected';
+            if (!onboardingState.connected.includes(platform)) {
+                onboardingState.connected.push(platform);
+            }
+        });
+
+        phylloConnect.on("account:error", (error) => {
+            console.error('[PHYLLO SDK ERROR]', error);
+            if (badge) badge.innerText = 'Connect';
+        });
+
+        phylloConnect.on("exit", (reason, userId) => {
+            console.log("[PHYLLO SDK EXIT] Flow closed:", reason);
+            if (!element.classList.contains('connected')) {
+                if (badge) badge.innerText = 'Connect';
+            }
+        });
+
+        phylloConnect.open();
+    })
+    .catch(err => {
+        console.warn('Backend connection failed. Reverting to mock connect simulation.', err);
+        // Fallback mockup behavior
+        element.classList.add('connected');
         if (badge) badge.innerText = 'Connected';
         if (!onboardingState.connected.includes(platform)) {
             onboardingState.connected.push(platform);
         }
-    } else {
-        if (badge) badge.innerText = 'Connect';
-        onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
-    }
+    });
+}
+
+function getWorkPlatformId(platform) {
+    // Map to default sandbox platform IDs or return undefined to show the catalog search menu
+    if (platform === 'YouTube') return '9bb11b30-383f-422f-a404-00d69355b2e3'; // YouTube Sandbox
+    return undefined; // catalog menu loads
 }
 
 async function triggerMagicMoment() {
