@@ -135,6 +135,51 @@ app.post('/api/auth/signup', async (req, res) => {
         // Seed transactions so dashboard immediately looks populated and realistic
         await seedDefaultTransactions(userId);
 
+        // 3. Dispatch Live Transactional Email via Resend
+        const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_SndXCwm1_PSg6tBxKRT4iqBMWafGf2uQU';
+        if (RESEND_API_KEY) {
+            console.log(`[RESEND] Sending welcome verification email to: ${email}`);
+            try {
+                const emailResponse = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${RESEND_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        from: 'Creator HQ <onboarding@resend.dev>',
+                        to: email.toLowerCase(),
+                        subject: 'Verify your Creator Command Center',
+                        html: `
+                            <div style="background-color: #050505; color: #ffffff; padding: 48px 24px; font-family: 'Inter', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08);">
+                                <h2 style="color: #22C55E; font-size: 24px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.02em;">Welcome to Creator HQ, ${name}!</h2>
+                                <p style="color: #8E8E93; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Your digital business command center is active and ready to import platform metrics.</p>
+                                <div style="background-color: #0B0B0B; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                        <span style="color: #8E8E93;">Creator Account:</span>
+                                        <strong style="color: #ffffff;">${email}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                        <span style="color: #8E8E93;">Command Center Status:</span>
+                                        <strong style="color: #22C55E;">Verified Active Sync</strong>
+                                    </div>
+                                </div>
+                                <p style="color: #8E8E93; font-size: 12px; opacity: 0.6; line-height: 1.4; margin-top: 24px;">If you did not initiate this activation, please contact support immediately.</p>
+                            </div>
+                        `
+                    })
+                });
+                const emailData = await emailResponse.json();
+                if (!emailResponse.ok) {
+                    console.error('[RESEND ERROR]', emailData);
+                } else {
+                    console.log('[RESEND SUCCESS] Email sent:', emailData.id);
+                }
+            } catch (err) {
+                console.error('[RESEND DISPATCH ERROR]', err);
+            }
+        }
+
         res.status(201).json({
             message: 'Registration successful!',
             userId,
