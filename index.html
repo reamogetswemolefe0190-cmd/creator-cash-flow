@@ -9,7 +9,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#050505">
 
-    <!-- Fonts: Inter / SF Pro Display -->
+    <!-- Fonts: Inter / Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -18,8 +18,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Cache-Busting CSS (v15.0 Animations System) -->
-    <link rel="stylesheet" href="style.css?v=15.0_animations_added">
+    <!-- Cache-Busting CSS (v16.0 Creator HQ Edition) -->
+    <link rel="stylesheet" href="style.css?v=16.0_creator_hq">
 </head>
 <body class="codex-app">
 
@@ -42,17 +42,17 @@
             </ul>
             <div class="marketing-auth-btns">
                 <button class="btn btn-secondary" onclick="openAccountAuthModal()">Sign In</button>
-                <button class="btn btn-emerald" onclick="switchView('app')">Get Started</button>
+                <button class="btn btn-emerald" onclick="switchView('onboarding')">Get Started</button>
             </div>
         </header>
 
         <!-- Cinematic Hero Section -->
         <section class="marketing-hero" id="product">
             <div>
-                <h1 class="marketing-hero-title animate-hero-text">Financial Intelligence<br>for Modern Creators</h1>
+                <h1 class="marketing-hero-title animate-hero-text">Financial Intelligence<br>for the Creator Economy</h1>
                 <p class="marketing-hero-subtitle animate-stagger-1">Understand where your money comes from, where it goes, and what happens next.</p>
                 <div class="marketing-hero-actions animate-stagger-2">
-                    <button class="btn btn-emerald" onclick="switchView('app')">Start Free</button>
+                    <button class="btn btn-emerald" onclick="switchView('onboarding')">Start Free</button>
                     <button class="btn btn-secondary" onclick="switchView('app')">Watch Demo →</button>
                 </div>
             </div>
@@ -180,22 +180,157 @@
     </div>
 
     <!-- ==========================================================================
-       VIEW 2: LOGGED-IN SOFTWARE DASHBOARD WORKSPACE
+       VIEW 2: ONBOARDING FLOW (Creator HQ Setup)
+       ========================================================================== -->
+    <div id="view-onboarding" class="onboarding-wrapper hidden">
+        <div class="onboarding-card">
+            <!-- Screen 1: Welcome -->
+            <div class="onboarding-step animate-hero-text" id="onboard-step-1">
+                <h1 class="onboard-title">Welcome to Creator Cash Flow</h1>
+                <p class="onboard-subtitle" style="margin-top: 12px; font-size: 18px; color: var(--text-secondary);">Let's build your creator business profile.</p>
+                <div style="margin-top: 48px; display: flex; justify-content: center;">
+                    <div class="onboard-illustration">
+                        <i data-lucide="sparkles" style="width: 48px; height: 48px; color: var(--accent-emerald);"></i>
+                    </div>
+                </div>
+                <button class="btn btn-emerald w-full" style="margin-top: 48px;" onclick="nextOnboardStep(2)">Continue</button>
+            </div>
+
+            <!-- Screen 2: Creator Type -->
+            <div class="onboarding-step hidden" id="onboard-step-2">
+                <h1 class="onboard-title">What best describes you?</h1>
+                <p class="onboard-subtitle" style="margin-top: 12px; font-size: 18px; color: var(--text-secondary);">Select a single category that defines your content engine.</p>
+                <div class="onboard-options-list" style="margin-top: 32px; display: flex; flex-direction: column; gap: 12px;">
+                    <div class="onboard-select-option" data-value="YouTuber" onclick="selectCreatorType(this)">
+                        <div style="font-weight: 700; font-size: 16px;">YouTuber</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">Longform video, shorts, and Google AdSense</div>
+                    </div>
+                    <div class="onboard-select-option" data-value="TikTok Creator" onclick="selectCreatorType(this)">
+                        <div style="font-weight: 700; font-size: 16px;">TikTok Creator</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">Shortform trends and Creator Rewards program</div>
+                    </div>
+                    <div class="onboard-select-option" data-value="Streamer" onclick="selectCreatorType(this)">
+                        <div style="font-weight: 700; font-size: 16px;">Streamer</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">Live broadcasts, direct support, and brand ads</div>
+                    </div>
+                    <div class="onboard-select-option" data-value="Podcaster" onclick="selectCreatorType(this)">
+                        <div style="font-weight: 700; font-size: 16px;">Podcaster</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">Audio episodes, premium subscriptions, and sponsors</div>
+                    </div>
+                    <div class="onboard-select-option" data-value="Multiple Platforms" onclick="selectCreatorType(this)">
+                        <div style="font-weight: 700; font-size: 16px;">Multiple Platforms</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">Omnichannel presence across the web</div>
+                    </div>
+                </div>
+                <button class="btn btn-emerald w-full" style="margin-top: 32px;" onclick="nextOnboardStep(3)">Continue</button>
+            </div>
+
+            <!-- Screen 3: Platforms -->
+            <div class="onboarding-step hidden" id="onboard-step-3">
+                <h1 class="onboard-title">Which platforms do you earn from?</h1>
+                <p class="onboard-subtitle" style="margin-top: 12px; font-size: 18px; color: var(--text-secondary);">Select the income channels you want to import.</p>
+                <div class="onboard-grid-choice" style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="onboard-choice-card" data-value="YouTube" onclick="togglePlatformChoice(this)">
+                        <div style="font-weight: 700; font-size: 16px;">YouTube</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">AdSense & Members</div>
+                    </div>
+                    <div class="onboard-choice-card" data-value="TikTok" onclick="togglePlatformChoice(this)">
+                        <div style="font-weight: 700; font-size: 16px;">TikTok</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Creator Fund & Gifts</div>
+                    </div>
+                    <div class="onboard-choice-card" data-value="Instagram" onclick="togglePlatformChoice(this)">
+                        <div style="font-weight: 700; font-size: 16px;">Instagram</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Sponsorship Deals</div>
+                    </div>
+                    <div class="onboard-choice-card" data-value="Patreon" onclick="togglePlatformChoice(this)">
+                        <div style="font-weight: 700; font-size: 16px;">Patreon</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Premium Subscriptions</div>
+                    </div>
+                    <div class="onboard-choice-card" data-value="Affiliate" onclick="togglePlatformChoice(this)">
+                        <div style="font-weight: 700; font-size: 16px;">Affiliate Income</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Referral & Promos</div>
+                    </div>
+                </div>
+                <button class="btn btn-emerald w-full" style="margin-top: 32px;" onclick="nextOnboardStep(4)">Continue</button>
+            </div>
+
+            <!-- Screen 4: Goal -->
+            <div class="onboarding-step hidden" id="onboard-step-4">
+                <h1 class="onboard-title">What's your goal?</h1>
+                <p class="onboard-subtitle" style="margin-top: 12px; font-size: 18px; color: var(--text-secondary);">Choose your core objective.</p>
+                <div class="onboard-options-list" style="margin-top: 32px; display: flex; flex-direction: column; gap: 12px;">
+                    <div class="onboard-select-option" data-value="Track income" onclick="selectGoal(this)">Track income</div>
+                    <div class="onboard-select-option" data-value="Understand profitability" onclick="selectGoal(this)">Understand profitability</div>
+                    <div class="onboard-select-option" data-value="Prepare taxes" onclick="selectGoal(this)">Prepare taxes</div>
+                    <div class="onboard-select-option" data-value="Grow revenue" onclick="selectGoal(this)">Grow revenue</div>
+                    <div class="onboard-select-option" data-value="All of the above" onclick="selectGoal(this)">All of the above</div>
+                </div>
+                <button class="btn btn-emerald w-full" style="margin-top: 32px;" onclick="nextOnboardStep(5)">Continue</button>
+            </div>
+
+            <!-- Screen 5: Connect platform -->
+            <div class="onboarding-step hidden" id="onboard-step-5">
+                <h1 class="onboard-title">Connect your first platform</h1>
+                <p class="onboard-subtitle" style="margin-top: 12px; font-size: 18px; color: var(--text-secondary);">Import history and view metrics securely.</p>
+                
+                <div style="margin-top: 32px; display: flex; flex-direction: column; gap: 16px;">
+                    <div class="connection-platform-card" onclick="simulatePlatformConnect(this, 'YouTube')">
+                        <div style="font-weight: 700; font-size: 16px;">YouTube Studio</div>
+                        <span class="connect-badge" id="connect-YouTube">Connect</span>
+                    </div>
+                    <div class="connection-platform-card" onclick="simulatePlatformConnect(this, 'TikTok')">
+                        <div style="font-weight: 700; font-size: 16px;">TikTok Rewards</div>
+                        <span class="connect-badge" id="connect-TikTok">Connect</span>
+                    </div>
+                    <div class="connection-platform-card" onclick="simulatePlatformConnect(this, 'Instagram')">
+                        <div style="font-weight: 700; font-size: 16px;">Instagram Deals</div>
+                        <span class="connect-badge" id="connect-Instagram">Connect</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-emerald w-full" style="margin-top: 32px;" onclick="nextOnboardStep(6)">Launch Command Center</button>
+            </div>
+
+            <!-- Screen 6: The Magic Moment -->
+            <div class="onboarding-step hidden" id="onboard-step-6" style="text-align: center;">
+                <h1 class="onboard-title" style="color: var(--accent-emerald); font-size: 32px;">Your Creator Command Center is ready.</h1>
+                <p class="onboard-subtitle" style="margin-top: 12px; font-size: 16px; color: var(--text-secondary);">Initializing real-time financial tracking...</p>
+                
+                <div class="magic-onboarding-summary" style="margin-top: 48px; background: rgba(255,255,255,0.02); border: var(--border-card); border-radius: var(--radius-strict); padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 16px;">
+                        <span style="color: var(--text-secondary);">Platforms</span>
+                        <strong style="color: #FFF;" id="magic-onboard-platforms">3</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px;">
+                        <span style="color: var(--text-secondary);">Revenue Streams</span>
+                        <strong style="color: #FFF;" id="magic-onboard-streams">5</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px;">
+                        <span style="color: var(--text-secondary);">Forecast Engine</span>
+                        <strong style="color: var(--accent-emerald);">Active</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       VIEW 3: LOGGED-IN SOFTWARE DASHBOARD WORKSPACE
        ========================================================================== -->
     <div id="view-app" class="app-shell hidden">
         
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Extremely Quiet) -->
         <aside class="codex-sidebar">
             <div style="margin-bottom: 48px;">
-                <h2 style="font-size: 18px; font-weight: 700;">Creator Cash Flow</h2>
-                <p style="font-size: 14px; color: var(--text-secondary);">Financial Workspace</p>
+                <h2 style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em;">Creator HQ</h2>
+                <p style="font-size: 13px; color: var(--accent-emerald); font-weight: 600;">Command Center</p>
             </div>
 
             <nav class="codex-nav">
-                <a href="#overview" class="nav-item active" data-tab="overview">Dashboard</a>
+                <a href="#overview" class="nav-item active" data-tab="overview">Overview</a>
                 <a href="#revenue" class="nav-item" data-tab="revenue">Revenue</a>
                 <a href="#expenses" class="nav-item" data-tab="expenses">Expenses</a>
-                <a href="#marketing" class="nav-item" onclick="switchView('marketing')">Landing View</a>
+                <a href="#forecast" class="nav-item" data-tab="forecast">Forecast</a>
                 <a href="#settings" class="nav-item" data-tab="settings">Settings</a>
             </nav>
 
@@ -212,11 +347,35 @@
             <!-- TAB 1: OVERVIEW -->
             <section id="tab-overview" class="tab-pane active">
                 
-                <!-- Date & Balance Header (Smooth 1.2s Count Up) -->
-                <div class="dashboard-balance-header">
-                    <div class="dashboard-date-label">July 2026 Cash Flow</div>
+                <!-- Date & Balance Header (Aspirational, Personal Greeting) -->
+                <div class="dashboard-balance-header animate-hero-text">
+                    <div style="font-size: 18px; color: var(--text-secondary); font-weight: 500; margin-bottom: 8px;">Good afternoon, <span id="dashboard-user-greeting">Reamogetswe</span></div>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">Your creator business generated</p>
                     <div class="dashboard-balance-amount" id="val-current-balance">R0</div>
-                    <div class="dashboard-change-badge" id="val-change-badge">+14.8% this month</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">this month.</div>
+                    <div class="dashboard-change-badge" id="val-change-badge">+14.8% vs last month</div>
+                </div>
+
+                <!-- Section 1 — Business Health Surface -->
+                <div class="codex-card" style="margin-bottom: 48px;">
+                    <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 24px;">Business Health</h3>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                            <span style="color: var(--text-secondary); font-size: 14px; font-weight: 500;">Revenue</span>
+                            <span style="font-size: 16px; font-weight: 700;">R24,650</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                            <span style="color: var(--text-secondary); font-size: 14px; font-weight: 500;">Expenses</span>
+                            <span style="font-size: 16px; font-weight: 700;">R3,820</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                            <span style="color: var(--text-secondary); font-size: 14px; font-weight: 500;">Profit</span>
+                            <span style="font-size: 16px; font-weight: 700; color: var(--accent-emerald);">R20,830</span>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span style="font-size: 14px; font-weight: 700; color: var(--accent-emerald);">Healthy Growth ↗</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- One Massive Chart: Revenue Intelligence Timeline -->
@@ -235,23 +394,30 @@
 
                 <!-- Revenue Sources & AI Insights Side-by-Side -->
                 <div class="dashboard-two-column">
-                    <!-- Revenue Sources -->
+                    <!-- Section 2 — Income Story -->
                     <div class="codex-card">
-                        <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 16px;">Revenue Sources</h3>
-                        <div id="sources-stream-list"></div>
+                        <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 16px;">Where your money came from</h3>
+                        <div id="sources-stream-list" style="margin-top: 24px;">
+                            <!-- Populated dynamically via app.js -->
+                        </div>
                     </div>
 
-                    <!-- AI Insights -->
+                    <!-- Section 3 — Intelligence Feed -->
                     <div class="codex-card">
-                        <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 16px;">AI Insights</h3>
-                        <div style="background: rgba(255,255,255,0.02); border: var(--border-card); border-radius: var(--radius-strict); padding: 18px; margin-bottom: 14px;">
-                            <div style="font-size: 14px; font-weight: 600; color: var(--accent-emerald); margin-bottom: 4px;">📈 Growth Acceleration</div>
-                            <div style="font-size: 14px; color: var(--text-secondary);">Your YouTube earnings grew <strong>14% faster</strong> than last month.</div>
-                        </div>
-
-                        <div style="background: rgba(255,255,255,0.02); border: var(--border-card); border-radius: var(--radius-strict); padding: 18px;">
-                            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">⚠️ Algorithm Risk Alert</div>
-                            <div style="font-size: 14px; color: var(--text-secondary);"><strong>82% of your income</strong> comes from YouTube Studio. Consider diversifying into sponsorship deals.</div>
+                        <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 16px;">Intelligence Briefing</h3>
+                        <div class="intelligence-briefing-feed" style="display: flex; flex-direction: column; gap: 14px; margin-top: 24px;">
+                            <div style="font-size: 14px; line-height: 1.6; padding-left: 12px; border-left: 2px solid var(--accent-emerald);">
+                                Revenue accelerated <strong>18%</strong> this month.
+                            </div>
+                            <div style="font-size: 14px; line-height: 1.6; padding-left: 12px; border-left: 2px solid var(--accent-emerald);">
+                                Your best performing platform was <strong>YouTube</strong>.
+                            </div>
+                            <div style="font-size: 14px; line-height: 1.6; padding-left: 12px; border-left: 2px solid rgba(255,255,255,0.2);">
+                                Expenses increased <strong>7%</strong>.
+                            </div>
+                            <div style="font-size: 14px; line-height: 1.6; padding-left: 12px; border-left: 2px solid var(--accent-emerald);">
+                                Forecast remains positive.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -283,6 +449,15 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Recent Activity Section -->
+                <div class="codex-card" style="margin-bottom: 48px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 class="section-title-32" style="font-size: 24px; margin-bottom: 0;">Recent Activity</h3>
+                        <button class="btn btn-secondary" onclick="openAddActivityModal()">+ Add Entry</button>
+                    </div>
+                    <div class="activity-list" id="activity-stream-os"></div>
+                </div>
             </section>
 
             <!-- TAB 2: REVENUE -->
@@ -301,11 +476,19 @@
                 </div>
             </section>
 
-            <!-- TAB 4: SETTINGS -->
+            <!-- TAB 4: FORECAST -->
+            <section id="tab-forecast" class="tab-pane hidden">
+                <div class="codex-card">
+                    <h3 class="section-title-32" style="font-size: 24px;">Forecast Engine</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Consolidated future growth projection and runway model calculations.</p>
+                </div>
+            </section>
+
+            <!-- TAB 5: SETTINGS -->
             <section id="tab-settings" class="tab-pane hidden">
                 <div class="codex-card">
                     <h3 class="section-title-32" style="font-size: 24px;">Settings & Security</h3>
-                    <p style="font-size: 14px; color: var(--text-secondary);">Security tokens and account authentication.</p>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Security tokens and account authentication settings.</p>
                 </div>
             </section>
         </main>

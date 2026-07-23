@@ -1,10 +1,10 @@
 /* ==========================================================================
-   Creator Cash Flow - Motion, Depth, & Interactive Engine
+   Creator Financial OS - HQ Engine & Onboarding Orchestrator
    ========================================================================== */
 
 const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
 
-// State Management
+// Application State
 const state = {
     user: { name: 'Reamogetswe', email: 'reamogetswe@creator.co.za' },
     balance: 24650,
@@ -31,6 +31,14 @@ const state = {
     ]
 };
 
+// Onboarding State
+const onboardingState = {
+    creatorType: '',
+    platforms: [],
+    goal: '',
+    connected: []
+};
+
 let intelligenceChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,6 +50,18 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     setupAuthModalTrigger();
 
+    // Check if user is already onboarded/logged in
+    const cachedUser = localStorage.getItem('creator_cashflow_user');
+    if (cachedUser) {
+        try {
+            state.user = JSON.parse(cachedUser);
+            const label = document.getElementById('nav-user-label');
+            if (label) label.innerText = state.user.name.split(' ')[0];
+            const greetingLabel = document.getElementById('dashboard-user-greeting');
+            if (greetingLabel) greetingLabel.innerText = state.user.name.split(' ')[0];
+        } catch (e) {}
+    }
+
     renderDashboardData();
     initIntelligenceChart();
     animateCounter();
@@ -50,7 +70,88 @@ document.addEventListener('DOMContentLoaded', () => {
     if (syncBtn) syncBtn.addEventListener('click', syncData);
 });
 
-// 6. Mouse Reactive Cursor Spotlight Glow
+// ==========================================================================
+// ONBOARDING ENGINE
+// ==========================================================================
+
+function nextOnboardStep(stepNum) {
+    // Hide all steps
+    document.querySelectorAll('.onboarding-step').forEach(step => {
+        step.classList.add('hidden');
+    });
+
+    const nextStep = document.getElementById(`onboard-step-${stepNum}`);
+    if (nextStep) {
+        nextStep.classList.remove('hidden');
+    }
+
+    // Step 6: Magic Moment activation triggers
+    if (stepNum === 6) {
+        triggerMagicMoment();
+    }
+}
+
+function selectCreatorType(element) {
+    document.querySelectorAll('#onboard-step-2 .onboard-select-option').forEach(opt => {
+        opt.classList.remove('active');
+    });
+    element.classList.add('active');
+    onboardingState.creatorType = element.getAttribute('data-value');
+}
+
+function togglePlatformChoice(element) {
+    element.classList.toggle('active');
+    const val = element.getAttribute('data-value');
+    
+    if (element.classList.contains('active')) {
+        if (!onboardingState.platforms.includes(val)) {
+            onboardingState.platforms.push(val);
+        }
+    } else {
+        onboardingState.platforms = onboardingState.platforms.filter(p => p !== val);
+    }
+}
+
+function selectGoal(element) {
+    document.querySelectorAll('#onboard-step-4 .onboard-select-option').forEach(opt => {
+        opt.classList.remove('active');
+    });
+    element.classList.add('active');
+    onboardingState.goal = element.getAttribute('data-value');
+}
+
+function simulatePlatformConnect(element, platform) {
+    element.classList.toggle('connected');
+    const badge = document.getElementById(`connect-${platform}`);
+    
+    if (element.classList.contains('connected')) {
+        if (badge) badge.innerText = 'Connected';
+        if (!onboardingState.connected.includes(platform)) {
+            onboardingState.connected.push(platform);
+        }
+    } else {
+        if (badge) badge.innerText = 'Connect';
+        onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
+    }
+}
+
+function triggerMagicMoment() {
+    const platformsCount = onboardingState.platforms.length || 3;
+    const streamsCount = platformsCount + 2; // Simulated extra streams (e.g. sponsorships)
+
+    document.getElementById('magic-onboard-platforms').innerText = platformsCount;
+    document.getElementById('magic-onboard-streams').innerText = streamsCount;
+
+    // After 2.5 seconds of displaying activation, transition to Command Center
+    setTimeout(() => {
+        switchView('app');
+    }, 2500);
+}
+
+// ==========================================================================
+// UTILITY & VIEW NAVIGATION
+// ==========================================================================
+
 function setupMouseSpotlight() {
     window.addEventListener('mousemove', (e) => {
         document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
@@ -58,7 +159,6 @@ function setupMouseSpotlight() {
     });
 }
 
-// 7. Sticky Navbar Scroll Shrink & Blur (72px -> 56px)
 function setupNavbarScroll() {
     const nav = document.getElementById('main-nav-header');
     if (!nav) return;
@@ -72,7 +172,6 @@ function setupNavbarScroll() {
     });
 }
 
-// 4. Animated Stream Bars Observer
 function setupStreamBarsObserver() {
     const section = document.getElementById('platform-breakdown-section');
     if (!section) return;
@@ -93,23 +192,30 @@ function setupStreamBarsObserver() {
     observer.observe(section);
 }
 
-// View Switcher (Marketing Landing Page vs Logged-In App)
+// Switch between Marketing, Onboarding, and Workspace
 function switchView(mode) {
     const marketingView = document.getElementById('view-marketing');
     const appView = document.getElementById('view-app');
+    const onboardingView = document.getElementById('view-onboarding');
+
+    // Reset visibility
+    marketingView.classList.add('hidden');
+    appView.classList.add('hidden');
+    onboardingView.classList.add('hidden');
 
     if (mode === 'app') {
-        marketingView.classList.add('hidden');
         appView.classList.remove('hidden');
         initIntelligenceChart();
         animateCounter();
+    } else if (mode === 'onboarding') {
+        onboardingView.classList.remove('hidden');
+        // Reset onboarding steps
+        nextOnboardStep(1);
     } else {
-        appView.classList.add('hidden');
         marketingView.classList.remove('hidden');
     }
 }
 
-// Navigation Engine inside App
 function setupNavigation() {
     const navItems = document.querySelectorAll('.codex-nav .nav-item');
     navItems.forEach(item => {
@@ -137,7 +243,7 @@ function switchTab(tabId) {
     }
 }
 
-// 3. Smooth 1.2s Counter Animation (0 -> R24,650)
+// Balance Counter Animation
 function animateCounter() {
     const target = state.balance;
     const element = document.getElementById('val-current-balance');
@@ -146,7 +252,7 @@ function animateCounter() {
 
     let current = 0;
     const duration = 1200; // 1.2s
-    const steps = 40;
+    const steps = 45;
     const stepVal = Math.ceil(target / steps);
     const stepTime = duration / steps;
 
@@ -162,16 +268,39 @@ function animateCounter() {
     }, stepTime);
 }
 
-// Render Dashboard Streams
+// Render Dashboard Data & Income Story
 function renderDashboardData() {
     const sourceContainer = document.getElementById('sources-stream-list');
     if (sourceContainer) {
         sourceContainer.innerHTML = '';
         state.sources.forEach(s => {
             sourceContainer.innerHTML += `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: var(--border-card);">
-                    <span style="font-size: 14px; font-weight: 500;">${s.name}</span>
-                    <span style="font-size: 16px; font-weight: 700; color: var(--accent-emerald);">R${s.amount.toLocaleString()} (${s.percent})</span>
+                <div class="stream-bar-row" style="margin-bottom: 20px;">
+                    <div class="stream-bar-meta">
+                        <span style="font-size: 14px; font-weight: 500;">${s.name}</span>
+                        <span style="color: var(--accent-emerald); font-weight: 700; font-size: 14px;">R${s.amount.toLocaleString()} (${s.percent})</span>
+                    </div>
+                    <div class="stream-bar-track">
+                        <div class="stream-bar-fill" style="width: ${s.percent};"></div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    const activityStream = document.getElementById('activity-stream-os');
+    if (activityStream) {
+        activityStream.innerHTML = '';
+        state.activities.slice(0, 4).forEach(a => {
+            const amountClass = a.type === 'income' ? 'style="color: var(--accent-emerald); font-weight: 700;"' : 'style="font-weight: 600;"';
+            const prefix = a.type === 'income' ? '+' : '-';
+            activityStream.innerHTML += `
+                <div class="activity-item">
+                    <div>
+                        <div style="font-weight: 600; font-size: 13px;">${a.desc}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); opacity: 0.6;">${a.date} • Verified Sync</div>
+                    </div>
+                    <div ${amountClass} font-size: 14px;">${prefix}R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -214,7 +343,7 @@ function renderFullStreams() {
     }
 }
 
-// Massive Hero Chart Canvas
+// Chart Engine
 function initIntelligenceChart() {
     const canvas = document.getElementById('chart-revenue-intelligence');
     if (!canvas) return;
@@ -377,28 +506,77 @@ async function executeCreateAccount() {
     const name = document.getElementById('reg-name').value.trim() || 'Reamogetswe Molefe';
     const email = document.getElementById('reg-email').value.trim() || 'reamogetswe@creator.co.za';
 
-    const userData = { id: 'usr_' + Date.now(), name, email, verified: true };
-    localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
+    state.user.name = name;
+    state.user.email = email;
+    localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
 
     const label = document.getElementById('nav-user-label');
     if (label) label.innerText = name.split(' ')[0];
+    const greetingLabel = document.getElementById('dashboard-user-greeting');
+    if (greetingLabel) greetingLabel.innerText = name.split(' ')[0];
+
     closeModal();
     switchView('app');
-    alert(`🎉 Account Activated for ${name} (${email})!\n\nWelcome to your Financial Intelligence workspace.`);
+    alert(`🎉 Account Activated for ${name} (${email})!\n\nWelcome to your Creator Command Center.`);
 }
 
 async function executeLogin() {
     const email = document.getElementById('login-email').value.trim() || 'reamogetswe@creator.co.za';
     const name = email.split('@')[0] || 'Reamogetswe';
 
-    const userData = { id: 'usr_logged_in', name, email, verified: true };
-    localStorage.setItem('creator_cashflow_user', JSON.stringify(userData));
+    state.user.name = name;
+    state.user.email = email;
+    localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
 
     const label = document.getElementById('nav-user-label');
     if (label) label.innerText = name;
+    const greetingLabel = document.getElementById('dashboard-user-greeting');
+    if (greetingLabel) greetingLabel.innerText = name;
+
     closeModal();
     switchView('app');
-    alert(`Welcome back, ${name}! Session active.`);
+    alert(`Welcome back, ${name}! Your Creator HQ is active.`);
+}
+
+function openAddActivityModal() {
+    openModal('Add Cash Flow Entry', `
+        <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="act-desc" class="form-input" placeholder="e.g. YouTube AdSense Payout">
+        </div>
+        <div class="form-group">
+            <label>Type</label>
+            <select id="act-type" class="form-input">
+                <option value="income">Income (+)</option>
+                <option value="expense">Expense (-)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Amount (ZAR)</label>
+            <input type="number" id="act-amount" class="form-input" placeholder="2500">
+        </div>
+        <button class="btn btn-emerald" style="width: 100%; margin-top: 12px;" onclick="submitActivity()">Add Entry</button>
+    `);
+}
+
+function submitActivity() {
+    const desc = document.getElementById('act-desc').value || 'New Entry';
+    const type = document.getElementById('act-type').value;
+    const amount = parseFloat(document.getElementById('act-amount').value) || 2500;
+
+    state.activities.unshift({
+        date: 'Today',
+        desc,
+        type,
+        amount
+    });
+
+    if (type === 'income') state.balance += amount;
+    else state.balance -= amount;
+
+    renderDashboardData();
+    animateCounter();
+    closeModal();
 }
 
 function openModal(title, html) {

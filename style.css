@@ -1,22 +1,27 @@
 /* ==========================================================================
-   Creator Cash Flow - Luxury Micro-Animations & Flow Shimmer Additions
+   Creator Cash Flow - Luxury Design Language (Creator HQ & Onboarding Edition)
+   Strict 80px/32px/16px/13px Scale | Pure Black | 24px Radii | 1px Borders
    ========================================================================== */
 
 :root {
+    /* Pure Black & Card Palette */
     --bg-page: #050505;
     --bg-card: #0B0B0B;
     --bg-card-hover: #121214;
     --bg-input: #141416;
     
-    --border-card: 1px solid rgba(255, 255, 255, 0.06);
-    --border-hover: 1px solid rgba(255, 255, 255, 0.14);
+    /* Strict Borders & Radius Rules */
+    --border-card: 1px solid rgba(255, 255, 255, 0.08);
+    --border-hover: 1px solid rgba(255, 255, 255, 0.16);
     --radius-strict: 24px;
     --radius-sm: 12px;
     
+    /* Typography Colors */
     --text-primary: #FFFFFF;
     --text-secondary: #8E8E93;
     --text-muted: #636366;
     
+    /* Brand Accent Color Only (#22C55E) */
     --accent-emerald: #22C55E;
     --accent-emerald-subtle: rgba(34, 197, 94, 0.12);
 
@@ -29,7 +34,10 @@
     box-sizing: border-box;
 }
 
-/* 5-Layer Ambient Depth Layers */
+/* ==========================================================================
+   5-LAYER AMBIENT DEPTH LAYER DEFINITION
+   ========================================================================== */
+
 body.codex-app {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     background-color: var(--bg-page);
@@ -39,8 +47,11 @@ body.codex-app {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     position: relative;
+    /* Limit font weights to 500, 600, 700 */
+    font-weight: 500;
 }
 
+/* Layer 1: Ambient Backdrop Glow */
 body.codex-app::before {
     content: '';
     position: fixed;
@@ -55,6 +66,7 @@ body.codex-app::before {
     z-index: 0;
 }
 
+/* Layer 2: Mouse Reactive Spotlight Glow */
 .mouse-spotlight {
     position: fixed;
     top: 0;
@@ -66,12 +78,12 @@ body.codex-app::before {
     z-index: 1;
 }
 
-.marketing-page-wrapper, .app-shell, .modal-overlay {
+.marketing-page-wrapper, .app-shell, .onboarding-wrapper, .modal-overlay {
     position: relative;
     z-index: 2;
 }
 
-/* Keyframes */
+/* Keyframes & Motion Transitions */
 @keyframes fadeSlideUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -93,7 +105,10 @@ body.codex-app::before {
 .animate-stagger-2 { animation: fadeSlideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards; }
 .animate-stagger-3 { animation: fadeSlideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards; }
 
-/* Sticky Navbar Header */
+/* ==========================================================================
+   MARKETING LANDING HEADER & NAVIGATION
+   ========================================================================== */
+
 .marketing-header {
     display: flex;
     justify-content: space-between;
@@ -116,13 +131,39 @@ body.codex-app::before {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
 
-.marketing-brand { font-size: 18px; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary); }
-.marketing-nav-links { display: flex; gap: 32px; list-style: none; }
-.marketing-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: var(--transition-smooth); }
-.marketing-nav-links a:hover { color: var(--text-primary); }
-.marketing-auth-btns { display: flex; align-items: center; gap: 16px; }
+.marketing-brand {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+}
 
-/* Hero Section */
+.marketing-nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+}
+
+.marketing-nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+}
+
+.marketing-nav-links a:hover { color: var(--text-primary); }
+
+.marketing-auth-btns {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* ==========================================================================
+   MARKETING HERO & SECTIONS
+   ========================================================================== */
+
 .marketing-hero {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
@@ -133,11 +174,30 @@ body.codex-app::before {
     margin: 0 auto;
 }
 
-.marketing-hero-title { font-size: 80px; font-weight: 700; letter-spacing: -0.06em; line-height: 1; color: var(--text-primary); margin-bottom: 24px; }
-.marketing-hero-subtitle { font-size: 18px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; max-width: 540px; }
-.marketing-hero-actions { display: flex; align-items: center; gap: 20px; }
+.marketing-hero-title {
+    font-size: 80px; /* 80px Hero */
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    line-height: 1;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+}
 
-/* Stream Cards & Pulse Micro-Animation */
+.marketing-hero-subtitle {
+    font-size: 18px; /* 18px Metric/Subtitle */
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 540px;
+}
+
+.marketing-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Marketing Flow Visualizer */
 .marketing-stream-card {
     background: var(--bg-card);
     border: var(--border-card);
@@ -160,7 +220,7 @@ body.codex-app::before {
     border: var(--border-card);
     border-radius: var(--radius-sm);
     margin-bottom: 10px;
-    font-size: 14px;
+    font-size: 13px;
     transition: var(--transition-smooth);
 }
 
@@ -169,7 +229,6 @@ body.codex-app::before {
     border-color: rgba(255, 255, 255, 0.14);
 }
 
-/* Pulsing Stream Arrow Micro-Animation */
 .stream-arrow {
     text-align: center;
     color: var(--accent-emerald);
@@ -178,7 +237,6 @@ body.codex-app::before {
     animation: pulseStream 2s infinite ease-in-out;
 }
 
-/* Shimmering Net Node Micro-Animation */
 .stream-final-node {
     background: var(--accent-emerald-subtle);
     border: 1px solid rgba(34, 197, 94, 0.3);
@@ -190,16 +248,27 @@ body.codex-app::before {
     animation: borderShimmer 4s infinite ease-in-out;
 }
 
-/* Section 2: Revenue Intelligence */
+/* General Marketing Section layout */
 .marketing-section {
     padding: 80px 64px;
     max-width: 1280px;
     margin: 0 auto;
 }
 
-.marketing-section-headline { font-size: 56px; font-weight: 700; letter-spacing: -0.05em; color: var(--text-primary); margin-bottom: 48px; text-align: center; }
+.marketing-section-headline {
+    font-size: 56px; /* 56px Section */
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    color: var(--text-primary);
+    margin-bottom: 48px;
+    text-align: center;
+}
 
-.three-cards-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+.three-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+}
 
 .large-stat-card {
     background: var(--bg-card);
@@ -214,11 +283,25 @@ body.codex-app::before {
     border: var(--border-hover);
 }
 
-.large-stat-label { font-size: 14px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
-.large-stat-val { font-size: 56px; font-weight: 700; letter-spacing: -0.05em; color: var(--text-primary); line-height: 1; }
+.large-stat-label {
+    font-size: 13px; /* 13px Supporting */
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.large-stat-val {
+    font-size: 56px; /* 56px scale */
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
 .large-stat-val.emerald { color: var(--accent-emerald); }
 
-/* Section 3: Animated Stream Bars */
+/* Horizontal Stream Bar breakdown */
 .horizontal-stream-card {
     background: var(--bg-card);
     border: var(--border-card);
@@ -234,7 +317,7 @@ body.codex-app::before {
 }
 
 .stream-bar-row { margin-bottom: 24px; }
-.stream-bar-meta { display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.stream-bar-meta { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
 .stream-bar-track { height: 10px; background: rgba(255, 255, 255, 0.04); border-radius: 5px; overflow: hidden; }
 
 .stream-bar-fill {
@@ -245,9 +328,148 @@ body.codex-app::before {
     transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Logged-In App Layout */
-.app-shell { display: flex; min-height: 100vh; }
+/* ==========================================================================
+   INTERACTIVE ONBOARDING STYLES
+   ========================================================================== */
 
+.onboarding-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px;
+}
+
+.onboarding-card {
+    background: var(--bg-card);
+    border: var(--border-card);
+    border-radius: var(--radius-strict);
+    width: 100%;
+    max-width: 580px;
+    padding: 48px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9);
+}
+
+.onboard-title {
+    font-size: 32px; /* 32px Section */
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.onboard-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+.onboard-illustration {
+    width: 96px;
+    height: 96px;
+    background: rgba(255, 255, 255, 0.02);
+    border: var(--border-card);
+    border-radius: var(--radius-strict);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Selection Cards step 2 & 4 */
+.onboard-select-option {
+    background: rgba(255, 255, 255, 0.015);
+    border: var(--border-card);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.onboard-select-option:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.onboard-select-option.active {
+    border-color: var(--accent-emerald);
+    background: var(--accent-emerald-subtle);
+}
+
+/* Grid Choices step 3 */
+.onboard-choice-card {
+    background: rgba(255, 255, 255, 0.015);
+    border: var(--border-card);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    text-align: center;
+}
+
+.onboard-choice-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.onboard-choice-card.active {
+    border-color: var(--accent-emerald);
+    background: var(--accent-emerald-subtle);
+}
+
+/* Connection Cards step 5 */
+.connection-platform-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    background: rgba(255, 255, 255, 0.015);
+    border: var(--border-card);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.connection-platform-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.connection-platform-card.connected {
+    border-color: var(--accent-emerald);
+    background: var(--accent-emerald-subtle);
+}
+
+.connect-badge {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: var(--border-card);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.connection-platform-card.connected .connect-badge {
+    background: var(--accent-emerald);
+    color: #000000;
+    border-color: var(--accent-emerald);
+}
+
+/* ==========================================================================
+   LOGGED-IN DASHBOARD (CREATOR HQ)
+   ========================================================================== */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Navigation (Extremely Quiet) */
 .codex-sidebar {
     width: 250px;
     background-color: var(--bg-page);
@@ -262,6 +484,44 @@ body.codex-app::before {
     z-index: 40;
 }
 
+.codex-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+    opacity: 0.55;
+    text-decoration: none;
+    font-size: 13px; /* 13px Supporting */
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-smooth);
+}
+
+.nav-item:hover {
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.nav-item.active {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: var(--border-card);
+}
+
+.sidebar-footer {
+    padding-top: 24px;
+    border-top: var(--border-card);
+}
+
+/* Main HQ Viewport */
 .codex-main {
     flex: 1;
     padding: 64px 80px;
@@ -270,13 +530,24 @@ body.codex-app::before {
     width: 100%;
 }
 
-.dashboard-balance-header { margin-bottom: 48px; }
-.dashboard-date-label { font-size: 14px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-.dashboard-balance-amount { font-size: 80px; font-weight: 700; letter-spacing: -0.06em; color: var(--text-primary); line-height: 1; margin-bottom: 12px; }
+/* Date & Balance Header (Aspirational, Personal Greeting) */
+.dashboard-balance-header {
+    margin-bottom: 56px;
+}
+
+/* 80px Dashboard Balance */
+.dashboard-balance-amount {
+    font-size: 80px;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    color: var(--text-primary);
+    line-height: 1;
+    margin: 4px 0 12px 0;
+}
 
 .dashboard-change-badge {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 700;
     color: var(--accent-emerald);
     opacity: 0;
     transform: translateY(10px);
@@ -288,24 +559,7 @@ body.codex-app::before {
     transform: translateY(0);
 }
 
-.massive-chart-card {
-    background: var(--bg-card);
-    border: var(--border-card);
-    border-radius: var(--radius-strict);
-    padding: 40px;
-    margin-bottom: 48px;
-    transition: var(--transition-smooth);
-}
-
-.massive-chart-card:hover {
-    transform: translateY(-3px);
-    border: var(--border-hover);
-}
-
-.chart-wrapper { position: relative; height: 380px; width: 100%; }
-
-.dashboard-two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 48px; }
-
+/* Cards & Surfaces */
 .codex-card {
     background: var(--bg-card);
     border: var(--border-card);
@@ -319,14 +573,49 @@ body.codex-app::before {
     border: var(--border-hover);
 }
 
-.section-title-32 { font-size: 32px; font-weight: 700; letter-spacing: -0.04em; color: var(--text-primary); margin-bottom: 24px; }
+.massive-chart-card {
+    background: var(--bg-card);
+    border: var(--border-card);
+    border-radius: var(--radius-strict);
+    padding: 40px;
+    margin-bottom: 56px;
+    transition: var(--transition-smooth);
+}
 
+.massive-chart-card:hover {
+    transform: translateY(-3px);
+    border: var(--border-hover);
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 380px;
+    width: 100%;
+}
+
+.dashboard-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 56px;
+}
+
+/* Section Title Scale (32px) */
+.section-title-32 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+}
+
+/* Signature Feature: Creator Revenue Engine */
 .signature-engine-card {
     background: var(--bg-card);
     border: var(--border-card);
     border-radius: var(--radius-strict);
     padding: 48px;
-    margin-bottom: 48px;
+    margin-bottom: 56px;
     transition: var(--transition-smooth);
 }
 
@@ -335,7 +624,13 @@ body.codex-app::before {
     border: var(--border-hover);
 }
 
-.engine-stream-pipeline { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 32px; }
+.engine-stream-pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 32px;
+}
 
 .engine-source-box {
     flex: 1;
@@ -352,7 +647,7 @@ body.codex-app::before {
     border-color: rgba(255, 255, 255, 0.14);
 }
 
-.engine-source-title { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+.engine-source-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
 .engine-source-val { font-size: 24px; font-weight: 700; color: var(--accent-emerald); }
 
 .engine-flow-arrow {
@@ -371,14 +666,37 @@ body.codex-app::before {
     animation: borderShimmer 4s infinite ease-in-out;
 }
 
-/* Buttons & Tactile Click Micro-Animation */
+/* Activity Items */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.015);
+    border: var(--border-card);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-smooth);
+}
+
+.activity-item:hover {
+    border-color: var(--border-hover);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Buttons with tactile active scale */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 12px 24px;
     border-radius: var(--radius-strict);
-    font-size: 14px;
+    font-size: 13px; /* 13px */
     font-weight: 600;
     border: none;
     cursor: pointer;
@@ -396,8 +714,9 @@ body.codex-app::before {
 
 .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: var(--border-card); }
 .btn-secondary:hover { border: var(--border-hover); }
+.btn-sm { padding: 8px 16px; font-size: 12px; }
 
-/* Modals */
+/* Modal overlay & popup styling */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -409,7 +728,7 @@ body.codex-app::before {
     z-index: 100;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 200ms ease;
 }
 
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
@@ -421,7 +740,7 @@ body.codex-app::before {
     max-width: 440px;
     padding: 36px;
     transform: scale(0.95);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-overlay.active .codex-modal {
@@ -432,7 +751,7 @@ body.codex-app::before {
 .modal-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
 
 .form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+.form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
 .form-input {
     width: 100%;
     background-color: var(--bg-input);
@@ -448,10 +767,12 @@ body.codex-app::before {
 .form-input:focus { border-color: var(--accent-emerald); }
 .hidden { display: none !important; }
 
-@media (max-width: 900px) {
-    .marketing-hero, .three-cards-grid, .dashboard-two-column, .engine-stream-pipeline { grid-template-columns: 1fr; flex-direction: column; }
+@media (max-width: 1024px) {
+    .marketing-hero, .three-cards-grid, .dashboard-two-column, .engine-stream-pipeline { grid-template-columns: 1fr; flex-direction: column; gap: 24px; }
     .marketing-hero-title { font-size: 48px; }
     .dashboard-balance-amount { font-size: 56px; }
     .marketing-header { padding: 0 24px; }
     .marketing-hero { padding: 48px 24px; }
+    .onboarding-card { padding: 24px; }
+    .codex-main { padding: 32px 20px; }
 }
