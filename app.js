@@ -242,6 +242,17 @@ function simulatePlatformConnect(element, platform) {
             }
         });
 
+        phylloConnect.on("accountDisconnected", (accountId, workPlatformId, userId) => {
+            console.log(`[PHYLLO DISCONNECTED] Account: ${accountId} for platform: ${workPlatformId}`);
+            element.classList.remove('connected');
+            if (badge) badge.innerText = 'Connect';
+            onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
+        });
+
+        phylloConnect.on("tokenExpired", (userId) => {
+            console.warn(`[PHYLLO TOKEN EXPIRED] User: ${userId}`);
+        });
+
         phylloConnect.on("accountError", (error) => {
             console.error('[PHYLLO SDK ERROR]', error);
             if (badge) badge.innerText = 'Connect';
