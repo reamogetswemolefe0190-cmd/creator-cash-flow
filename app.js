@@ -75,6 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load real transactions from Supabase cloud database
 async function loadUserTransactions() {
     if (!state.token) return;
+    if (state.token === 'demo_token') {
+        renderDashboardData();
+        initIntelligenceChart();
+        animateCounter();
+        return;
+    }
 
     try {
         const res = await fetch(`${API_BASE_URL}/transactions`, {
@@ -787,7 +793,7 @@ async function submitActivity() {
     const type = document.getElementById('act-type').value;
     const amount = parseFloat(document.getElementById('act-amount').value) || 2500;
 
-    if (state.token && state.token !== 'offline_token') {
+    if (state.token && state.token !== 'offline_token' && state.token !== 'demo_token') {
         try {
             await fetch(`${API_BASE_URL}/transactions`, {
                 method: 'POST',
@@ -809,7 +815,7 @@ async function submitActivity() {
             console.error('Failed to sync transaction to cloud database', e);
         }
     } else {
-        // Offline Fallback local modification
+        // Offline / Demo Fallback local modification
         state.activities.unshift({
             date: 'Today',
             desc,
@@ -818,8 +824,14 @@ async function submitActivity() {
         });
         if (type === 'income') state.balance += amount;
         else state.balance -= amount;
+        
+        if (typeof updateDemoTimeline === 'function') {
+            updateDemoTimeline();
+        }
+        
         renderDashboardData();
         animateCounter();
+        initIntelligenceChart();
     }
 
     closeModal();
@@ -834,4 +846,96 @@ function openModal(title, html) {
 
 function closeModal() {
     document.getElementById('modal-app').classList.remove('active');
+}
+
+// ==========================================================================
+// DEMO MODE ENGINE
+// ==========================================================================
+
+function enterDemoMode() {
+    state.user = { name: 'Demo Creator', email: 'demo@creator.co' };
+    state.token = 'demo_token';
+    
+    // Set greeting headers
+    const label = document.getElementById('nav-user-label');
+    if (label) label.innerText = 'Demo';
+    const greetingLabel = document.getElementById('dashboard-user-greeting');
+    if (greetingLabel) greetingLabel.innerText = 'Demo';
+
+    // Show Demo Banner
+    const banner = document.getElementById('demo-mode-banner');
+    if (banner) banner.classList.remove('hidden');
+
+    // Populate rich, high-fidelity demo activities
+    state.activities = [
+        { date: 'Jul 28', desc: 'Sponsorship Commission Payout', type: 'income', amount: 3200 },
+        { date: 'Jul 26', desc: 'Supercell Brand Sponsorship', type: 'income', amount: 8500 },
+        { date: 'Jul 24', desc: 'DigitalOcean Cloud Hosting', type: 'expense', amount: 480 },
+        { date: 'Jul 21', desc: 'Google AdSense South Africa Payout', type: 'income', amount: 18420 },
+        { date: 'Jul 19', desc: 'Orms Direct (Sony Alpha Lens)', type: 'expense', amount: 4200 },
+        { date: 'Jul 18', desc: 'TikTok Creator Rewards ZAR', type: 'income', amount: 4850 },
+        { date: 'Jul 15', desc: 'Adobe Creative Cloud SA', type: 'expense', amount: 950 },
+        { date: 'Jul 14', desc: 'Woolworths SA Brand Deal', type: 'income', amount: 2100 }
+    ];
+
+    // Compute initial balance
+    let totalIncome = 0;
+    let totalExpense = 0;
+    state.activities.forEach(a => {
+        if (a.type === 'income') totalIncome += a.amount;
+        else totalExpense += a.amount;
+    });
+    state.balance = totalIncome - totalExpense;
+
+    // Calculate dynamic timeline data for Chart.js
+    updateDemoTimeline();
+
+    // Switch view to dashboard
+    switchView('app');
+    
+    // Rerender icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function exitDemoMode() {
+    state.user = null;
+    state.token = null;
+
+    // Clear greeting labels
+    const label = document.getElementById('nav-user-label');
+    if (label) label.innerText = 'Account';
+    const greetingLabel = document.getElementById('dashboard-user-greeting');
+    if (greetingLabel) greetingLabel.innerText = 'Creator';
+
+    // Hide banner
+    const banner = document.getElementById('demo-mode-banner');
+    if (banner) banner.classList.add('hidden');
+
+    // Return to marketing landing page
+    switchView('marketing');
+}
+
+function updateDemoTimeline() {
+    const timelineMap = {};
+    state.activities.slice().reverse().forEach(a => {
+        const dateKey = a.date;
+        if (!timelineMap[dateKey]) timelineMap[dateKey] = { rev: 0, exp: 0 };
+        if (a.type === 'income') timelineMap[dateKey].rev += a.amount;
+        else timelineMap[dateKey].exp += a.amount;
+    });
+
+    let runningRev = 0;
+    let runningExp = 0;
+    state.timelineData = Object.keys(timelineMap).map(k => {
+        runningRev += timelineMap[k].rev;
+        runningExp += timelineMap[k].exp;
+        return {
+            date: k,
+            rev: runningRev,
+            exp: runningExp,
+            profit: runningRev - runningExp
+        };
+    });
 }

@@ -56,7 +56,7 @@
                 <p class="marketing-hero-subtitle animate-stagger-1">Understand where your money comes from, where it goes, and what happens next.</p>
                 <div class="marketing-hero-actions animate-stagger-2">
                     <button class="btn btn-emerald" onclick="switchView('onboarding')">Start Free</button>
-                    <button class="btn btn-secondary" onclick="switchView('app')">Watch Demo →</button>
+                    <button class="btn btn-secondary" onclick="enterDemoMode()">Watch Demo →</button>
                 </div>
             </div>
 
@@ -371,6 +371,12 @@
             
             <!-- TAB 1: OVERVIEW -->
             <section id="tab-overview" class="tab-pane active">
+                
+                <!-- Demo Mode Banner -->
+                <div id="demo-mode-banner" class="demo-banner hidden">
+                    <span style="font-weight: 500;">✨ <strong>Demo Mode</strong> — Experience the full financial analytics suite.</span>
+                    <button class="btn btn-emerald btn-sm" onclick="exitDemoMode()" style="padding: 6px 12px; min-height: 28px !important; font-size: 11px;">Exit Demo</button>
+                </div>
                 
                 <!-- Date & Balance Header (Aspirational, Personal Greeting) -->
                 <div class="dashboard-balance-header animate-hero-text">
