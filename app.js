@@ -399,7 +399,7 @@ function switchView(mode) {
 }
 
 function setupNavigation() {
-    const navItems = document.querySelectorAll('.codex-nav .nav-item');
+    const navItems = document.querySelectorAll('.codex-nav .nav-item, .mobile-bottom-nav .mobile-nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             const tabId = item.getAttribute('data-tab');
@@ -412,14 +412,14 @@ function setupNavigation() {
 }
 
 function switchTab(tabId) {
-    document.querySelectorAll('.codex-nav .nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.codex-nav .nav-item, .mobile-bottom-nav .mobile-nav-item').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
 
-    const selectedNav = document.querySelector(`.codex-nav .nav-item[data-tab="${tabId}"]`);
+    const selectedNavs = document.querySelectorAll(`[data-tab="${tabId}"]`);
     const selectedPane = document.getElementById(`tab-${tabId}`);
 
-    if (selectedNav && selectedPane) {
-        selectedNav.classList.add('active');
+    if (selectedPane) {
+        selectedNavs.forEach(nav => nav.classList.add('active'));
         selectedPane.classList.remove('hidden');
         selectedPane.classList.add('active');
     }
