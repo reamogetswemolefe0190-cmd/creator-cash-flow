@@ -9,12 +9,7 @@ const state = {
     user: null,
     token: null,
     balance: 0,
-    sources: [
-        { name: 'YouTube Studio', amount: 18420, percent: '62%' },
-        { name: 'TikTok Creator Rewards', amount: 4850, percent: '21%' },
-        { name: 'Instagram Sponsorships', amount: 2100, percent: '10%' },
-        { name: 'Sponsors & Affiliate', amount: 4940, percent: '7%' }
-    ],
+    sources: [],
     timelineData: [
         { date: 'Jul 1', rev: 4200, exp: 500, profit: 3700 },
         { date: 'Jul 5', rev: 8900, exp: 1200, profit: 7700 },
@@ -28,20 +23,18 @@ const state = {
 
 // Onboarding State
 const onboardingState = {
-    creatorType: '',
     platforms: [],
-    goal: '',
     connected: []
 };
 
 let intelligenceChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 
-    setupMouseSpotlight();
     setupNavbarScroll();
-    setupStreamBarsObserver();
     setupNavigation();
     setupAuthModalTrigger();
 
@@ -59,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const greetingLabel = document.getElementById('dashboard-user-greeting');
             if (greetingLabel) greetingLabel.innerText = state.user.name.split(' ')[0];
 
-            // Load real data from Supabase
             loadUserTransactions();
         } catch (e) {
             loadLocalBackupData();
@@ -76,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadUserTransactions() {
     if (!state.token) return;
     if (state.token === 'demo_token') {
+        recalculateBusinessMetrics();
         renderDashboardData();
         initIntelligenceChart();
         animateCounter();
@@ -134,6 +127,7 @@ async function loadUserTransactions() {
         loadLocalBackupData();
     }
 
+    recalculateBusinessMetrics();
     renderDashboardData();
     initIntelligenceChart();
     animateCounter();
@@ -148,6 +142,7 @@ function loadLocalBackupData() {
         { date: 'Jul 15', desc: 'Adobe Creative Cloud SA', type: 'expense', amount: 950 },
         { date: 'Jul 14', desc: 'Woolworths SA Brand Deal', type: 'income', amount: 2100 }
     ];
+    recalculateBusinessMetrics();
 }
 
 // ==========================================================================
@@ -164,17 +159,33 @@ function nextOnboardStep(stepNum) {
         nextStep.classList.remove('hidden');
     }
 
-    if (stepNum === 6) {
+    if (stepNum === 2) {
+        const connectList = document.getElementById('onboarding-connect-list');
+        if (connectList) {
+            connectList.innerHTML = '';
+            if (onboardingState.platforms.length === 0) {
+                onboardingState.platforms = ['YouTube', 'TikTok'];
+            }
+            onboardingState.platforms.forEach(platform => {
+                const card = document.createElement('div');
+                card.className = "connection-platform-card flex justify-between items-center p-md bg-surface-container-low border border-outline-variant rounded-2xl cursor-pointer hover:bg-surface-container transition-all";
+                card.onclick = (e) => simulatePlatformConnect(card, platform);
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-sm">
+                        <span class="material-symbols-outlined text-primary">${platform === 'YouTube' ? 'play_circle' : platform === 'TikTok' ? 'music_note' : platform === 'Instagram' ? 'photo_camera' : 'account_balance_wallet'}</span>
+                        <span class="font-body-md font-semibold">${platform} Channel</span>
+                    </div>
+                    <span class="connect-badge text-xs font-bold border border-outline-variant bg-surface px-md py-xs rounded-xl" id="connect-${platform}">Connect</span>
+                `;
+                connectList.appendChild(card);
+            });
+        }
+    }
+
+    if (stepNum === 3) {
         triggerMagicMoment();
     }
-}
-
-function selectCreatorType(element) {
-    document.querySelectorAll('#onboard-step-2 .onboard-select-option').forEach(opt => {
-        opt.classList.remove('active');
-    });
-    element.classList.add('active');
-    onboardingState.creatorType = element.getAttribute('data-value');
 }
 
 function togglePlatformChoice(element) {
@@ -190,16 +201,13 @@ function togglePlatformChoice(element) {
     }
 }
 
-function selectGoal(element) {
-    document.querySelectorAll('#onboard-step-4 .onboard-select-option').forEach(opt => {
-        opt.classList.remove('active');
-    });
-    element.classList.add('active');
-    onboardingState.goal = element.getAttribute('data-value');
+function skipOnboardingConnection(e) {
+    if (e) e.preventDefault();
+    console.log('[ONBOARDING] Skip trigger called. Routing to Step 3.');
+    nextOnboardStep(3);
 }
 
 function simulatePlatformConnect(element, platform) {
-    // If already connected, toggle it off
     if (element.classList.contains('connected')) {
         element.classList.remove('connected');
         const badge = document.getElementById(`connect-${platform}`);
@@ -211,7 +219,6 @@ function simulatePlatformConnect(element, platform) {
     const badge = document.getElementById(`connect-${platform}`);
     if (badge) badge.innerText = 'Linking...';
 
-    // Assemble auth headers if token is present
     const headers = {};
     if (state.token) {
         headers['Authorization'] = `Bearer ${state.token}`;
@@ -236,20 +243,14 @@ function simulatePlatformConnect(element, platform) {
             token: data.sdkToken
         };
 
-        // Dynamically locate the correct platform ID from the active backend list
         const platformId = findPlatformId(platform, data.platforms);
         if (platformId) {
             config.workPlatformId = platformId;
         }
 
-        console.log('[PHYLLO CONFIG DEBUG]', config);
-
-        // Initialize live Phyllo Connect SDK (Staging environment)
         const phylloConnect = PhylloConnect.initialize(config);
 
-        // Event listeners are bound directly to the returned phylloConnect instance
         phylloConnect.on("accountConnected", (accountId, workPlatformId, userId) => {
-            console.log(`[PHYLLO SUCCESS] Linked Account: ${accountId} for platform: ${workPlatformId}`);
             element.classList.add('connected');
             if (badge) badge.innerText = 'Connected';
             if (!onboardingState.connected.includes(platform)) {
@@ -258,33 +259,15 @@ function simulatePlatformConnect(element, platform) {
         });
 
         phylloConnect.on("accountDisconnected", (accountId, workPlatformId, userId) => {
-            console.log(`[PHYLLO DISCONNECTED] Account: ${accountId} for platform: ${workPlatformId}`);
             element.classList.remove('connected');
             if (badge) badge.innerText = 'Connect';
             onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
-        });
-
-        phylloConnect.on("tokenExpired", (userId) => {
-            console.warn(`[PHYLLO TOKEN EXPIRED] User: ${userId}`);
-        });
-
-        phylloConnect.on("connectionFailure", (reason, workPlatformId, userId) => {
-            console.error('[PHYLLO SDK ERROR]', reason, workPlatformId, userId);
-            if (badge) badge.innerText = 'Connect';
-        });
-
-        phylloConnect.on("exit", (reason, userId) => {
-            console.log("[PHYLLO SDK EXIT] Flow closed:", reason);
-            if (!element.classList.contains('connected')) {
-                if (badge) badge.innerText = 'Connect';
-            }
         });
 
         phylloConnect.open();
     })
     .catch(err => {
         console.warn('Backend connection failed. Reverting to mock connect simulation.', err);
-        // Fallback mockup behavior
         element.classList.add('connected');
         if (badge) badge.innerText = 'Connected';
         if (!onboardingState.connected.includes(platform)) {
@@ -295,10 +278,7 @@ function simulatePlatformConnect(element, platform) {
 
 function findPlatformId(platformName, platformMap) {
     if (!platformMap || typeof platformMap !== 'object') return undefined;
-    
     const search = platformName.toLowerCase();
-    
-    // Perform fuzzy/prefix match to handle "YouTube", "YouTube Sandbox", "Instagram Business", etc.
     for (const name of Object.keys(platformMap)) {
         const nameLower = name.toLowerCase();
         if (nameLower.includes(search) || search.includes(nameLower)) {
@@ -310,12 +290,8 @@ function findPlatformId(platformName, platformMap) {
 
 async function triggerMagicMoment() {
     const platformsCount = onboardingState.platforms.length || 3;
-    const streamsCount = platformsCount + 2;
-
     document.getElementById('magic-onboard-platforms').innerText = platformsCount;
-    document.getElementById('magic-onboard-streams').innerText = streamsCount;
 
-    // Save onboarding preferences to the backend database if user is logged in
     if (state.token) {
         try {
             await fetch(`${API_BASE_URL}/onboarding/save`, {
@@ -325,9 +301,7 @@ async function triggerMagicMoment() {
                     'Authorization': `Bearer ${state.token}`
                 },
                 body: JSON.stringify({
-                    creatorType: onboardingState.creatorType,
-                    platforms: onboardingState.platforms,
-                    goal: onboardingState.goal
+                    platforms: onboardingState.platforms
                 })
             });
         } catch (e) {
@@ -344,68 +318,20 @@ async function triggerMagicMoment() {
 // UTILITY & VIEW ENGINE
 // ==========================================================================
 
-function setupMouseSpotlight() {
-    window.addEventListener('mousemove', (e) => {
-        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-    });
-}
-
 function setupNavbarScroll() {
-    const nav = document.getElementById('main-nav-header');
-    if (!nav) return;
-
+    const header = document.querySelector('header');
+    if (!header) return;
     window.addEventListener('scroll', () => {
         if (window.scrollY > 20) {
-            nav.classList.add('scrolled');
+            header.classList.add('shadow-md');
         } else {
-            nav.classList.remove('scrolled');
+            header.classList.remove('shadow-md');
         }
     });
 }
 
-function setupStreamBarsObserver() {
-    const section = document.getElementById('platform-breakdown-section');
-    if (!section) return;
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const bars = section.querySelectorAll('.stream-bar-fill');
-                bars.forEach(bar => {
-                    const targetWidth = bar.getAttribute('data-width') || '100%';
-                    bar.style.width = targetWidth;
-                });
-                observer.unobserve(section);
-            }
-        });
-    }, { threshold: 0.2 });
-
-    observer.observe(section);
-}
-
-function switchView(mode) {
-    const marketingView = document.getElementById('view-marketing');
-    const appView = document.getElementById('view-app');
-    const onboardingView = document.getElementById('view-onboarding');
-
-    marketingView.classList.add('hidden');
-    appView.classList.add('hidden');
-    onboardingView.classList.add('hidden');
-
-    if (mode === 'app') {
-        appView.classList.remove('hidden');
-        loadUserTransactions();
-    } else if (mode === 'onboarding') {
-        onboardingView.classList.remove('hidden');
-        nextOnboardStep(1);
-    } else {
-        marketingView.classList.remove('hidden');
-    }
-}
-
 function setupNavigation() {
-    const navItems = document.querySelectorAll('.codex-nav .nav-item, .mobile-bottom-nav .mobile-nav-item');
+    const navItems = document.querySelectorAll('[data-tab]');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             const tabId = item.getAttribute('data-tab');
@@ -418,7 +344,7 @@ function setupNavigation() {
 }
 
 function switchTab(tabId) {
-    document.querySelectorAll('.codex-nav .nav-item, .mobile-bottom-nav .mobile-nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('[data-tab]').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
 
     const selectedNavs = document.querySelectorAll(`[data-tab="${tabId}"]`);
@@ -463,13 +389,13 @@ function renderDashboardData() {
         sourceContainer.innerHTML = '';
         state.sources.forEach(s => {
             sourceContainer.innerHTML += `
-                <div class="stream-bar-row" style="margin-bottom: 20px;">
-                    <div class="stream-bar-meta">
-                        <span style="font-size: 14px; font-weight: 500;">${s.name}</span>
-                        <span style="color: var(--accent-emerald); font-weight: 700; font-size: 14px;">R${s.amount.toLocaleString()} (${s.percent})</span>
+                <div class="space-y-sm" style="margin-bottom: 20px;">
+                    <div class="flex justify-between text-label-lg">
+                        <span>${s.name}</span>
+                        <span class="font-bold text-secondary">R${s.amount.toLocaleString()} (${s.percent})</span>
                     </div>
-                    <div class="stream-bar-track">
-                        <div class="stream-bar-fill" style="width: ${s.percent};"></div>
+                    <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
+                        <div class="h-full bg-primary" style="width: ${s.percent};"></div>
                     </div>
                 </div>
             `;
@@ -480,15 +406,15 @@ function renderDashboardData() {
     if (activityStream) {
         activityStream.innerHTML = '';
         state.activities.slice(0, 4).forEach(a => {
-            const amountClass = a.type === 'income' ? 'style="color: var(--accent-emerald); font-weight: 700;"' : 'style="font-weight: 600;"';
+            const amountClass = a.type === 'income' ? 'class="font-display font-bold text-secondary text-sm"' : 'class="font-display font-bold text-primary text-sm"';
             const prefix = a.type === 'income' ? '+' : '-';
             activityStream.innerHTML += `
-                <div class="activity-item">
+                <div class="flex justify-between items-center p-md bg-surface-container-low rounded-xl border border-outline-variant/30">
                     <div>
-                        <div style="font-weight: 600; font-size: 13px;">${a.desc}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary); opacity: 0.6;">${a.date} • Verified Sync</div>
+                        <div class="font-body-md font-semibold text-primary text-sm">${a.desc}</div>
+                        <div class="text-xs text-outline">${a.date} • Verified Sync</div>
                     </div>
-                    <div ${amountClass} font-size: 14px;">${prefix}R${a.amount.toLocaleString()}</div>
+                    <div ${amountClass}>${prefix}R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -503,12 +429,12 @@ function renderFullStreams() {
         revStream.innerHTML = '';
         state.activities.filter(a => a.type === 'income').forEach(a => {
             revStream.innerHTML += `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: var(--border-card);">
+                <div class="flex justify-between items-center py-md border-b border-outline-variant/30">
                     <div>
-                        <div style="font-size: 14px; font-weight: 600;">${a.desc}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary);">${a.date}</div>
+                        <div class="font-body-md font-semibold text-primary text-sm">${a.desc}</div>
+                        <div class="text-xs text-outline">${a.date}</div>
                     </div>
-                    <div style="font-size: 16px; font-weight: 700; color: var(--accent-emerald);">+R${a.amount.toLocaleString()}</div>
+                    <div class="font-display font-bold text-secondary text-sm">+R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -519,12 +445,12 @@ function renderFullStreams() {
         expStream.innerHTML = '';
         state.activities.filter(a => a.type === 'expense').forEach(a => {
             expStream.innerHTML += `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: var(--border-card);">
+                <div class="flex justify-between items-center py-md border-b border-outline-variant/30">
                     <div>
-                        <div style="font-size: 14px; font-weight: 600;">${a.desc}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary);">${a.date} • 100% Tax Write-Off</div>
+                        <div class="font-body-md font-semibold text-primary text-sm">${a.desc}</div>
+                        <div class="text-xs text-outline">${a.date}</div>
                     </div>
-                    <div style="font-size: 16px; font-weight: 600;">-R${a.amount.toLocaleString()}</div>
+                    <div class="font-display font-bold text-primary text-sm">-R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -536,9 +462,9 @@ function initIntelligenceChart() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 360);
-    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.18)');
-    gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, 'rgba(0, 108, 73, 0.15)');
+    gradient.addColorStop(1, 'rgba(0, 108, 73, 0)');
 
     if (intelligenceChartInstance) intelligenceChartInstance.destroy();
 
@@ -549,15 +475,15 @@ function initIntelligenceChart() {
             datasets: [{
                 label: 'Revenue Timeline',
                 data: state.timelineData.map(d => d.rev),
-                borderColor: '#22C55E',
+                borderColor: '#006c49',
                 borderWidth: 3,
                 backgroundColor: gradient,
                 fill: true,
                 tension: 0.4,
                 pointRadius: 4,
                 pointHoverRadius: 8,
-                pointBackgroundColor: '#22C55E',
-                pointBorderColor: '#050505',
+                pointBackgroundColor: '#006c49',
+                pointBorderColor: '#FFFFFF',
                 pointBorderWidth: 2
             }]
         },
@@ -565,21 +491,20 @@ function initIntelligenceChart() {
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 1200,
-                easing: 'easeInOutQuart'
+                duration: 1000
             },
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#0B0B0B',
-                    titleColor: '#FFFFFF',
-                    bodyColor: '#22C55E',
-                    borderColor: 'rgba(255, 255, 255, 0.16)',
+                    backgroundColor: '#FFFFFF',
+                    titleColor: '#0B1C30',
+                    bodyColor: '#006c49',
+                    borderColor: '#C6C6CD',
                     borderWidth: 1,
                     displayColors: false,
-                    padding: 14,
-                    titleFont: { family: 'Inter', size: 13, weight: '600' },
-                    bodyFont: { family: 'Inter', size: 13 },
+                    padding: 12,
+                    titleFont: { family: 'Inter', size: 12, weight: '600' },
+                    bodyFont: { family: 'Inter', size: 12 },
                     callbacks: {
                         label: function(context) {
                             const idx = context.dataIndex;
@@ -595,14 +520,14 @@ function initIntelligenceChart() {
             },
             scales: {
                 x: {
-                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                    ticks: { color: '#8E8E93', font: { family: 'Inter', size: 12 } }
+                    grid: { color: 'rgba(0, 0, 0, 0.03)' },
+                    ticks: { color: '#76777D', font: { family: 'Inter', size: 11 } }
                 },
                 y: {
-                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                    grid: { color: 'rgba(0, 0, 0, 0.03)' },
                     ticks: {
-                        color: '#8E8E93',
-                        font: { family: 'Inter', size: 12 },
+                        color: '#76777D',
+                        font: { family: 'Inter', size: 11 },
                         callback: function(value) {
                             return 'R' + (value / 1000) + 'k';
                         }
@@ -625,46 +550,50 @@ function syncData() {
     }
 }
 
+// ==========================================================================
+// AUTHENTICATION MODULES
+// ==========================================================================
+
 function setupAuthModalTrigger() {
     const authBtn = document.getElementById('btn-auth-modal');
     if (authBtn) authBtn.addEventListener('click', openAccountAuthModal);
 }
 
 function openAccountAuthModal() {
-    openModal('Creator OS Authentication', `
-        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: var(--radius-strict);">
-            <button class="btn btn-emerald btn-sm" id="auth-tab-signup" style="flex:1;" onclick="switchAuthTab('signup')">Create Account</button>
-            <button class="btn btn-secondary btn-sm" id="auth-tab-login" style="flex:1;" onclick="switchAuthTab('login')">Sign In</button>
+    openModal('Authentication', `
+        <div class="flex gap-sm p-xs bg-surface-container rounded-2xl mb-lg">
+            <button class="flex-1 font-label-lg py-sm rounded-xl bg-primary text-on-primary shadow-sm" id="auth-tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
+            <button class="flex-1 font-label-lg py-sm rounded-xl text-primary hover:bg-surface-container-high" id="auth-tab-login" onclick="switchAuthTab('login')">Sign In</button>
         </div>
 
-        <div id="auth-signup-fields">
-            <div class="form-group">
-                <label>Full Creator Name</label>
-                <input type="text" id="reg-name" class="form-input" placeholder="e.g. Reamogetswe Molefe">
+        <div id="auth-signup-fields" class="space-y-md">
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Full Creator Name</label>
+                <input type="text" id="reg-name" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="e.g. Reamogetswe Molefe">
             </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="reg-email" class="form-input" placeholder="reamogetswe@creator.co.za">
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Email Address</label>
+                <input type="email" id="reg-email" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="reamogetswe@creator.co.za">
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="reg-pass" class="form-input" placeholder="••••••••••••">
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Password</label>
+                <input type="password" id="reg-pass" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="••••••••••••">
             </div>
-            <button class="btn btn-emerald" style="width: 100%; margin-top: 8px;" onclick="executeCreateAccount()">
+            <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeCreateAccount()">
                 Create Creator Account
             </button>
         </div>
 
-        <div id="auth-login-fields" class="hidden">
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="login-email" class="form-input" placeholder="reamogetswe@creator.co.za">
+        <div id="auth-login-fields" class="space-y-md hidden">
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Email Address</label>
+                <input type="email" id="login-email" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="reamogetswe@creator.co.za">
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="login-pass" class="form-input" placeholder="••••••••••••">
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Password</label>
+                <input type="password" id="login-pass" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="••••••••••••">
             </div>
-            <button class="btn btn-emerald" style="width: 100%; margin-top: 8px;" onclick="executeLogin()">
+            <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeLogin()">
                 Sign In To OS
             </button>
         </div>
@@ -680,13 +609,13 @@ function switchAuthTab(tab) {
     if (tab === 'signup') {
         signupFields.classList.remove('hidden');
         loginFields.classList.add('hidden');
-        signupBtn.className = 'btn btn-emerald btn-sm';
-        loginBtn.className = 'btn btn-secondary btn-sm';
+        signupBtn.className = 'flex-1 font-label-lg py-sm rounded-xl bg-primary text-on-primary shadow-sm';
+        loginBtn.className = 'flex-1 font-label-lg py-sm rounded-xl text-primary hover:bg-surface-container-high';
     } else {
         signupFields.classList.add('hidden');
         loginFields.classList.remove('hidden');
-        signupBtn.className = 'btn btn-secondary btn-sm';
-        loginBtn.className = 'btn btn-emerald btn-sm';
+        signupBtn.className = 'flex-1 font-label-lg py-sm rounded-xl text-primary hover:bg-surface-container-high';
+        loginBtn.className = 'flex-1 font-label-lg py-sm rounded-xl bg-primary text-on-primary shadow-sm';
     }
 }
 
@@ -713,7 +642,6 @@ async function executeCreateAccount() {
             return;
         }
 
-        // Automatic Login after Registration
         const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -733,16 +661,17 @@ async function executeCreateAccount() {
         if (greetingLabel) greetingLabel.innerText = name.split(' ')[0];
 
         closeModal();
+        switchTab('overview');
         switchView('app');
         alert(`🎉 Creator HQ Activated for ${name}! Seed data populated successfully.`);
     } catch (err) {
         console.error('Signup failed, using offline fallback', err);
-        // Offline Fallback
         state.user = { id: 'usr_offline', name, email };
         state.token = 'offline_token';
         localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
         localStorage.setItem('creator_cashflow_user_token', state.token);
         closeModal();
+        switchTab('overview');
         switchView('app');
     }
 }
@@ -781,6 +710,7 @@ async function executeLogin() {
         if (greetingLabel) greetingLabel.innerText = state.user.name.split(' ')[0];
 
         closeModal();
+        switchTab('overview');
         switchView('app');
         alert(`Welcome back, ${state.user.name}! Syncing database records...`);
     } catch (err) {
@@ -809,22 +739,19 @@ async function submitActivity() {
                 })
             });
             
-            // Sync ledger values directly from Supabase DB
             loadUserTransactions();
         } catch (e) {
             console.error('Failed to sync transaction to cloud database', e);
         }
     } else {
-        // Offline / Demo Fallback local modification
         state.activities.unshift({
             date: 'Today',
             desc,
             type,
             amount
         });
-        if (type === 'income') state.balance += amount;
-        else state.balance -= amount;
         
+        recalculateBusinessMetrics();
         if (typeof updateDemoTimeline === 'function') {
             updateDemoTimeline();
         }
@@ -841,11 +768,38 @@ function openModal(title, html) {
     document.getElementById('modal-title').innerText = title;
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-app').classList.add('active');
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 function closeModal() {
     document.getElementById('modal-app').classList.remove('active');
+}
+
+function openAddActivityModal() {
+    openModal('Add Ledger Entry', `
+        <div class="space-y-md">
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Description</label>
+                <input type="text" id="act-desc" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="e.g. YouTube AdSense Payout">
+            </div>
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Type</label>
+                <select id="act-type" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense Write-off</option>
+                </select>
+            </div>
+            <div class="space-y-xs text-left">
+                <label class="text-xs text-outline font-bold uppercase">Amount (ZAR)</label>
+                <input type="number" id="act-amount" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="2500">
+            </div>
+            <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="submitActivity()">
+                Save Entry
+            </button>
+        </div>
+    `);
 }
 
 // ==========================================================================
@@ -856,17 +810,14 @@ function enterDemoMode() {
     state.user = { name: 'Demo Creator', email: 'demo@creator.co' };
     state.token = 'demo_token';
     
-    // Set greeting headers
     const label = document.getElementById('nav-user-label');
     if (label) label.innerText = 'Demo';
     const greetingLabel = document.getElementById('dashboard-user-greeting');
     if (greetingLabel) greetingLabel.innerText = 'Demo';
 
-    // Show Demo Banner
     const banner = document.getElementById('demo-mode-banner');
     if (banner) banner.classList.remove('hidden');
 
-    // Populate rich, high-fidelity demo activities
     state.activities = [
         { date: 'Jul 28', desc: 'Sponsorship Commission Payout', type: 'income', amount: 3200 },
         { date: 'Jul 26', desc: 'Supercell Brand Sponsorship', type: 'income', amount: 8500 },
@@ -878,22 +829,11 @@ function enterDemoMode() {
         { date: 'Jul 14', desc: 'Woolworths SA Brand Deal', type: 'income', amount: 2100 }
     ];
 
-    // Compute initial balance
-    let totalIncome = 0;
-    let totalExpense = 0;
-    state.activities.forEach(a => {
-        if (a.type === 'income') totalIncome += a.amount;
-        else totalExpense += a.amount;
-    });
-    state.balance = totalIncome - totalExpense;
-
-    // Calculate dynamic timeline data for Chart.js
+    recalculateBusinessMetrics();
     updateDemoTimeline();
-
-    // Switch view to dashboard
+    switchTab('overview');
     switchView('app');
     
-    // Rerender icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
@@ -903,17 +843,14 @@ function exitDemoMode() {
     state.user = null;
     state.token = null;
 
-    // Clear greeting labels
     const label = document.getElementById('nav-user-label');
     if (label) label.innerText = 'Account';
     const greetingLabel = document.getElementById('dashboard-user-greeting');
     if (greetingLabel) greetingLabel.innerText = 'Creator';
 
-    // Hide banner
     const banner = document.getElementById('demo-mode-banner');
     if (banner) banner.classList.add('hidden');
 
-    // Return to marketing landing page
     switchView('marketing');
 }
 
@@ -938,4 +875,192 @@ function updateDemoTimeline() {
             profit: runningRev - runningExp
         };
     });
+}
+
+function switchView(mode) {
+    const marketingView = document.getElementById('view-marketing');
+    const appView = document.getElementById('view-app');
+    const onboardingView = document.getElementById('view-onboarding');
+
+    marketingView.classList.add('hidden');
+    appView.classList.add('hidden');
+    onboardingView.classList.add('hidden');
+
+    if (mode === 'app') {
+        appView.classList.remove('hidden');
+        loadUserTransactions();
+    } else if (mode === 'onboarding') {
+        onboardingView.classList.remove('hidden');
+        nextOnboardStep(1);
+    } else {
+        marketingView.classList.remove('hidden');
+    }
+}
+
+// ==========================================================================
+// CORE METRICS & AI HEURISTIC ENGINE
+// ==========================================================================
+
+function recalculateBusinessMetrics() {
+    let totalIncome = 0;
+    let totalExpense = 0;
+    const platformBreakdown = {
+        YouTube: 0,
+        TikTok: 0,
+        Instagram: 0,
+        Patreon: 0,
+        Affiliate: 0
+    };
+
+    state.activities.forEach(a => {
+        const amt = a.amount;
+        if (a.type === 'income') {
+            totalIncome += amt;
+            const desc = a.desc.toLowerCase();
+            if (desc.includes('youtube') || desc.includes('adsense')) {
+                platformBreakdown.YouTube += amt;
+            } else if (desc.includes('tiktok') || desc.includes('rewards')) {
+                platformBreakdown.TikTok += amt;
+            } else if (desc.includes('instagram') || desc.includes('deals') || desc.includes('brand') || desc.includes('sponsorship')) {
+                platformBreakdown.Instagram += amt;
+            } else if (desc.includes('patreon') || desc.includes('sub')) {
+                platformBreakdown.Patreon += amt;
+            } else {
+                platformBreakdown.Affiliate += amt;
+            }
+        } else {
+            totalExpense += amt;
+        }
+    });
+
+    state.balance = totalIncome - totalExpense;
+
+    state.sources = [];
+    Object.keys(platformBreakdown).forEach(key => {
+        const val = platformBreakdown[key];
+        if (val > 0) {
+            const pct = totalIncome > 0 ? Math.round((val / totalIncome) * 100) : 0;
+            state.sources.push({
+                name: `${key} Studio`,
+                amount: val,
+                percent: `${pct}%`
+            });
+        }
+    });
+
+    state.sources.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
+
+    // 1. Dynamic Tax Liability
+    const estimatedTax = Math.max(0, Math.round(state.balance * 0.15));
+    const taxEl = document.getElementById('estimated-tax-val');
+    if (taxEl) {
+        taxEl.innerText = `R${estimatedTax.toLocaleString()}`;
+    }
+
+    // 2. Creator Score Logic
+    let score = 100;
+    let scoreLabel = 'Excellent';
+    let scoreBgClass = 'bg-green-50/70';
+    let scoreBorderClass = 'border-green-200';
+
+    let highestPct = 0;
+    Object.keys(platformBreakdown).forEach(key => {
+        const val = platformBreakdown[key];
+        const pct = totalIncome > 0 ? (val / totalIncome) : 0;
+        if (pct > highestPct) highestPct = pct;
+    });
+    if (highestPct > 0.70) {
+        score -= 15;
+    }
+
+    const profitMargin = totalIncome > 0 ? (state.balance / totalIncome) : 0;
+    if (profitMargin < 0.60) {
+        score -= 15;
+    } else if (profitMargin > 0.80) {
+        score += 5;
+    }
+
+    const expenseRatio = totalIncome > 0 ? (totalExpense / totalIncome) : 0;
+    if (expenseRatio > 0.30) {
+        score -= 10;
+    }
+
+    score = Math.max(0, Math.min(100, score));
+
+    if (score >= 90) {
+        scoreLabel = 'Excellent';
+        scoreBgClass = 'bg-green-50/70';
+        scoreBorderClass = 'border-green-200';
+    } else if (score >= 70) {
+        scoreLabel = 'Healthy';
+        scoreBgClass = 'bg-yellow-50/70';
+        scoreBorderClass = 'border-yellow-200';
+    } else {
+        scoreLabel = 'Needs Attention';
+        scoreBgClass = 'bg-red-50/70';
+        scoreBorderClass = 'border-red-200';
+    }
+
+    const scoreValEl = document.getElementById('creator-score-val');
+    if (scoreValEl) scoreValEl.innerText = score;
+
+    const scoreLabelEl = document.getElementById('creator-score-label');
+    if (scoreLabelEl) {
+        scoreLabelEl.innerText = scoreLabel;
+        if (score >= 90) {
+            scoreLabelEl.className = "text-label-lg font-bold text-green-700";
+        } else if (score >= 70) {
+            scoreLabelEl.className = "text-label-lg font-bold text-yellow-700";
+        } else {
+            scoreLabelEl.className = "text-label-lg font-bold text-red-700";
+        }
+    }
+
+    const scoreCardEl = document.getElementById('creator-score-color');
+    if (scoreCardEl) {
+        scoreCardEl.className = `p-lg border rounded-2xl card-shadow flex flex-col justify-between ${scoreBgClass} ${scoreBorderClass}`;
+    }
+
+    // 3. AI Recommendations
+    const insightsEl = document.getElementById('ai-insights-list');
+    if (insightsEl) {
+        insightsEl.innerHTML = '';
+        const insights = [];
+
+        if (highestPct > 0.70) {
+            insights.push(`<li class="text-red-700 font-medium">⚠️ Risk Alert: Roster dependency is high (${Math.round(highestPct * 100)}% on one platform).</li>`);
+        } else {
+            insights.push(`<li class="text-green-700 font-medium">✓ Diversification is healthy across channels.</li>`);
+        }
+
+        if (expenseRatio > 0.25) {
+            insights.push(`<li class="text-yellow-700">⚠️ Overhead Alert: Expenses represent ${Math.round(expenseRatio * 100)}% of earnings.</li>`);
+        }
+
+        let largestExpenseAmt = 0;
+        let largestExpenseDesc = '';
+        state.activities.forEach(a => {
+            if (a.type === 'expense' && a.amount > largestExpenseAmt) {
+                largestExpenseAmt = a.amount;
+                largestExpenseDesc = a.desc;
+            }
+        });
+
+        if (largestExpenseAmt > 0) {
+            const descLower = largestExpenseDesc.toLowerCase();
+            if (descLower.includes('cloud') || descLower.includes('creative') || descLower.includes('adobe') || descLower.includes('hosting') || descLower.includes('digitalocean')) {
+                insights.push(`<li>🔮 Software overheads dominate expenses. Audit inactive seat subscriptions to save up to 12%.</li>`);
+            } else if (descLower.includes('lens') || descLower.includes('camera') || descLower.includes('gear') || descLower.includes('orms')) {
+                insights.push(`<li>🔮 Gear depreciation detected. Ensure this equipment write-off is logged in tax deductions.</li>`);
+            } else {
+                insights.push(`<li>🔮 Optimize cash flow by tracking recurring operational write-offs.</li>`);
+            }
+        } else {
+            insights.push(`<li>🔮 No business expenses logged. Add operational overheads to lower tax obligation.</li>`);
+        }
+
+        insights.forEach(ins => {
+            insightsEl.innerHTML += ins;
+        });
+    }
 }
