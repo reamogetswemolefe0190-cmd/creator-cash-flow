@@ -23,7 +23,9 @@ const state = {
 
 // Onboarding State
 const onboardingState = {
+    creatorType: '',
     platforms: [],
+    goal: '',
     connected: []
 };
 
@@ -146,7 +148,7 @@ function loadLocalBackupData() {
 }
 
 // ==========================================================================
-// ONBOARDING MODULES
+// ONBOARDING MODULES (6-Step Wizard)
 // ==========================================================================
 
 function nextOnboardStep(stepNum) {
@@ -159,7 +161,7 @@ function nextOnboardStep(stepNum) {
         nextStep.classList.remove('hidden');
     }
 
-    if (stepNum === 2) {
+    if (stepNum === 5) {
         const connectList = document.getElementById('onboarding-connect-list');
         if (connectList) {
             connectList.innerHTML = '';
@@ -168,24 +170,32 @@ function nextOnboardStep(stepNum) {
             }
             onboardingState.platforms.forEach(platform => {
                 const card = document.createElement('div');
-                card.className = "connection-platform-card flex justify-between items-center p-md bg-surface-container-low border border-outline-variant rounded-2xl cursor-pointer hover:bg-surface-container transition-all";
+                card.className = "connection-platform-card flex justify-between items-center p-md bg-surface border border-white/[0.08] rounded-2xl cursor-pointer hover:bg-white/[0.02] transition-all";
                 card.onclick = (e) => simulatePlatformConnect(card, platform);
                 
                 card.innerHTML = `
                     <div class="flex items-center gap-sm">
-                        <span class="material-symbols-outlined text-primary">${platform === 'YouTube' ? 'play_circle' : platform === 'TikTok' ? 'music_note' : platform === 'Instagram' ? 'photo_camera' : 'account_balance_wallet'}</span>
-                        <span class="font-body-md font-semibold">${platform} Channel</span>
+                        <span class="material-symbols-outlined text-accent-emerald">${platform === 'YouTube' ? 'play_circle' : platform === 'TikTok' ? 'music_note' : platform === 'Instagram' ? 'photo_camera' : 'account_balance_wallet'}</span>
+                        <span class="font-body-md font-semibold text-white">${platform} Channel</span>
                     </div>
-                    <span class="connect-badge text-xs font-bold border border-outline-variant bg-surface px-md py-xs rounded-xl" id="connect-${platform}">Connect</span>
+                    <span class="connect-badge text-xs font-bold border border-white/[0.08] bg-background px-md py-xs rounded-xl" id="connect-${platform}">Connect</span>
                 `;
                 connectList.appendChild(card);
             });
         }
     }
 
-    if (stepNum === 3) {
+    if (stepNum === 6) {
         triggerMagicMoment();
     }
+}
+
+function selectCreatorType(element) {
+    document.querySelectorAll('#onboard-step-2 .onboard-choice-card').forEach(opt => {
+        opt.classList.remove('active');
+    });
+    element.classList.add('active');
+    onboardingState.creatorType = element.getAttribute('data-value');
 }
 
 function togglePlatformChoice(element) {
@@ -201,10 +211,18 @@ function togglePlatformChoice(element) {
     }
 }
 
+function selectGoal(element) {
+    document.querySelectorAll('#onboard-step-4 .onboard-choice-card').forEach(opt => {
+        opt.classList.remove('active');
+    });
+    element.classList.add('active');
+    onboardingState.goal = element.getAttribute('data-value');
+}
+
 function skipOnboardingConnection(e) {
     if (e) e.preventDefault();
-    console.log('[ONBOARDING] Skip trigger called. Routing to Step 3.');
-    nextOnboardStep(3);
+    console.log('[ONBOARDING] Skipping connection and entering manual mode.');
+    nextOnboardStep(6);
 }
 
 function simulatePlatformConnect(element, platform) {
@@ -301,17 +319,15 @@ async function triggerMagicMoment() {
                     'Authorization': `Bearer ${state.token}`
                 },
                 body: JSON.stringify({
-                    platforms: onboardingState.platforms
+                    creatorType: onboardingState.creatorType,
+                    platforms: onboardingState.platforms,
+                    goal: onboardingState.goal
                 })
             });
         } catch (e) {
             console.error('Failed to sync onboarding to cloud database', e);
         }
     }
-
-    setTimeout(() => {
-        switchView('app');
-    }, 2500);
 }
 
 // ==========================================================================
@@ -390,12 +406,12 @@ function renderDashboardData() {
         state.sources.forEach(s => {
             sourceContainer.innerHTML += `
                 <div class="space-y-sm" style="margin-bottom: 20px;">
-                    <div class="flex justify-between text-label-lg">
-                        <span>${s.name}</span>
-                        <span class="font-bold text-secondary">R${s.amount.toLocaleString()} (${s.percent})</span>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-white font-medium">${s.name}</span>
+                        <span class="font-bold text-accent-emerald">R${s.amount.toLocaleString()} (${s.percent})</span>
                     </div>
-                    <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
-                        <div class="h-full bg-primary" style="width: ${s.percent};"></div>
+                    <div class="w-full h-2 bg-white/[0.08] rounded-full overflow-hidden">
+                        <div class="h-full bg-accent-emerald" style="width: ${s.percent};"></div>
                     </div>
                 </div>
             `;
@@ -406,13 +422,13 @@ function renderDashboardData() {
     if (activityStream) {
         activityStream.innerHTML = '';
         state.activities.slice(0, 4).forEach(a => {
-            const amountClass = a.type === 'income' ? 'class="font-display font-bold text-secondary text-sm"' : 'class="font-display font-bold text-primary text-sm"';
+            const amountClass = a.type === 'income' ? 'class="font-display font-bold text-accent-emerald text-sm"' : 'class="font-display font-bold text-white text-sm"';
             const prefix = a.type === 'income' ? '+' : '-';
             activityStream.innerHTML += `
-                <div class="flex justify-between items-center p-md bg-surface-container-low rounded-xl border border-outline-variant/30">
+                <div class="flex justify-between items-center p-md bg-surface rounded-2xl border border-white/[0.05]">
                     <div>
-                        <div class="font-body-md font-semibold text-primary text-sm">${a.desc}</div>
-                        <div class="text-xs text-outline">${a.date} • Verified Sync</div>
+                        <div class="font-semibold text-white text-sm">${a.desc}</div>
+                        <div class="text-xs text-text-secondary">${a.date} • Verified Sync</div>
                     </div>
                     <div ${amountClass}>${prefix}R${a.amount.toLocaleString()}</div>
                 </div>
@@ -429,12 +445,12 @@ function renderFullStreams() {
         revStream.innerHTML = '';
         state.activities.filter(a => a.type === 'income').forEach(a => {
             revStream.innerHTML += `
-                <div class="flex justify-between items-center py-md border-b border-outline-variant/30">
+                <div class="flex justify-between items-center py-md border-b border-white/[0.05]">
                     <div>
-                        <div class="font-body-md font-semibold text-primary text-sm">${a.desc}</div>
-                        <div class="text-xs text-outline">${a.date}</div>
+                        <div class="font-semibold text-white text-sm">${a.desc}</div>
+                        <div class="text-xs text-text-secondary">${a.date}</div>
                     </div>
-                    <div class="font-display font-bold text-secondary text-sm">+R${a.amount.toLocaleString()}</div>
+                    <div class="font-display font-bold text-accent-emerald text-sm">+R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -445,12 +461,12 @@ function renderFullStreams() {
         expStream.innerHTML = '';
         state.activities.filter(a => a.type === 'expense').forEach(a => {
             expStream.innerHTML += `
-                <div class="flex justify-between items-center py-md border-b border-outline-variant/30">
+                <div class="flex justify-between items-center py-md border-b border-white/[0.05]">
                     <div>
-                        <div class="font-body-md font-semibold text-primary text-sm">${a.desc}</div>
-                        <div class="text-xs text-outline">${a.date}</div>
+                        <div class="font-semibold text-white text-sm">${a.desc}</div>
+                        <div class="text-xs text-text-secondary">${a.date}</div>
                     </div>
-                    <div class="font-display font-bold text-primary text-sm">-R${a.amount.toLocaleString()}</div>
+                    <div class="font-display font-bold text-white text-sm">-R${a.amount.toLocaleString()}</div>
                 </div>
             `;
         });
@@ -462,9 +478,9 @@ function initIntelligenceChart() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-    gradient.addColorStop(0, 'rgba(0, 108, 73, 0.15)');
-    gradient.addColorStop(1, 'rgba(0, 108, 73, 0)');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.15)');
+    gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
 
     if (intelligenceChartInstance) intelligenceChartInstance.destroy();
 
@@ -475,15 +491,15 @@ function initIntelligenceChart() {
             datasets: [{
                 label: 'Revenue Timeline',
                 data: state.timelineData.map(d => d.rev),
-                borderColor: '#006c49',
+                borderColor: '#22C55E',
                 borderWidth: 3,
                 backgroundColor: gradient,
                 fill: true,
                 tension: 0.4,
                 pointRadius: 4,
                 pointHoverRadius: 8,
-                pointBackgroundColor: '#006c49',
-                pointBorderColor: '#FFFFFF',
+                pointBackgroundColor: '#22C55E',
+                pointBorderColor: '#050505',
                 pointBorderWidth: 2
             }]
         },
@@ -496,10 +512,10 @@ function initIntelligenceChart() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#FFFFFF',
-                    titleColor: '#0B1C30',
-                    bodyColor: '#006c49',
-                    borderColor: '#C6C6CD',
+                    backgroundColor: '#0B0B0B',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#22C55E',
+                    borderColor: 'rgba(255, 255, 255, 0.08)',
                     borderWidth: 1,
                     displayColors: false,
                     padding: 12,
@@ -520,13 +536,13 @@ function initIntelligenceChart() {
             },
             scales: {
                 x: {
-                    grid: { color: 'rgba(0, 0, 0, 0.03)' },
-                    ticks: { color: '#76777D', font: { family: 'Inter', size: 11 } }
+                    grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                    ticks: { color: '#8E8E93', font: { family: 'Inter', size: 11 } }
                 },
                 y: {
-                    grid: { color: 'rgba(0, 0, 0, 0.03)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.03)' },
                     ticks: {
-                        color: '#76777D',
+                        color: '#8E8E93',
                         font: { family: 'Inter', size: 11 },
                         callback: function(value) {
                             return 'R' + (value / 1000) + 'k';
@@ -561,39 +577,39 @@ function setupAuthModalTrigger() {
 
 function openAccountAuthModal() {
     openModal('Authentication', `
-        <div class="flex gap-sm p-xs bg-surface-container rounded-2xl mb-lg">
-            <button class="flex-1 font-label-lg py-sm rounded-xl bg-primary text-on-primary shadow-sm" id="auth-tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
-            <button class="flex-1 font-label-lg py-sm rounded-xl text-primary hover:bg-surface-container-high" id="auth-tab-login" onclick="switchAuthTab('login')">Sign In</button>
+        <div class="flex gap-sm p-xs bg-surface border border-white/[0.08] rounded-2xl mb-lg">
+            <button class="flex-1 font-label-lg py-sm rounded-xl bg-white text-black shadow-sm" id="auth-tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
+            <button class="flex-1 font-label-lg py-sm rounded-xl text-text-secondary hover:text-white" id="auth-tab-login" onclick="switchAuthTab('login')">Sign In</button>
         </div>
 
         <div id="auth-signup-fields" class="space-y-md">
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Full Creator Name</label>
-                <input type="text" id="reg-name" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="e.g. Reamogetswe Molefe">
+                <label class="text-xs text-text-secondary font-bold uppercase">Full Creator Name</label>
+                <input type="text" id="reg-name" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="e.g. Reamogetswe Molefe">
             </div>
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Email Address</label>
-                <input type="email" id="reg-email" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="reamogetswe@creator.co.za">
+                <label class="text-xs text-text-secondary font-bold uppercase">Email Address</label>
+                <input type="email" id="reg-email" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="reamogetswe@creator.co.za">
             </div>
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Password</label>
-                <input type="password" id="reg-pass" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="••••••••••••">
+                <label class="text-xs text-text-secondary font-bold uppercase">Password</label>
+                <input type="password" id="reg-pass" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="••••••••••••">
             </div>
-            <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeCreateAccount()">
+            <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeCreateAccount()">
                 Create Creator Account
             </button>
         </div>
 
         <div id="auth-login-fields" class="space-y-md hidden">
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Email Address</label>
-                <input type="email" id="login-email" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="reamogetswe@creator.co.za">
+                <label class="text-xs text-text-secondary font-bold uppercase">Email Address</label>
+                <input type="email" id="login-email" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="reamogetswe@creator.co.za">
             </div>
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Password</label>
-                <input type="password" id="login-pass" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="••••••••••••">
+                <label class="text-xs text-text-secondary font-bold uppercase">Password</label>
+                <input type="password" id="login-pass" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="••••••••••••">
             </div>
-            <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeLogin()">
+            <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeLogin()">
                 Sign In To OS
             </button>
         </div>
@@ -609,13 +625,13 @@ function switchAuthTab(tab) {
     if (tab === 'signup') {
         signupFields.classList.remove('hidden');
         loginFields.classList.add('hidden');
-        signupBtn.className = 'flex-1 font-label-lg py-sm rounded-xl bg-primary text-on-primary shadow-sm';
-        loginBtn.className = 'flex-1 font-label-lg py-sm rounded-xl text-primary hover:bg-surface-container-high';
+        signupBtn.className = 'flex-1 font-label-lg py-sm rounded-xl bg-white text-black shadow-sm';
+        loginBtn.className = 'flex-1 font-label-lg py-sm rounded-xl text-text-secondary hover:text-white';
     } else {
         signupFields.classList.add('hidden');
         loginFields.classList.remove('hidden');
-        signupBtn.className = 'flex-1 font-label-lg py-sm rounded-xl text-primary hover:bg-surface-container-high';
-        loginBtn.className = 'flex-1 font-label-lg py-sm rounded-xl bg-primary text-on-primary shadow-sm';
+        signupBtn.className = 'flex-1 font-label-lg py-sm rounded-xl text-text-secondary hover:text-white';
+        loginBtn.className = 'flex-1 font-label-lg py-sm rounded-xl bg-white text-black shadow-sm';
     }
 }
 
@@ -781,21 +797,21 @@ function openAddActivityModal() {
     openModal('Add Ledger Entry', `
         <div class="space-y-md">
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Description</label>
-                <input type="text" id="act-desc" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="e.g. YouTube AdSense Payout">
+                <label class="text-xs text-text-secondary font-bold uppercase">Description</label>
+                <input type="text" id="act-desc" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="e.g. YouTube AdSense Payout">
             </div>
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Type</label>
-                <select id="act-type" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0">
+                <label class="text-xs text-text-secondary font-bold uppercase">Type</label>
+                <select id="act-type" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0">
                     <option value="income">Income</option>
                     <option value="expense">Expense Write-off</option>
                 </select>
             </div>
             <div class="space-y-xs text-left">
-                <label class="text-xs text-outline font-bold uppercase">Amount (ZAR)</label>
-                <input type="number" id="act-amount" class="w-full px-md py-sm rounded-xl border border-outline-variant bg-surface text-primary focus:border-secondary focus:ring-0" placeholder="2500">
+                <label class="text-xs text-text-secondary font-bold uppercase">Amount (ZAR)</label>
+                <input type="number" id="act-amount" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="2500">
             </div>
-            <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="submitActivity()">
+            <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="submitActivity()">
                 Save Entry
             </button>
         </div>
@@ -941,7 +957,7 @@ function recalculateBusinessMetrics() {
         if (val > 0) {
             const pct = totalIncome > 0 ? Math.round((val / totalIncome) * 100) : 0;
             state.sources.push({
-                name: `${key} Studio`,
+                name: `${key}`,
                 amount: val,
                 percent: `${pct}%`
             });
@@ -1001,40 +1017,20 @@ function recalculateBusinessMetrics() {
         scoreBorderClass = 'border-red-200';
     }
 
-    const scoreValEl = document.getElementById('creator-score-val');
-    if (scoreValEl) scoreValEl.innerText = score;
-
-    const scoreLabelEl = document.getElementById('creator-score-label');
-    if (scoreLabelEl) {
-        scoreLabelEl.innerText = scoreLabel;
-        if (score >= 90) {
-            scoreLabelEl.className = "text-label-lg font-bold text-green-700";
-        } else if (score >= 70) {
-            scoreLabelEl.className = "text-label-lg font-bold text-yellow-700";
-        } else {
-            scoreLabelEl.className = "text-label-lg font-bold text-red-700";
-        }
-    }
-
-    const scoreCardEl = document.getElementById('creator-score-color');
-    if (scoreCardEl) {
-        scoreCardEl.className = `p-lg border rounded-2xl card-shadow flex flex-col justify-between ${scoreBgClass} ${scoreBorderClass}`;
-    }
-
-    // 3. AI Recommendations
+    // 3. AI Insights
     const insightsEl = document.getElementById('ai-insights-list');
     if (insightsEl) {
         insightsEl.innerHTML = '';
         const insights = [];
 
         if (highestPct > 0.70) {
-            insights.push(`<li class="text-red-700 font-medium">⚠️ Risk Alert: Roster dependency is high (${Math.round(highestPct * 100)}% on one platform).</li>`);
+            insights.push(`<li class="flex items-center gap-xs py-xs text-red-500 font-medium border-b border-white/[0.03]">⚠️ Risk Alert: Roster dependency is high (${Math.round(highestPct * 100)}% on one platform).</li>`);
         } else {
-            insights.push(`<li class="text-green-700 font-medium">✓ Diversification is healthy across channels.</li>`);
+            insights.push(`<li class="flex items-center gap-xs py-xs text-accent-emerald font-medium border-b border-white/[0.03]">✓ Diversification is healthy across channels.</li>`);
         }
 
         if (expenseRatio > 0.25) {
-            insights.push(`<li class="text-yellow-700">⚠️ Overhead Alert: Expenses represent ${Math.round(expenseRatio * 100)}% of earnings.</li>`);
+            insights.push(`<li class="flex items-center gap-xs py-xs text-yellow-500 border-b border-white/[0.03]">⚠️ Overhead Alert: Expenses represent ${Math.round(expenseRatio * 100)}% of earnings.</li>`);
         }
 
         let largestExpenseAmt = 0;
@@ -1049,14 +1045,14 @@ function recalculateBusinessMetrics() {
         if (largestExpenseAmt > 0) {
             const descLower = largestExpenseDesc.toLowerCase();
             if (descLower.includes('cloud') || descLower.includes('creative') || descLower.includes('adobe') || descLower.includes('hosting') || descLower.includes('digitalocean')) {
-                insights.push(`<li>🔮 Software overheads dominate expenses. Audit inactive seat subscriptions to save up to 12%.</li>`);
+                insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 Software overheads dominate expenses. Audit inactive seat subscriptions to save up to 12%.</li>`);
             } else if (descLower.includes('lens') || descLower.includes('camera') || descLower.includes('gear') || descLower.includes('orms')) {
-                insights.push(`<li>🔮 Gear depreciation detected. Ensure this equipment write-off is logged in tax deductions.</li>`);
+                insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 Gear depreciation detected. Ensure this equipment write-off is logged in tax deductions.</li>`);
             } else {
-                insights.push(`<li>🔮 Optimize cash flow by tracking recurring operational write-offs.</li>`);
+                insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 Optimize cash flow by tracking recurring operational write-offs.</li>`);
             }
         } else {
-            insights.push(`<li>🔮 No business expenses logged. Add operational overheads to lower tax obligation.</li>`);
+            insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 No business expenses logged. Add operational overheads to lower tax obligation.</li>`);
         }
 
         insights.forEach(ins => {

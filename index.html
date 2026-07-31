@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Creator Cash Flow | Financial Intelligence for the Creator Economy</title>
+    <title>Creator Cash Flow | Financial Intelligence for Modern Creators</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#f8f9ff">
+    <meta name="theme-color" content="#050505">
 
     <!-- Tailwind CSS with Forms & Container Queries -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="style.css?v=2c083b9"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -25,93 +24,25 @@
             theme: {
                 extend: {
                     "colors": {
-                        "surface-tint": "#565e74",
-                        "on-secondary": "#ffffff",
-                        "on-secondary-fixed": "#002113",
-                        "on-tertiary": "#ffffff",
-                        "error": "#ba1a1a",
-                        "surface-container-high": "#dce9ff",
-                        "surface-dim": "#cbdbf5",
-                        "error-container": "#ffdad6",
-                        "secondary-container": "#6cf8bb",
-                        "on-surface-variant": "#45464d",
-                        "on-primary-fixed": "#131b2e",
-                        "primary-fixed-dim": "#bec6e0",
-                        "inverse-surface": "#213145",
-                        "tertiary-fixed-dim": "#d0bcff",
-                        "surface-container-highest": "#d3e4fe",
-                        "surface": "#f8f9ff",
-                        "outline-variant": "#c6c6cd",
-                        "on-secondary-container": "#00714d",
-                        "primary": "#000000",
-                        "secondary": "#006c49",
-                        "primary-fixed": "#dae2fd",
-                        "surface-container": "#e5eeff",
-                        "on-error-container": "#93000a",
-                        "on-primary-container": "#7c839b",
-                        "primary-container": "#131b2e",
-                        "on-tertiary-fixed-variant": "#5516be",
-                        "secondary-fixed-dim": "#4edea3",
-                        "on-surface": "#0b1c30",
-                        "surface-variant": "#d3e4fe",
-                        "surface-container-lowest": "#ffffff",
-                        "inverse-on-surface": "#eaf1ff",
-                        "on-secondary-fixed-variant": "#005236",
-                        "on-primary-fixed-variant": "#3f465c",
-                        "on-primary": "#ffffff",
-                        "surface-bright": "#f8f9ff",
-                        "tertiary-fixed": "#e9ddff",
-                        "surface-container-low": "#eff4ff",
-                        "outline": "#76777d",
-                        "secondary-fixed": "#6ffbbe",
-                        "on-background": "#0b1c30",
-                        "inverse-primary": "#bec6e0",
-                        "on-tertiary-container": "#9466ff",
-                        "on-error": "#ffffff",
-                        "on-tertiary-fixed": "#23005c",
-                        "tertiary": "#000000",
-                        "tertiary-container": "#23005c",
-                        "background": "#f8f9ff"
+                        "background": "#050505",
+                        "surface": "#0B0B0B",
+                        "border-slate": "rgba(255,255,255,0.08)",
+                        "text-primary": "#FFFFFF",
+                        "text-secondary": "#8E8E93",
+                        "accent-emerald": "#22C55E",
+                        "secondary-container": "rgba(34, 197, 94, 0.1)",
+                        "on-secondary-container": "#22C55E"
                     },
                     "borderRadius": {
                         "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
+                        "lg": "12px",
+                        "xl": "16px",
+                        "3xl": "24px",
                         "full": "9999px"
                     },
-                    "spacing": {
-                        "gutter": "24px",
-                        "xl": "32px",
-                        "sm": "8px",
-                        "container-max": "1280px",
-                        "2xl": "48px",
-                        "xs": "4px",
-                        "3xl": "64px",
-                        "lg": "24px",
-                        "md": "16px",
-                        "base": "4px"
-                    },
                     "fontFamily": {
-                        "body-lg": ["Inter"],
                         "display": ["Plus Jakarta Sans"],
-                        "body-md": ["Inter"],
-                        "label-md": ["Inter"],
-                        "label-lg": ["Inter"],
-                        "body-sm": ["Inter"],
-                        "headline-lg-mobile": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "headline-md": ["Plus Jakarta Sans"]
-                    },
-                    "fontSize": {
-                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
-                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
-                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
-                        "label-lg": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
-                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
-                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
-                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                        "body": ["Inter"]
                     }
                 },
             },
@@ -121,153 +52,162 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .gradient-mesh {
-            background-color: #f8f9ff;
-            background-image: radial-gradient(at 0% 0%, hsla(222, 100%, 98%, 1) 0, transparent 50%), 
-                              radial-gradient(at 100% 100%, hsla(158, 91%, 94%, 1) 0, transparent 50%);
+        /* Custom Noise Texture Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            content: "";
+            opacity: 0.015;
+            pointer-events: none;
+            z-index: 9999;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        /* Ambient Glow behind Hero */
+        .hero-glow {
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
         }
         .card-shadow {
-            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
         }
     </style>
+    <!-- Phyllo Connect SDK -->
+    <script src="https://cdn.getphyllo.com/connect/v2/phyllo-connect.js"></script>
 </head>
-<body class="bg-background text-on-surface font-body-md selection:bg-secondary-container gradient-mesh min-height-screen">
+<body class="bg-background text-text-primary font-body selection:bg-accent-emerald/30 relative min-h-screen overflow-x-hidden">
+    <!-- Noise overlay -->
+    <div class="noise-overlay"></div>
 
     <!-- ==========================================================================
-       VIEW 1: CLEAN MARKETING HOMEPAGE
+       VIEW 1: LANDING PAGE REDESIGN
        ========================================================================== -->
-    <div id="view-marketing" class="marketing-page-wrapper relative z-10 max-w-container-max mx-auto">
+    <div id="view-marketing" class="marketing-page-wrapper relative z-10 max-w-5xl mx-auto px-md">
+        <!-- Glow gradient -->
+        <div class="hero-glow"></div>
+
         <!-- TopAppBar -->
-        <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/80 backdrop-blur-md border-b border-outline-variant shadow-sm flex justify-between items-center px-lg py-md max-w-container-max mx-auto">
+        <header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/[0.08] shadow-sm flex justify-between items-center px-lg py-md max-w-5xl mx-auto">
             <div class="flex items-center gap-sm">
-                <span class="material-symbols-outlined text-primary text-headline-md" data-icon="account_balance_wallet">account_balance_wallet</span>
-                <span class="font-display text-headline-md font-extrabold text-primary">Creator Cash Flow</span>
+                <span class="material-symbols-outlined text-accent-emerald text-headline-md" data-icon="account_balance_wallet">account_balance_wallet</span>
+                <span class="font-display text-headline-md font-extrabold text-white">Creator Cash Flow</span>
             </div>
             <div class="flex items-center gap-md">
-                <button class="font-label-lg text-primary hover:bg-surface px-md py-xs rounded-xl active:scale-95 transition-transform" onclick="openAccountAuthModal()">Sign In</button>
-                <button class="bg-primary text-on-primary font-label-lg py-sm px-lg rounded-xl shadow-lg active:scale-95 transition-transform" onclick="switchView('onboarding')">Get Started</button>
+                <button class="font-label-lg text-text-secondary hover:text-white px-md py-xs rounded-xl active:scale-95 transition-transform" onclick="openAccountAuthModal()">Sign In</button>
+                <button class="bg-white text-black font-label-lg py-sm px-lg rounded-xl active:scale-95 transition-transform font-bold" onclick="switchView('onboarding')">Get Started</button>
             </div>
         </header>
 
-        <main class="pt-32 pb-32 px-md overflow-x-hidden">
+        <main class="pt-32 pb-32">
             <!-- Hero Section -->
-            <section class="mb-3xl text-center">
-                <div class="inline-flex items-center px-md py-xs rounded-full bg-secondary-container text-on-secondary-container text-label-lg mb-md">
-                    <span class="material-symbols-outlined text-[18px] mr-xs" data-icon="auto_awesome">auto_awesome</span>
-                    The future of creator finance
-                </div>
-                <h1 class="font-display text-headline-lg-mobile mb-md text-primary leading-tight font-extrabold text-4xl lg:text-5xl">
-                    Financial Intelligence for the Creator Economy
+            <section class="mb-3xl text-center relative z-10 max-w-3xl mx-auto">
+                <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-md">
+                    Financial Intelligence<br>for Modern Creators
                 </h1>
-                <p class="font-body-md text-on-surface-variant mb-xl px-sm max-w-xl mx-auto">
-                    Understand where your money comes from, where it goes, and what happens next in your creator journey.
+                <p class="font-body-md text-text-secondary mb-xl max-w-lg mx-auto">
+                    Track earnings. Understand growth. Build a sustainable creator business.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-md justify-center">
-                    <button class="bg-primary text-on-primary font-label-lg py-md px-xl rounded-xl shadow-lg active:scale-95 transition-transform" onclick="switchView('onboarding')">
+                    <button class="bg-white text-black font-bold font-label-lg py-md px-xl rounded-xl shadow-lg active:scale-95 transition-transform" onclick="switchView('onboarding')">
                         Start Free
                     </button>
-                    <button class="flex items-center justify-center gap-xs font-label-lg text-primary py-md px-xl rounded-xl border border-outline-variant bg-surface-container-lowest hover:bg-surface active:scale-95 transition-transform" onclick="enterDemoMode()">
+                    <button class="flex items-center justify-center gap-xs font-label-lg text-white py-md px-xl rounded-xl border border-white/[0.08] bg-surface hover:bg-white/[0.03] active:scale-95 transition-transform" onclick="enterDemoMode()">
                         Watch Demo <span class="material-symbols-outlined">arrow_forward</span>
                     </button>
                 </div>
             </section>
 
-            <!-- Live Stream Visual -->
-            <section class="mb-3xl max-w-xl mx-auto">
-                <div class="relative p-lg rounded-2xl bg-surface-container-lowest border border-outline-variant card-shadow overflow-hidden">
-                    <div class="absolute top-0 right-0 p-md">
-                        <span class="flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-secondary opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+            <!-- Section 2: Crafted Mockup (Apple style) -->
+            <section class="mb-3xl max-w-3xl mx-auto">
+                <div class="relative p-lg rounded-3xl bg-surface border border-white/[0.08] card-shadow overflow-hidden">
+                    <div class="absolute -top-12 -right-12 w-64 h-64 bg-accent-emerald/10 rounded-full blur-3xl"></div>
+                    <div class="flex justify-between items-center mb-lg">
+                        <span class="text-xs font-bold text-accent-emerald uppercase tracking-wider">Creator HQ Command Center</span>
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-emerald opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-emerald"></span>
                         </span>
                     </div>
-                    <h3 class="font-label-lg uppercase tracking-wider text-outline mb-lg">Live Earnings Stream</h3>
-                    <div class="space-y-md relative z-10">
-                        <div class="flex justify-between items-center p-md bg-surface-container-low rounded-xl">
-                            <div class="flex items-center gap-sm">
-                                <span class="material-symbols-outlined text-[#FF0000]" data-icon="play_circle">play_circle</span>
-                                <span class="font-body-md font-semibold">YouTube Studio</span>
+
+                    <!-- Simplified Interactive Mockup Layout -->
+                    <div class="space-y-md">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                            <div class="p-md bg-background border border-white/[0.05] rounded-2xl flex justify-between items-center">
+                                <div>
+                                    <p class="text-xs text-text-secondary uppercase">Net Profit</p>
+                                    <p class="font-display font-extrabold text-2xl text-white">R24,650</p>
+                                </div>
+                                <span class="material-symbols-outlined text-accent-emerald text-3xl">trending_up</span>
                             </div>
-                            <span class="font-display font-bold">R18,420</span>
-                        </div>
-                        <div class="flex justify-between items-center p-md bg-surface-container-low rounded-xl">
-                            <div class="flex items-center gap-sm">
-                                <span class="material-symbols-outlined text-primary" data-icon="music_note">music_note</span>
-                                <span class="font-body-md font-semibold">TikTok Rewards</span>
+                            <div class="p-md bg-background border border-white/[0.05] rounded-2xl">
+                                <p class="text-xs text-text-secondary uppercase mb-sm">Earnings Breakdown</p>
+                                <div class="w-full h-2 bg-white/[0.08] rounded-full overflow-hidden">
+                                    <div class="h-full bg-accent-emerald w-[74%]"></div>
+                                </div>
+                                <div class="flex justify-between text-xs mt-xs text-text-secondary">
+                                    <span>YouTube</span> <strong>74%</strong>
+                                </div>
                             </div>
-                            <span class="font-display font-bold">R4,850</span>
-                        </div>
-                        <div class="flex justify-between items-center p-md bg-surface-container-low rounded-xl opacity-60">
-                            <div class="flex items-center gap-sm">
-                                <span class="material-symbols-outlined text-[#E4405F]" data-icon="photo_camera">photo_camera</span>
-                                <span class="font-body-md font-semibold">Instagram Sponsorships</span>
-                            </div>
-                            <span class="font-display font-bold">R2,100</span>
-                        </div>
-                        <div class="flex justify-center py-sm">
-                            <span class="material-symbols-outlined text-outline animate-bounce">arrow_downward</span>
-                        </div>
-                        <div class="p-lg bg-secondary-container text-on-secondary-container rounded-xl flex justify-between items-center">
-                            <div>
-                                <p class="text-label-md font-bold uppercase opacity-80">Net Profit</p>
-                                <p class="font-display text-headline-md font-extrabold">R24,650</p>
-                            </div>
-                            <span class="material-symbols-outlined text-display" data-icon="trending_up">trending_up</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Metrics Grid -->
-            <section class="mb-3xl max-w-xl mx-auto">
-                <h2 class="font-display text-headline-md mb-lg">See your creator business from every angle.</h2>
-                <div class="grid grid-cols-2 gap-md">
-                    <div class="col-span-2 p-lg bg-surface-container-lowest rounded-2xl border border-outline-variant card-shadow">
-                        <p class="text-label-lg text-outline uppercase mb-xs">Earnings</p>
-                        <div class="flex items-end justify-between">
-                            <h4 class="font-display text-display text-primary leading-none" id="marketing-val-earnings">R0</h4>
-                            <span class="text-label-md font-semibold text-secondary flex items-center bg-secondary-fixed/20 px-sm py-xs rounded-full">
-                                +14.8% <span class="material-symbols-outlined text-sm ml-[2px]">trending_up</span>
-                            </span>
-                        </div>
+            <!-- Section 2: Problem Statement -->
+            <section class="mb-3xl text-center">
+                <h3 class="font-display text-text-secondary font-bold text-lg mb-xs">The Reality</h3>
+                <h2 class="font-display text-headline-lg font-extrabold text-white mb-xl">Creators know their views.<br>Most don't know their business.</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-lg max-w-4xl mx-auto">
+                    <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl text-left">
+                        <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">account_tree</span>
+                        <h4 class="font-display font-bold text-lg text-white mb-sm">Scattered Income</h4>
+                        <p class="text-text-secondary text-sm">Earnings are spread across platforms, brands, and affiliate dashboards.</p>
                     </div>
-                    <div class="p-lg bg-surface-container-lowest rounded-2xl border border-outline-variant card-shadow flex flex-col justify-between">
-                        <p class="text-label-lg text-outline uppercase mb-xs">Growth</p>
-                        <p class="font-display text-headline-md text-secondary">+18.4%</p>
+                    <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl text-left">
+                        <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">monitoring</span>
+                        <h4 class="font-display font-bold text-lg text-white mb-sm">Profitability Blindspot</h4>
+                        <p class="text-text-secondary text-sm">It's hard to understand actual net margins after expense write-offs.</p>
                     </div>
-                    <div class="p-lg bg-primary text-on-primary rounded-2xl card-shadow flex flex-col justify-between">
-                        <p class="text-label-lg opacity-60 uppercase mb-xs">Forecast</p>
-                        <div>
-                            <p class="font-display text-headline-md">R31,200</p>
-                            <p class="text-label-md opacity-70">next month</p>
-                        </div>
+                    <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl text-left">
+                        <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">query_stats</span>
+                        <h4 class="font-display font-bold text-lg text-white mb-sm">No Runway Forecasts</h4>
+                        <p class="text-text-secondary text-sm">Guessing tax obligations and predicting next month's cash flow models.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Platform Breakdown -->
-            <section class="mb-3xl max-w-xl mx-auto">
-                <div class="flex justify-between items-center mb-lg">
-                    <h2 class="font-display text-headline-md">Platform Breakdown</h2>
-                    <span class="material-symbols-outlined text-on-surface-variant" data-icon="pie_chart">pie_chart</span>
-                </div>
-                <div class="p-lg bg-surface-container-lowest rounded-2xl border border-outline-variant card-shadow space-y-lg">
-                    <div class="space-y-sm">
-                        <div class="flex justify-between text-label-lg">
-                            <span>YouTube Studio</span>
-                            <span class="font-bold">62%</span>
-                        </div>
-                        <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
-                            <div class="h-full bg-primary w-[62%]"></div>
-                        </div>
+            <!-- Section 3: Feature Storytelling -->
+            <section class="mb-3xl space-y-2xl max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-xl items-center justify-between">
+                    <div class="flex-1 space-y-md">
+                        <h3 class="font-display font-extrabold text-2xl text-white">Know where every rand comes from</h3>
+                        <p class="text-text-secondary text-sm">Consolidate private analytics from YouTube Studio, TikTok rewards, and sponsorships into one secure screen automatically.</p>
                     </div>
-                    <div class="space-y-sm">
-                        <div class="flex justify-between text-label-lg">
-                            <span>TikTok Rewards</span>
-                            <span class="font-bold">21%</span>
-                        </div>
-                        <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
-                            <div class="h-full bg-secondary-fixed-dim w-[21%]"></div>
+                    <div class="flex-1 w-full p-lg bg-surface border border-white/[0.08] rounded-3xl text-center">
+                        <div class="text-xs text-text-secondary uppercase mb-sm">Earnings Hub</div>
+                        <div class="font-display text-3xl font-extrabold text-white" id="marketing-val-earnings">R0</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row-reverse gap-xl items-center justify-between">
+                    <div class="flex-1 space-y-md">
+                        <h3 class="font-display font-extrabold text-2xl text-white">Understand where it goes</h3>
+                        <p class="text-text-secondary text-sm">Log business deductions, hosting bills, and production gear write-offs instantly. Keep your net margin high and tax bills small.</p>
+                    </div>
+                    <div class="flex-1 w-full p-lg bg-surface border border-white/[0.08] rounded-3xl">
+                        <div class="flex justify-between items-center text-sm border-b border-white/[0.05] pb-sm">
+                            <span class="text-text-secondary">Adobe Creative Suite</span>
+                            <span class="text-white font-bold">-R950</span>
                         </div>
                     </div>
                 </div>
@@ -276,77 +216,123 @@
     </div>
 
     <!-- ==========================================================================
-       VIEW 2: ONBOARDING FLOW (Simplified 3-Step Wizard)
+       VIEW 2: ONBOARDING REDESIGN (6-Step Premium Flow)
        ========================================================================== -->
     <div id="view-onboarding" class="onboarding-wrapper hidden min-h-screen flex items-center justify-center p-md">
-        <div class="w-full max-w-xl bg-surface-container-lowest border border-outline-variant card-shadow rounded-3xl p-lg relative z-10">
+        <div class="w-full max-w-xl bg-surface border border-white/[0.08] card-shadow rounded-3xl p-lg relative z-10 space-y-lg">
             
-            <!-- Step 1: Select Platforms -->
-            <div class="onboarding-step" id="onboard-step-1">
-                <h1 class="font-display text-headline-lg mb-xs text-primary">What platforms do you earn from?</h1>
-                <p class="font-body-md text-on-surface-variant mb-lg">Select the income channels you want to import.</p>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-md my-lg" id="onboard-choice-grid">
-                    <div class="onboard-choice-card border border-outline-variant p-lg rounded-2xl cursor-pointer hover:bg-surface-container transition-all" data-value="YouTube" onclick="togglePlatformChoice(this)">
-                        <div class="font-display font-bold text-lg text-primary">YouTube</div>
-                        <div class="text-xs text-outline mt-sm">AdSense & Members</div>
+            <!-- Step 1: Welcome to Creator Cash Flow -->
+            <div class="onboarding-step space-y-lg" id="onboard-step-1">
+                <div class="text-center space-y-sm">
+                    <div class="flex justify-center mb-md">
+                        <div class="w-16 h-16 bg-accent-emerald/10 border border-accent-emerald/20 rounded-3xl flex items-center justify-center">
+                            <span class="material-symbols-outlined text-accent-emerald text-display">auto_awesome</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-outline-variant p-lg rounded-2xl cursor-pointer hover:bg-surface-container transition-all" data-value="TikTok" onclick="togglePlatformChoice(this)">
-                        <div class="font-display font-bold text-lg text-primary">TikTok</div>
-                        <div class="text-xs text-outline mt-sm">Creator Fund & Gifts</div>
-                    </div>
-                    <div class="onboard-choice-card border border-outline-variant p-lg rounded-2xl cursor-pointer hover:bg-surface-container transition-all" data-value="Instagram" onclick="togglePlatformChoice(this)">
-                        <div class="font-display font-bold text-lg text-primary">Instagram</div>
-                        <div class="text-xs text-outline mt-sm">Sponsorship Deals</div>
-                    </div>
-                    <div class="onboard-choice-card border border-outline-variant p-lg rounded-2xl cursor-pointer hover:bg-surface-container transition-all" data-value="Patreon" onclick="togglePlatformChoice(this)">
-                        <div class="font-display font-bold text-lg text-primary">Patreon</div>
-                        <div class="text-xs text-outline mt-sm">Premium Subscriptions</div>
-                    </div>
+                    <h1 class="font-display text-3xl font-extrabold text-white">Welcome to Creator Cash Flow</h1>
+                    <p class="font-body-md text-text-secondary">Let's set up your creator business dashboard.</p>
                 </div>
-                
-                <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform" onclick="nextOnboardStep(2)">Continue</button>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform" onclick="nextOnboardStep(2)">Get Started</button>
             </div>
 
-            <!-- Step 2: Connect Platforms via Phyllo -->
-            <div class="onboarding-step hidden" id="onboard-step-2">
-                <h1 class="font-display text-headline-lg mb-xs text-primary">Connect your accounts</h1>
-                <p class="font-body-md text-on-surface-variant mb-lg">Securely connect using the Phyllo API platform.</p>
-                
-                <div class="space-y-md my-lg" id="onboarding-connect-list">
-                    <!-- Loaded dynamically in app.js based on Step 1 selections -->
+            <!-- Step 2: Creator Type -->
+            <div class="onboarding-step hidden space-y-md" id="onboard-step-2">
+                <h1 class="font-display text-2xl font-extrabold text-white text-center">What kind of creator are you?</h1>
+                <div class="grid grid-cols-1 gap-md">
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background hover:bg-white/[0.02] p-md rounded-2xl cursor-pointer" data-value="YouTuber" onclick="selectCreatorType(this)">
+                        <div class="font-bold text-white">YouTube Creator</div>
+                        <p class="text-xs text-text-secondary">Longform video, shorts, and Google AdSense</p>
+                    </div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background hover:bg-white/[0.02] p-md rounded-2xl cursor-pointer" data-value="TikTok" onclick="selectCreatorType(this)">
+                        <div class="font-bold text-white">TikTok Creator</div>
+                        <p class="text-xs text-text-secondary">Shortform video, rewards, and brand sponsorships</p>
+                    </div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background hover:bg-white/[0.02] p-md rounded-2xl cursor-pointer" data-value="Streamer" onclick="selectCreatorType(this)">
+                        <div class="font-bold text-white">Streamer</div>
+                        <p class="text-xs text-text-secondary">Live broadcasts, subscriber support, and ads</p>
+                    </div>
                 </div>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg" onclick="nextOnboardStep(3)">Continue</button>
+            </div>
 
+            <!-- Step 3: Revenue Sources -->
+            <div class="onboarding-step hidden space-y-md" id="onboard-step-3">
+                <h1 class="font-display text-2xl font-extrabold text-white text-center">Which platforms generate revenue?</h1>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-md" id="onboard-choice-grid">
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="YouTube" onclick="togglePlatformChoice(this)">
+                        <div class="font-bold text-white">YouTube</div>
+                        <div class="text-xs text-text-secondary mt-xs">AdSense</div>
+                    </div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="TikTok" onclick="togglePlatformChoice(this)">
+                        <div class="font-bold text-white">TikTok</div>
+                        <div class="text-xs text-text-secondary mt-xs">Rewards</div>
+                    </div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Instagram" onclick="togglePlatformChoice(this)">
+                        <div class="font-bold text-white">Instagram</div>
+                        <div class="text-xs text-text-secondary mt-xs">Sponsorships</div>
+                    </div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Patreon" onclick="togglePlatformChoice(this)">
+                        <div class="font-bold text-white">Patreon</div>
+                        <div class="text-xs text-text-secondary mt-xs">Subscriptions</div>
+                    </div>
+                </div>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg" onclick="nextOnboardStep(4)">Continue</button>
+            </div>
+
+            <!-- Step 4: Primary Goal -->
+            <div class="onboarding-step hidden space-y-md" id="onboard-step-4">
+                <h1 class="font-display text-2xl font-extrabold text-white text-center">What's your primary goal?</h1>
+                <div class="grid grid-cols-1 gap-md">
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Track Revenue" onclick="selectGoal(this)">
+                        <div class="font-bold text-white">Track Revenue</div>
+                    </div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Understand Profitability" onclick="selectGoal(this)">
+                        <div class="font-bold text-white">Understand Profitability</div>
+                    </div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Prepare Taxes" onclick="selectGoal(this)">
+                        <div class="font-bold text-white">Prepare Taxes</div>
+                    </div>
+                </div>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg" onclick="nextOnboardStep(5)">Continue</button>
+            </div>
+
+            <!-- Step 5: Connect Platforms -->
+            <div class="onboarding-step hidden space-y-md" id="onboard-step-5">
+                <h1 class="font-display text-2xl font-extrabold text-white text-center">Connect your platforms</h1>
+                <div class="space-y-md" id="onboarding-connect-list">
+                    <!-- Dynamically populated in app.js -->
+                </div>
                 <div class="flex flex-col gap-md mt-xl">
-                    <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform" onclick="nextOnboardStep(3)">Continue</button>
-                    <button class="w-full border border-outline-variant bg-surface hover:bg-surface-container-high text-primary font-label-lg py-md rounded-xl active:scale-95 transition-transform" onclick="skipOnboardingConnection(event)">
+                    <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform" onclick="nextOnboardStep(6)">Continue</button>
+                    <button class="w-full border border-white/[0.08] hover:bg-white/[0.02] text-text-secondary font-label-lg py-md rounded-xl" onclick="skipOnboardingConnection(event)">
                         Skip & Enter Data Manually →
                     </button>
                 </div>
             </div>
 
-            <!-- Step 3: Review & Summary -->
-            <div class="onboarding-step hidden text-center" id="onboard-step-3">
-                <div class="flex justify-center mb-lg">
-                    <div class="w-16 h-16 bg-secondary-container rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-secondary text-display" data-icon="auto_awesome">auto_awesome</span>
+            <!-- Step 6: Magic Moment -->
+            <div class="onboarding-step hidden text-center space-y-lg" id="onboard-step-6">
+                <div class="flex justify-center">
+                    <div class="w-16 h-16 bg-accent-emerald/10 border border-accent-emerald/20 rounded-3xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-accent-emerald text-display">auto_awesome</span>
                     </div>
                 </div>
-                <h1 class="font-display text-headline-lg mb-xs text-primary">Your Creator Command Center is ready.</h1>
-                <p class="font-body-md text-on-surface-variant mb-lg">Initializing real-time financial tracking...</p>
-                
-                <div class="p-lg bg-surface-container rounded-2xl border border-outline-variant text-left space-y-md my-lg">
+                <h1 class="font-display text-2xl font-extrabold text-white">Your Creator HQ is Ready.</h1>
+                <div class="p-lg bg-background border border-white/[0.08] rounded-2xl text-left space-y-md">
                     <div class="flex justify-between font-label-lg">
-                        <span class="text-outline">Connected Platforms</span>
-                        <strong class="text-primary" id="magic-onboard-platforms">0</strong>
+                        <span class="text-text-secondary">Platforms Connected</span>
+                        <strong class="text-white" id="magic-onboard-platforms">0</strong>
                     </div>
                     <div class="flex justify-between font-label-lg">
-                        <span class="text-outline">Runway Calculator</span>
-                        <strong class="text-secondary">Active</strong>
+                        <span class="text-text-secondary">Forecast Engine</span>
+                        <strong class="text-accent-emerald">Enabled</strong>
+                    </div>
+                    <div class="flex justify-between font-label-lg">
+                        <span class="text-text-secondary">Insights Briefings</span>
+                        <strong class="text-accent-emerald">Active</strong>
                     </div>
                 </div>
-                
-                <button class="w-full bg-primary text-on-primary font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform" onclick="switchView('app')">Launch Command Center</button>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform" onclick="switchView('app')">Launch Command Center</button>
             </div>
         </div>
     </div>
@@ -356,36 +342,33 @@
        ========================================================================== -->
     <div id="view-app" class="app-shell hidden flex flex-col lg:flex-row min-h-screen relative z-10">
         
-        <!-- Sidebar Navigation (Desktop Only) -->
-        <aside class="hidden lg:flex flex-col w-64 bg-surface-container-lowest border-r border-outline-variant p-lg flex-shrink-0 h-screen sticky top-0">
+        <!-- Sidebar Navigation -->
+        <aside class="hidden lg:flex flex-col w-64 bg-surface border-r border-white/[0.08] p-lg flex-shrink-0 h-screen sticky top-0">
             <div class="flex items-center gap-sm mb-xl">
-                <span class="material-symbols-outlined text-primary text-headline-md" data-icon="account_balance_wallet">account_balance_wallet</span>
-                <span class="font-display text-headline-md font-extrabold text-primary">Creator HQ</span>
+                <span class="material-symbols-outlined text-accent-emerald text-headline-md" data-icon="account_balance_wallet">account_balance_wallet</span>
+                <span class="font-display text-headline-md font-extrabold text-white">Creator HQ</span>
             </div>
             
             <nav class="flex flex-col gap-sm flex-1">
-                <a href="#overview" class="flex items-center gap-md px-md py-sm rounded-xl text-primary font-label-lg hover:bg-surface-container active" data-tab="overview">
+                <a href="#overview" class="flex items-center gap-md px-md py-sm rounded-xl text-white font-label-lg hover:bg-white/[0.02] active" data-tab="overview">
                     <span class="material-symbols-outlined">home</span> Overview
                 </a>
-                <a href="#performance" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" data-tab="performance">
+                <a href="#performance" class="flex items-center gap-md px-md py-sm rounded-xl text-text-secondary font-label-lg hover:bg-white/[0.02]" data-tab="performance">
                     <span class="material-symbols-outlined">monitoring</span> Performance
                 </a>
-                <a href="#revenue" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" data-tab="revenue">
+                <a href="#revenue" class="flex items-center gap-md px-md py-sm rounded-xl text-text-secondary font-label-lg hover:bg-white/[0.02]" data-tab="revenue">
                     <span class="material-symbols-outlined">trending_up</span> Revenue
                 </a>
-                <a href="#expenses" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" data-tab="expenses">
+                <a href="#expenses" class="flex items-center gap-md px-md py-sm rounded-xl text-text-secondary font-label-lg hover:bg-white/[0.02]" data-tab="expenses">
                     <span class="material-symbols-outlined">credit-card</span> Expenses
                 </a>
-                <a href="#forecast" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" data-tab="forecast">
-                    <span class="material-symbols-outlined">calendar_today</span> Forecast
-                </a>
-                <a href="#insights" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" data-tab="insights">
+                <a href="#insights" class="flex items-center gap-md px-md py-sm rounded-xl text-text-secondary font-label-lg hover:bg-white/[0.02]" data-tab="insights">
                     <span class="material-symbols-outlined">lightbulb</span> Insights
                 </a>
             </nav>
 
-            <div class="border-t border-outline-variant pt-lg mt-auto flex flex-col gap-sm">
-                <a href="#account" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" id="btn-auth-modal" data-tab="account">
+            <div class="border-t border-white/[0.08] pt-lg mt-auto flex flex-col gap-sm">
+                <a href="#account" class="flex items-center gap-md px-md py-sm rounded-xl text-text-secondary font-label-lg hover:bg-white/[0.02]" id="btn-auth-modal" data-tab="account">
                     <span class="material-symbols-outlined">account_circle</span> <span id="nav-user-label">Account</span>
                 </a>
             </div>
@@ -398,107 +381,71 @@
             <section id="tab-overview" class="tab-pane active space-y-xl">
                 
                 <!-- Demo Mode Banner -->
-                <div id="demo-mode-banner" class="demo-banner hidden flex justify-between items-center p-md bg-secondary-container/40 border border-secondary/20 rounded-2xl text-label-lg text-primary">
-                    <span class="flex items-center gap-xs"><span class="material-symbols-outlined text-secondary">auto_awesome</span> <strong>Demo Mode</strong> — Experience the full financial analytics suite.</span>
-                    <button class="bg-secondary text-on-secondary font-label-md px-md py-xs rounded-xl hover:scale-105 transition-transform" onclick="exitDemoMode()">Exit Demo</button>
+                <div id="demo-mode-banner" class="demo-banner hidden flex justify-between items-center p-md bg-accent-emerald/10 border border-accent-emerald/20 rounded-2xl text-label-lg text-white">
+                    <span class="flex items-center gap-xs"><span class="material-symbols-outlined text-accent-emerald">auto_awesome</span> <strong>Demo Mode</strong> — Experience the full financial analytics suite.</span>
+                    <button class="bg-accent-emerald text-white font-label-md px-md py-xs rounded-xl hover:scale-105 transition-transform" onclick="exitDemoMode()">Exit Demo</button>
                 </div>
 
-                <!-- Balance Header -->
+                <!-- Section 1: Balance Header -->
                 <div class="dashboard-balance-header">
-                    <p class="text-label-lg text-outline uppercase">Current Balance</p>
-                    <h1 class="font-display text-headline-lg font-extrabold text-primary text-5xl leading-tight" id="val-current-balance">R0</h1>
-                    <span class="inline-flex items-center text-label-md font-semibold text-secondary bg-secondary-fixed/20 px-sm py-xs rounded-full mt-sm" id="val-change-badge">+14.8% vs last month</span>
+                    <div class="text-lg text-text-secondary font-medium mb-xs">Good Afternoon, <span id="dashboard-user-greeting">Creator</span></div>
+                    <p class="text-sm text-text-secondary">Your creator business generated</p>
+                    <h1 class="font-display text-5xl font-extrabold text-white mt-xs" id="val-current-balance">R0</h1>
+                    <div class="text-sm text-text-secondary mt-sm" id="val-change-badge">↑ 14.8% from last month</div>
                 </div>
 
-                <!-- Action-Oriented Operations Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+                <!-- Section 2: Business Snapshot (Whitespace focused statistics) -->
+                <div class="border-y border-white/[0.08] py-xl my-lg">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-lg">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-text-secondary uppercase tracking-wider font-semibold">Revenue</span>
+                            <span class="font-display text-2xl font-bold text-white mt-xs">R24,650</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-text-secondary uppercase tracking-wider font-semibold">Expenses</span>
+                            <span class="font-display text-2xl font-bold text-white mt-xs">R3,820</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-text-secondary uppercase tracking-wider font-semibold">Net Profit</span>
+                            <span class="font-display text-2xl font-bold text-accent-emerald mt-xs">R20,830</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-text-secondary uppercase tracking-wider font-semibold">Estimated Tax</span>
+                            <span class="font-display text-2xl font-bold text-white mt-xs" id="estimated-tax-val">R3,125</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 & 4: Roster Splits & AI Briefing Insights -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
                     
-                    <!-- Card 1: Business Health -->
-                    <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-display font-bold text-lg text-primary mb-md">Business Health</h3>
-                            <div class="space-y-sm">
-                                <div class="flex justify-between text-body-sm text-outline">
-                                    <span>Revenue</span> <strong class="text-primary">R24,650</strong>
-                                </div>
-                                <div class="flex justify-between text-body-sm text-outline">
-                                    <span>Expenses</span> <strong class="text-primary">R3,820</strong>
-                                </div>
-                                <div class="border-t border-outline-variant/30 pt-xs flex justify-between text-label-lg">
-                                    <span>Net Profit</span> <strong class="text-secondary">R20,830</strong>
-                                </div>
-                            </div>
+                    <!-- Revenue Sources -->
+                    <div class="space-y-lg">
+                        <h3 class="font-display font-bold text-lg text-white">Revenue Sources</h3>
+                        <div id="sources-stream-list" class="space-y-md">
+                            <!-- Populated dynamically via app.js -->
                         </div>
                     </div>
 
-                    <!-- Card 2: Health Score & Tax Estimate -->
-                    <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow flex flex-col justify-between" id="creator-score-color">
-                        <div>
-                            <h3 class="font-display font-bold text-lg text-primary mb-xs">Business Score</h3>
-                            <div class="flex items-center gap-md mb-md">
-                                <div class="font-display text-4xl font-extrabold text-primary" id="creator-score-val">100</div>
-                                <div>
-                                    <div class="text-label-lg font-bold text-secondary" id="creator-score-label">Excellent</div>
-                                    <div class="text-xs text-outline">Overall score</div>
-                                </div>
-                            </div>
-                            <div class="border-t border-outline-variant/30 pt-sm">
-                                <p class="text-xs text-outline uppercase mb-xs">Estimated Tax Liability</p>
-                                <p class="font-display text-xl font-bold text-primary" id="estimated-tax-val">R3,125</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 3: AI Insights & Alerts -->
-                    <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                        <h3 class="font-display font-bold text-lg text-primary mb-md flex items-center gap-xs">
-                            <span class="material-symbols-outlined text-secondary">insights</span> AI Engine
+                    <!-- AI Insights -->
+                    <div class="space-y-lg">
+                        <h3 class="font-display font-bold text-lg text-white flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-accent-emerald">insights</span> AI Briefings
                         </h3>
-                        <ul id="ai-insights-list" class="space-y-sm text-xs text-outline list-disc pl-md">
+                        <ul id="ai-insights-list" class="space-y-md text-sm text-text-secondary list-none">
                             <!-- Populated dynamically via app.js -->
                         </ul>
                     </div>
                 </div>
 
-                <!-- Double column visual: Sources List & Revenue Engine -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                    <!-- Revenue Sources -->
-                    <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                        <h3 class="font-display font-bold text-lg text-primary mb-lg">Revenue Sources</h3>
-                        <div id="sources-stream-list" class="space-y-md">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-
-                    <!-- Creator Revenue Engine visual flow -->
-                    <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow flex flex-col justify-between">
-                        <h3 class="font-display font-bold text-lg text-primary mb-lg">Creator Revenue Engine</h3>
-                        <div class="flex flex-col md:flex-row justify-between items-center gap-md my-md">
-                            <div class="flex-1 w-full bg-surface-container p-md rounded-xl text-center">
-                                <p class="text-xs text-outline font-semibold">YouTube</p>
-                                <p class="font-display text-lg font-bold text-primary">R18.4k</p>
-                            </div>
-                            <div class="flex-1 w-full bg-surface-container p-md rounded-xl text-center">
-                                <p class="text-xs text-outline font-semibold">TikTok</p>
-                                <p class="font-display text-lg font-bold text-primary">R4.8k</p>
-                            </div>
-                            <span class="material-symbols-outlined text-secondary text-headline-md rotate-90 md:rotate-0" data-icon="arrow_forward">arrow_forward</span>
-                            <div class="flex-1 w-full bg-secondary-container p-md rounded-xl text-center border border-secondary/20">
-                                <p class="text-xs text-on-secondary-container font-bold">Profit</p>
-                                <p class="font-display text-lg font-extrabold text-on-secondary-container">R24.6k</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity Ledger -->
-                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                    <div class="flex justify-between items-center mb-lg">
+                <!-- Section 6: Recent Activity -->
+                <div class="space-y-lg pt-lg border-t border-white/[0.08]">
+                    <div class="flex justify-between items-center">
                         <div>
-                            <h3 class="font-display font-bold text-lg text-primary">Recent Activity</h3>
-                            <p class="text-xs text-outline">Real-time ledger audit entries</p>
+                            <h3 class="font-display font-bold text-lg text-white">Recent Activity</h3>
+                            <p class="text-xs text-text-secondary">Real-time ledger audit entries</p>
                         </div>
-                        <button class="bg-primary text-on-primary font-label-lg py-sm px-lg rounded-xl shadow-lg active:scale-95 transition-transform" onclick="openAddActivityModal()">+ Add Entry</button>
+                        <button class="bg-white text-black font-bold font-label-lg py-sm px-lg rounded-xl shadow-lg active:scale-95 transition-transform" onclick="openAddActivityModal()">+ Add Entry</button>
                     </div>
                     <div class="activity-list space-y-sm" id="activity-stream-os">
                         <!-- Loaded dynamically -->
@@ -509,13 +456,13 @@
 
             <!-- TAB 6: PERFORMANCE -->
             <section id="tab-performance" class="tab-pane hidden space-y-xl">
-                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
+                <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl card-shadow">
                     <div class="flex justify-between items-center mb-lg">
                         <div>
-                            <h3 class="font-display font-bold text-lg text-primary">Business Performance</h3>
-                            <p class="text-xs text-outline">Consolidated profit trajectory</p>
+                            <h3 class="font-display font-bold text-lg text-white">Performance Timeline</h3>
+                            <p class="text-xs text-text-secondary">Consolidated daily profit trajectory</p>
                         </div>
-                        <button class="flex items-center gap-xs font-label-lg text-primary px-lg py-sm rounded-xl border border-outline-variant bg-surface hover:bg-surface-container active:scale-95 transition-transform" id="btn-sync-trigger">
+                        <button class="flex items-center gap-xs font-label-lg text-white px-lg py-sm rounded-xl border border-white/[0.08] bg-surface hover:bg-white/[0.02] active:scale-95 transition-transform" id="btn-sync-trigger">
                             <span class="material-symbols-outlined text-[18px]">sync</span> Sync
                         </button>
                     </div>
@@ -527,56 +474,48 @@
 
             <!-- TAB 2: REVENUE -->
             <section id="tab-revenue" class="tab-pane hidden">
-                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                    <h3 class="font-display text-headline-md mb-lg">Revenue Streams</h3>
+                <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl card-shadow">
+                    <h3 class="font-display text-headline-md mb-lg text-white">Revenue Streams</h3>
                     <div id="full-revenue-stream" class="space-y-md"></div>
                 </div>
             </section>
 
             <!-- TAB 3: EXPENSES -->
             <section id="tab-expenses" class="tab-pane hidden">
-                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                    <h3 class="font-display text-headline-md mb-lg">Expense Write-Offs</h3>
+                <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl card-shadow">
+                    <h3 class="font-display text-headline-md mb-lg text-white">Expense Write-Offs</h3>
                     <div id="full-expense-stream" class="space-y-md"></div>
-                </div>
-            </section>
-
-            <!-- TAB 4: FORECAST -->
-            <section id="tab-forecast" class="tab-pane hidden">
-                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                    <h3 class="font-display text-headline-md mb-lg">Forecast Engine</h3>
-                    <p class="font-body-md text-on-surface-variant">Consolidated future growth projection and runway model calculations.</p>
                 </div>
             </section>
 
             <!-- TAB 5: INSIGHTS -->
             <section id="tab-insights" class="tab-pane hidden">
-                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                    <h3 class="font-display text-headline-md mb-lg">Business Intelligence</h3>
-                    <p class="font-body-md text-on-surface-variant">Comprehensive narrative briefings and platform metrics.</p>
+                <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl card-shadow">
+                    <h3 class="font-display text-headline-md mb-lg text-white">Business Intelligence</h3>
+                    <p class="font-body-md text-text-secondary">Comprehensive narrative briefings and platform metrics.</p>
                 </div>
             </section>
         </main>
 
         <!-- Bottom Navigation Bar (Mobile Only) -->
-        <nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-md pb-6 pt-md bg-surface-container-lowest border-t border-outline-variant z-50 mobile-bottom-nav">
-            <a href="#overview" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant active" data-tab="overview">
+        <nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-md pb-6 pt-md bg-surface border-t border-white/[0.08] z-50 mobile-bottom-nav">
+            <a href="#overview" class="mobile-nav-item flex flex-col items-center justify-center text-text-secondary active" data-tab="overview">
                 <span class="material-symbols-outlined">home</span>
                 <span class="font-label-md text-label-md">Home</span>
             </a>
-            <a href="#performance" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="performance">
+            <a href="#performance" class="mobile-nav-item flex flex-col items-center justify-center text-text-secondary" data-tab="performance">
                 <span class="material-symbols-outlined">monitoring</span>
                 <span class="font-label-md text-label-md">Performance</span>
             </a>
-            <a href="#revenue" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="revenue">
+            <a href="#revenue" class="mobile-nav-item flex flex-col items-center justify-center text-text-secondary" data-tab="revenue">
                 <span class="material-symbols-outlined">trending_up</span>
                 <span class="font-label-md text-label-md">Revenue</span>
             </a>
-            <a href="#expenses" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="expenses">
+            <a href="#expenses" class="mobile-nav-item flex flex-col items-center justify-center text-text-secondary" data-tab="expenses">
                 <span class="material-symbols-outlined">credit-card</span>
                 <span class="font-label-md text-label-md">Expenses</span>
             </a>
-            <a href="#insights" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="insights">
+            <a href="#insights" class="mobile-nav-item flex flex-col items-center justify-center text-text-secondary" data-tab="insights">
                 <span class="material-symbols-outlined">lightbulb</span>
                 <span class="font-label-md text-label-md">Insights</span>
             </a>
@@ -584,11 +523,11 @@
     </div>
 
     <!-- Minimal Modal Wrapper -->
-    <div class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200" id="modal-app">
-        <div class="codex-modal bg-surface-container-lowest border border-outline-variant rounded-3xl w-[90%] max-w-md p-lg shadow-2xl transform scale-95 transition-transform duration-200">
+    <div class="modal-overlay fixed inset-0 bg-black/80 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200" id="modal-app">
+        <div class="codex-modal bg-surface border border-white/[0.08] rounded-3xl w-[90%] max-w-md p-lg shadow-2xl transform scale-95 transition-transform duration-200 text-center">
             <div class="modal-header flex justify-between items-center mb-lg">
-                <h3 class="font-display font-bold text-headline-md" id="modal-title">Modal Title</h3>
-                <button class="modal-close text-outline hover:text-primary transition-colors active:scale-90" onclick="closeModal()">
+                <h3 class="font-display font-bold text-headline-md text-white" id="modal-title">Modal Title</h3>
+                <button class="modal-close text-text-secondary hover:text-white transition-colors active:scale-90" onclick="closeModal()">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
