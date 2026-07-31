@@ -366,6 +366,9 @@
                 <a href="#overview" class="flex items-center gap-md px-md py-sm rounded-xl text-primary font-label-lg hover:bg-surface-container active" data-tab="overview">
                     <span class="material-symbols-outlined">home</span> Overview
                 </a>
+                <a href="#performance" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" data-tab="performance">
+                    <span class="material-symbols-outlined">monitoring</span> Performance
+                </a>
                 <a href="#revenue" class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant font-label-lg hover:bg-surface-container" data-tab="revenue">
                     <span class="material-symbols-outlined">trending_up</span> Revenue
                 </a>
@@ -456,22 +459,6 @@
                     </div>
                 </div>
 
-                <!-- Business Performance Chart -->
-                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
-                    <div class="flex justify-between items-center mb-lg">
-                        <div>
-                            <h3 class="font-display font-bold text-lg text-primary">Business Performance</h3>
-                            <p class="text-xs text-outline">Consolidated profit trajectory</p>
-                        </div>
-                        <button class="flex items-center gap-xs font-label-lg text-primary px-lg py-sm rounded-xl border border-outline-variant bg-surface hover:bg-surface-container active:scale-95 transition-transform" id="btn-sync-trigger">
-                            <span class="material-symbols-outlined text-[18px]">sync</span> Sync
-                        </button>
-                    </div>
-                    <div class="chart-wrapper h-[280px]">
-                        <canvas id="chart-revenue-intelligence"></canvas>
-                    </div>
-                </div>
-
                 <!-- Double column visual: Sources List & Revenue Engine -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
                     <!-- Revenue Sources -->
@@ -519,6 +506,24 @@
 
             </section>
 
+            <!-- TAB 6: PERFORMANCE -->
+            <section id="tab-performance" class="tab-pane hidden space-y-xl">
+                <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
+                    <div class="flex justify-between items-center mb-lg">
+                        <div>
+                            <h3 class="font-display font-bold text-lg text-primary">Business Performance</h3>
+                            <p class="text-xs text-outline">Consolidated profit trajectory</p>
+                        </div>
+                        <button class="flex items-center gap-xs font-label-lg text-primary px-lg py-sm rounded-xl border border-outline-variant bg-surface hover:bg-surface-container active:scale-95 transition-transform" id="btn-sync-trigger">
+                            <span class="material-symbols-outlined text-[18px]">sync</span> Sync
+                        </button>
+                    </div>
+                    <div class="chart-wrapper h-[380px]">
+                        <canvas id="chart-revenue-intelligence"></canvas>
+                    </div>
+                </div>
+            </section>
+
             <!-- TAB 2: REVENUE -->
             <section id="tab-revenue" class="tab-pane hidden">
                 <div class="p-lg bg-surface-container-lowest border border-outline-variant rounded-2xl card-shadow">
@@ -558,6 +563,10 @@
                 <span class="material-symbols-outlined">home</span>
                 <span class="font-label-md text-label-md">Home</span>
             </a>
+            <a href="#performance" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="performance">
+                <span class="material-symbols-outlined">monitoring</span>
+                <span class="font-label-md text-label-md">Performance</span>
+            </a>
             <a href="#revenue" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="revenue">
                 <span class="material-symbols-outlined">trending_up</span>
                 <span class="font-label-md text-label-md">Revenue</span>
@@ -565,10 +574,6 @@
             <a href="#expenses" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="expenses">
                 <span class="material-symbols-outlined">credit-card</span>
                 <span class="font-label-md text-label-md">Expenses</span>
-            </a>
-            <a href="#forecast" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="forecast">
-                <span class="material-symbols-outlined">calendar_today</span>
-                <span class="font-label-md text-label-md">Forecast</span>
             </a>
             <a href="#insights" class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant" data-tab="insights">
                 <span class="material-symbols-outlined">lightbulb</span>

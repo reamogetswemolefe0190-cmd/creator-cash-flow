@@ -73,3 +73,36 @@ aside nav a.active, .mobile-bottom-nav a.active {
     border-radius: 0 !important;
     background-color: #0b0b0b !important;
 }
+
+/* ==========================================================================
+   PREMIUM MOTION & HOVER ANIMATIONS
+   ========================================================================== */
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hero text fade + slide up */
+.marketing-page-wrapper h1, 
+.marketing-page-wrapper p, 
+.onboarding-wrapper h1, 
+.dashboard-balance-header h1 {
+    animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Responsive cards hover lift & border glow */
+.card-shadow, .onboard-choice-card, .connection-platform-card {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
+}
+
+.card-shadow:hover, .onboard-choice-card:hover, .connection-platform-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 20px -8px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(0, 108, 73, 0.08) !important;
+}
