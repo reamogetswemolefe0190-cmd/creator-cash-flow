@@ -1,95 +1,83 @@
-# Handoff Report: Explorer M3_1 — Feature F9 (Micro-Interactions & Hover Lifts)
+# Handoff Report: Milestone M3 — Audit Logging & PII Telemetry API Strategy
+
+**Agent**: Explorer M3_1  
+**Working Directory**: `c:\Users\User\OneDrive\Desktop\New folder (2)\.agents\explorer_m3_1`  
+**Target Milestone**: Milestone M3 (Audit Logging & PII Telemetry API)  
+**Date**: 2026-08-07  
+
+---
 
 ## 1. Observation
-Direct evidence gathered from codebase inspection:
 
-- **Source File Paths**:
-  - `c:\Users\User\OneDrive\Desktop\New folder (2)\style.css`
-  - `c:\Users\User\OneDrive\Desktop\New folder (2)\index.html`
-  - `c:\Users\User\OneDrive\Desktop\New folder (2)\app.js`
+1. **Backend Server Architecture (`server.js`)**:
+   - `server.js` uses Express.js with JWT authentication and `requireAdmin` middleware (lines 204-222) protecting `/api/admin/*` endpoints.
+   - Dual database architecture present: Supabase Cloud PostgreSQL client initialized if environment keys are present, falling back to `memoryDb` array structures (lines 32-39).
+   - Currently implemented admin endpoints: `POST /api/admin/auth/login` (lines 465-534), `GET /api/admin/verify-auth` (lines 537-539), and `GET /api/admin/metrics` (lines 542-676).
+   - Existing `POST /api/gemini` endpoint (lines 960-1001) forwards prompts to Gemini 1.5 Flash API but lacks PII masking, telemetry logging, and category tagging.
 
-- **Observed CSS Rules in `style.css`**:
-  - **Lines 25–48**:
-    ```css
-    .onboard-choice-card {
-        position: relative;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-    .onboard-choice-card.active {
-        border-color: #22C55E !important;
-        background-color: rgba(34, 197, 94, 0.08) !important;
-        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.4), 0 8px 25px -5px rgba(34, 197, 94, 0.25) !important;
-    }
-    .onboard-choice-card.active .check-indicator {
-        color: #22C55E !important;
-    }
-    ```
-  - **Lines 119–127**:
-    ```css
-    .card-shadow, .onboard-choice-card, .connection-platform-card {
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
-    }
-    .card-shadow:hover, .onboard-choice-card:hover, .connection-platform-card:hover {
-        transform: translateY(-2px) !important;
-        border-color: rgba(255, 255, 255, 0.12) !important;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.02) !important;
-    }
-    ```
-  - **Lines 141–155**:
-    ```css
-    .glass-card:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-color: rgba(255, 255, 255, 0.16) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2), 0 0 20px rgba(34, 197, 94, 0.08) !important;
-    }
-    ```
+2. **Database Schema (`database_setup.sql`)**:
+   - Schema already defines `public.audit_logs` (lines 62-74) with columns: `id`, `admin_id`, `target_creator_id`, `action_type`, `old_value`, `new_value`, `timestamp`, `ip_hash`.
+   - Schema already defines `public.ai_telemetry` (lines 77-89) with columns: `id`, `category_tag`, `prompt_masked`, `tokens_used`, `model`, `latency_ms`, `created_at`.
 
-- **Observed JS Handlers in `app.js`**:
-  - **Lines 297–345**: `selectCreatorType`, `togglePlatformChoice`, `selectGoal` toggle class `.active` and set icon `innerText` to `'check_circle'` or `'radio_button_unchecked'`.
-  - **Lines 361–370**: `simulatePlatformConnect` toggles class `.connected` on `.connection-platform-card`.
-
-- **Console / Build Status**:
-  - No JS syntax or runtime errors observed. Vanilla ES6/CSS architecture.
+3. **Existing Automated Test Suites**:
+   - `test_admin_auth.js` passes 31/31 assertions cleanly via `node test_admin_auth.js`.
+   - `test_admin_metrics.js` passes 34/34 assertions cleanly via `node test_admin_metrics.js`.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Step 1 (Observation → Card Lift Scope)**:
-   Observations at `style.css:119-127` and `style.css:141-155` confirm that 2px hover lifts (`transform: translateY(-2px)`) are currently defined for `.card-shadow`, `.onboard-choice-card`, `.connection-platform-card`, and `.glass-card`. However, `.glass-card-nested`, `.floating-badge`, `.activity-card-item`, and `.arc-tab-btn` do not have hover lift transition rules.
-   *Reasoning*: Extending hover lift selectors to include all interactive cards creates consistent physical micro-interactions across landing, onboarding, and dashboard views.
+1. **`POST /api/admin/creators/:id/status` Implementation**:
+   - *Observation*: Admin mutations (suspension, reactivation, plan changes) must be tracked immutably per R2 & R6 requirements.
+   - *Deduction*: Adding `POST /api/admin/creators/:id/status` guarded by `requireAdmin` enables admins to alter creator status (`active`/`suspended`) and plan tier (`Pro`/`Free`).
+   - *Audit Trail Logic*: On every mutation, the handler will capture `old_value` and `new_value` snapshots, compute SHA-256 IP hash prefix (`ip_hash`), and write an immutable log entry to both Supabase `audit_logs` table and `memoryDb.audit_logs` array.
 
-2. **Step 2 (Observation → Emerald Border Glow)**:
-   Observations at `style.css:123` show `.onboard-choice-card:hover` using `border-color: rgba(255, 255, 255, 0.12) !important;`, which overrides emerald glows on hover.
-   *Reasoning*: Updating card hover rules to use `border-color: rgba(34, 197, 94, 0.4)` and `box-shadow: ... 0 0 20px 2px rgba(34, 197, 94, 0.2)` fulfills the requirement for vibrant emerald border glows on hover.
+2. **`GET /api/admin/audit-logs` Implementation**:
+   - *Observation*: Admin portal UI requires access to chronological audit events.
+   - *Deduction*: Exposing `GET /api/admin/audit-logs` guarded by `requireAdmin` returns the array of audit logs ordered by timestamp descending, fetching from Supabase PostgreSQL when available or `memoryDb.audit_logs` as fallback.
 
-3. **Step 3 (Observation → Selection Indicator Springs)**:
-   Observations at `style.css:36` and `app.js:297-345` show that active state selection toggles icon text instantly without any CSS transform keyframe transition.
-   *Reasoning*: Defining `@keyframes selectionIndicatorSpring` and `@keyframes iconBoxSpring` with spring timing (`cubic-bezier(0.175, 0.885, 0.32, 1.275)`) and binding them to `.onboard-choice-card.active .check-indicator span` delivers tactile spring micro-interactions upon selection.
+3. **PII-Masked AI Telemetry & `POST /api/gemini` Enhancement**:
+   - *Observation*: AI queries sent to Gemini must not retain raw PII or unmasked financial amounts per R3 & R6 requirements.
+   - *Deduction*: Modifying `POST /api/gemini` to run all incoming prompts through a PII scrubbing engine (`maskPiiFromPrompt`) replaces emails (`[REDACTED_EMAIL]`), phone numbers (`[REDACTED_PHONE]`), and ZAR amounts (`[REDACTED_ZAR]`).
+   - *Telemetry & Classification*: Classifies prompts into 5 category tags (`Tax Deduction Strategy`, `Gear Purchase Planning`, `Revenue & Cash Flow Optimization`, `Expense Management`, `General Creator Advice`) and logs latency in ms and tokens used into `ai_telemetry` and `memoryDb.ai_telemetry`.
+   - *Retention Policy*: Applies a 30-day cutoff filter (`created_at >= 30 days ago`) on storage and query time.
+
+4. **`GET /api/admin/telemetry` Implementation**:
+   - *Observation*: Admin portal UI needs to inspect AI usage telemetry without exposing user PII.
+   - *Deduction*: `GET /api/admin/telemetry` guarded by `requireAdmin` returns PII-masked query entries subject to the 30-day automated TTL policy filter.
+
+5. **Unit Test Strategy**:
+   - *Observation*: Existing test suites (`test_admin_auth.js` and `test_admin_metrics.js`) use standalone Node.js HTTP servers.
+   - *Deduction*: Creating `test_admin_m3.js` following the same structure provides automated, repeatable validation across 5 test groups covering auth checks, status mutations, audit logs, PII regex edge cases, and 30-day TTL filtering.
 
 ---
 
 ## 3. Caveats
-- Touch-first devices (mobile viewports <640px with coarse pointers) disable 3D hero perspective tilt to prevent sticky hover states; card lift micro-interactions use `:active` touch feedback instead.
-- No third-party animation libraries (like Framer Motion or GSAP) are installed; all spring micro-interactions must rely on pure CSS `@keyframes` and `cubic-bezier` timing functions.
+
+1. **Supabase Environment Availability**:
+   - In local development without Supabase environment variables, all operations operate cleanly on `memoryDb`. Both Supabase Cloud PostgreSQL and `memoryDb` fallback paths must be implemented and tested.
+2. **Regex Edge Cases for ZAR Currency & Phone Numbers**:
+   - Phone regex must check for digit counts (>= 7 digits) to prevent erroneously masking short numerical values in prompts (e.g. "Step 1 of 3").
+   - ZAR currency regex must handle variations (`R1,500`, `ZAR 5000`, `R500`, `R 1,500.00`, `ZAR 250,000`).
 
 ---
 
 ## 4. Conclusion
-Feature F9 is fully analyzed. Implementation requires targeted CSS additions in `style.css` (keyframe springs `@keyframes selectionIndicatorSpring` and `@keyframes iconBoxSpring`, unified hover lift selector `.card-shadow:hover, .onboard-choice-card:hover, .connection-platform-card:hover, .glass-card:hover, .glass-card-nested:hover, .activity-card-item:hover`, emerald border glows, and active press scale states) and minor class tagging in `app.js` (`.activity-card-item`). Full specifications have been written to `analysis.md`.
+
+The technical strategy for Milestone M3 (Audit Logging & PII Telemetry API) is fully formulated, documented in `analysis.md`, and ready for implementation. Implementing the 4 specified endpoints (`POST /api/admin/creators/:id/status`, `GET /api/admin/audit-logs`, PII masking in `POST /api/gemini`, `GET /api/admin/telemetry`) alongside dual memory aliases (`memoryDb.auditLogs`, `memoryDb.aiTelemetry`) will achieve complete functional and security compliance without regressing M1 or M2 functionality.
 
 ---
 
 ## 5. Verification Method
 
-### How to Verify
-1. **Visual Sweep**: Open `index.html` in browser or run local server (`python -m http.server 3000`).
-2. **Hover Test**: Hover over landing glass cards, onboarding choice cards, and hero mockup elements to verify `-2px` translateY lift and emerald border glow (`rgba(34, 197, 94, 0.4)`).
-3. **Selection Spring Test**: Enter onboarding wizard (`switchView('onboarding')`) and click choice cards in Step 2, Step 3, Step 4. Confirm check indicator springs into place with cubic-bezier pop animation.
-4. **Console Check**: Open Browser DevTools Console and verify zero errors during card selection and view switching.
-
-### Invalidation Conditions
-- Any layout jump, scrollbar shift, or element displacement exceeding 2px during hover.
-- Missing emerald border glow on hover or active card states.
-- Static or unanimated check indicator state transitions.
+To independently verify the implementation:
+1. **Source Inspection**:
+   - Inspect `server.js` for `POST /api/admin/creators/:id/status`, `GET /api/admin/audit-logs`, `GET /api/admin/telemetry`, and enhanced `POST /api/gemini`.
+2. **Execute Automated Test Suite**:
+   - Run `node test_admin_auth.js` (Verify M1 test suite passes).
+   - Run `node test_admin_metrics.js` (Verify M2 test suite passes).
+   - Run `node test_admin_m3.js` (Verify new M3 test suite passes all 5 test groups).
+3. **Invalidation Conditions**:
+   - If any `/api/admin/*` endpoint returns 200 without a valid admin Bearer token -> Verification FAIL.
+   - If unmasked email, phone, or ZAR currency appears in telemetry log -> Verification FAIL.
+   - If telemetry entries older than 30 days are returned by `GET /api/admin/telemetry` -> Verification FAIL.

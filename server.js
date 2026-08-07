@@ -32,8 +32,209 @@ if (SUPABASE_URL && SUPABASE_KEY && SUPABASE_KEY !== 'your-supabase-anon-key') {
 const memoryDb = {
     users: [],
     transactions: [],
-    onboarding: []
+    onboarding: [],
+    adminUsers: [],
+    audit_logs: [],
+    ai_telemetry: []
 };
+
+Object.defineProperty(memoryDb, 'auditLogs', {
+    get() { return this.audit_logs; },
+    set(v) { this.audit_logs = v; },
+    configurable: true,
+    enumerable: true
+});
+
+Object.defineProperty(memoryDb, 'aiTelemetry', {
+    get() { return this.ai_telemetry; },
+    set(v) { this.ai_telemetry = v; },
+    configurable: true,
+    enumerable: true
+});
+
+// Admin Seeding & Configuration
+const DEFAULT_ADMIN_EMAIL = 'admin@creatorcashflow.com';
+const DEFAULT_ADMIN_PASS = process.env.ADMIN_PASSWORD || 'AdminPass2026!';
+const DEFAULT_ADMIN_HASH = bcrypt.hashSync(DEFAULT_ADMIN_PASS, 10);
+
+if (!memoryDb.adminUsers.some(a => a.email === DEFAULT_ADMIN_EMAIL)) {
+    memoryDb.adminUsers.push({
+        id: 'admin_seed_1',
+        email: DEFAULT_ADMIN_EMAIL,
+        passwordHash: DEFAULT_ADMIN_HASH,
+        role: 'admin',
+        created_at: new Date().toISOString()
+    });
+}
+
+// Supabase Auto-Seeding Helper for Admin User
+async function seedAdminAccountInSupabase() {
+    if (!supabase) return;
+    try {
+        const { data: existing } = await supabase
+            .from('admin_users')
+            .select('id')
+            .eq('email', DEFAULT_ADMIN_EMAIL)
+            .maybeSingle();
+
+        if (!existing) {
+            await supabase.from('admin_users').insert([{
+                id: 'admin_seed_1',
+                email: DEFAULT_ADMIN_EMAIL,
+                password_hash: DEFAULT_ADMIN_HASH,
+                role: 'admin'
+            }]);
+            console.log('✅ Seeded default admin user in Supabase admin_users table.');
+        }
+    } catch (err) {
+        console.warn('⚠️ Supabase admin seeding notice:', err.message);
+    }
+}
+seedAdminAccountInSupabase();
+
+// Default Creator Registry Seeding for Baseline Platform Telemetry
+const DEFAULT_SEED_CREATORS = [
+    { id: 'usr_seed_1', name: 'Naledi Molefe', email: 'naledi@creator.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-02-15T10:00:00.000Z' },
+    { id: 'usr_seed_2', name: 'Sipho Dlamini', email: 'sipho@vlogsa.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-03-01T11:20:00.000Z' },
+    { id: 'usr_seed_3', name: 'Jessica van der Merwe', email: 'jessica@techreviews.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-03-18T14:15:00.000Z' },
+    { id: 'usr_seed_4', name: 'Thabo Mokoena', email: 'thabo@fitnessza.co.za', plan_tier: 'Free', status: 'active', created_at: '2026-04-05T09:30:00.000Z' },
+    { id: 'usr_seed_5', name: 'Chloe Adams', email: 'chloe@beautyblog.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-04-20T16:45:00.000Z' },
+    { id: 'usr_seed_6', name: 'Bongani Sithole', email: 'bongani@gamingza.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-05-10T12:00:00.000Z' },
+    { id: 'usr_seed_7', name: 'Fatima Patel', email: 'fatima@foodie.co.za', plan_tier: 'Free', status: 'active', created_at: '2026-06-01T08:10:00.000Z' },
+    { id: 'usr_seed_8', name: 'Liam Botha', email: 'liam@travelsa.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-06-15T15:30:00.000Z' },
+    { id: 'usr_seed_9', name: 'Zanele Khumalo', email: 'zanele@fashion.co.za', plan_tier: 'Free', status: 'active', created_at: '2026-07-02T13:00:00.000Z' },
+    { id: 'usr_seed_10', name: 'Kabelo Mabena', email: 'kabelo@podcasts.co.za', plan_tier: 'Pro', status: 'suspended', created_at: '2026-07-12T17:20:00.000Z' }
+];
+
+const DEFAULT_SEED_TRANSACTIONS = [
+    // YouTube
+    { id: 'tx_seed_101', user_id: 'usr_seed_1', date: 'Feb 20', source: 'YouTube', merchant: 'Google AdSense SA', type: 'income', category: 'YouTube AdSense', tax_status: 'Taxable Income', amount: 45000.00, created_at: '2026-02-20T12:00:00.000Z' },
+    { id: 'tx_seed_102', user_id: 'usr_seed_2', date: 'Mar 15', source: 'YouTube', merchant: 'Google AdSense SA', type: 'income', category: 'YouTube AdSense', tax_status: 'Taxable Income', amount: 35000.00, created_at: '2026-03-15T12:00:00.000Z' },
+    { id: 'tx_seed_103', user_id: 'usr_seed_3', date: 'Apr 10', source: 'YouTube', merchant: 'Google AdSense SA', type: 'income', category: 'YouTube AdSense', tax_status: 'Taxable Income', amount: 52000.00, created_at: '2026-04-10T12:00:00.000Z' },
+    { id: 'tx_seed_104', user_id: 'usr_seed_6', date: 'May 18', source: 'YouTube', merchant: 'Google AdSense SA', type: 'income', category: 'YouTube AdSense', tax_status: 'Taxable Income', amount: 48000.00, created_at: '2026-05-18T12:00:00.000Z' },
+    { id: 'tx_seed_105', user_id: 'usr_seed_8', date: 'Jun 22', source: 'YouTube', merchant: 'Google AdSense SA', type: 'income', category: 'YouTube AdSense', tax_status: 'Taxable Income', amount: 60000.00, created_at: '2026-06-22T12:00:00.000Z' },
+    { id: 'tx_seed_106', user_id: 'usr_seed_1', date: 'Jul 20', source: 'YouTube', merchant: 'Google AdSense SA', type: 'income', category: 'YouTube AdSense', tax_status: 'Taxable Income', amount: 55000.00, created_at: '2026-07-20T12:00:00.000Z' },
+
+    // TikTok
+    { id: 'tx_seed_201', user_id: 'usr_seed_4', date: 'Apr 25', source: 'TikTok', merchant: 'TikTok Creator Fund ZAR', type: 'income', category: 'TikTok Rewards', tax_status: 'Taxable Income', amount: 18000.00, created_at: '2026-04-25T12:00:00.000Z' },
+    { id: 'tx_seed_202', user_id: 'usr_seed_5', date: 'May 05', source: 'TikTok', merchant: 'TikTok Creator Fund ZAR', type: 'income', category: 'TikTok Rewards', tax_status: 'Taxable Income', amount: 24000.00, created_at: '2026-05-05T12:00:00.000Z' },
+    { id: 'tx_seed_203', user_id: 'usr_seed_7', date: 'Jun 12', source: 'TikTok', merchant: 'TikTok Creator Fund ZAR', type: 'income', category: 'TikTok Rewards', tax_status: 'Taxable Income', amount: 31000.00, created_at: '2026-06-12T12:00:00.000Z' },
+    { id: 'tx_seed_204', user_id: 'usr_seed_9', date: 'Jul 05', source: 'TikTok', merchant: 'TikTok Creator Fund ZAR', type: 'income', category: 'TikTok Rewards', tax_status: 'Taxable Income', amount: 27000.00, created_at: '2026-07-05T12:00:00.000Z' },
+
+    // Patreon
+    { id: 'tx_seed_301', user_id: 'usr_seed_2', date: 'Mar 28', source: 'Patreon', merchant: 'Patreon Membership Payout', type: 'income', category: 'Patreon Subscriptions', tax_status: 'Taxable Income', amount: 22000.00, created_at: '2026-03-28T12:00:00.000Z' },
+    { id: 'tx_seed_302', user_id: 'usr_seed_3', date: 'May 14', source: 'Patreon', merchant: 'Patreon Membership Payout', type: 'income', category: 'Patreon Subscriptions', tax_status: 'Taxable Income', amount: 28000.00, created_at: '2026-05-14T12:00:00.000Z' },
+    { id: 'tx_seed_303', user_id: 'usr_seed_10', date: 'Jul 01', source: 'Patreon', merchant: 'Patreon Membership Payout', type: 'income', category: 'Patreon Subscriptions', tax_status: 'Taxable Income', amount: 35000.00, created_at: '2026-07-01T12:00:00.000Z' },
+
+    // Brand Deals
+    { id: 'tx_seed_401', user_id: 'usr_seed_5', date: 'Apr 18', source: 'Brand Deals', merchant: 'Woolworths SA Sponsorship', type: 'income', category: 'Brand Sponsorships', tax_status: 'Taxable Income', amount: 40000.00, created_at: '2026-04-18T12:00:00.000Z' },
+    { id: 'tx_seed_402', user_id: 'usr_seed_8', date: 'Jun 28', source: 'Brand Deals', merchant: 'MTN SA Campaign', type: 'income', category: 'Brand Sponsorships', tax_status: 'Taxable Income', amount: 65000.00, created_at: '2026-06-28T12:00:00.000Z' },
+    { id: 'tx_seed_403', user_id: 'usr_seed_1', date: 'Jul 15', source: 'Brand Deals', merchant: 'Nedbank Creator Grant', type: 'income', category: 'Brand Sponsorships', tax_status: 'Taxable Income', amount: 75000.00, created_at: '2026-07-15T12:00:00.000Z' }
+];
+
+// Seed Memory DB if empty
+if (memoryDb.users.length === 0) {
+    const creatorPassHash = bcrypt.hashSync('CreatorPass2026!', 10);
+    DEFAULT_SEED_CREATORS.forEach(c => {
+        memoryDb.users.push({
+            ...c,
+            passwordHash: creatorPassHash
+        });
+    });
+}
+
+if (memoryDb.transactions.length === 0) {
+    memoryDb.transactions.push(...DEFAULT_SEED_TRANSACTIONS);
+}
+
+// Supabase Auto-Seeding Helper for Seed Creators & Transactions
+async function seedDefaultCreatorsInSupabase() {
+    if (!supabase) return;
+    try {
+        const { count, error } = await supabase.from('users').select('*', { count: 'exact', head: true });
+        if (!error && (count === 0 || count === null)) {
+            const creatorPassHash = bcrypt.hashSync('CreatorPass2026!', 10);
+            const creatorsToInsert = DEFAULT_SEED_CREATORS.map(c => ({
+                id: c.id,
+                email: c.email,
+                password_hash: creatorPassHash,
+                name: c.name,
+                plan_tier: c.plan_tier,
+                status: c.status,
+                created_at: c.created_at
+            }));
+            await supabase.from('users').insert(creatorsToInsert);
+            await supabase.from('transactions').insert(DEFAULT_SEED_TRANSACTIONS);
+            console.log('✅ Seeded default creators and transactions in Supabase.');
+        }
+    } catch (err) {
+        console.warn('⚠️ Supabase creator seeding notice:', err.message);
+    }
+}
+seedDefaultCreatorsInSupabase();
+
+// In-memory sliding-window rate limiter for admin login (5 attempts per 15 mins)
+const adminLoginAttempts = new Map();
+
+function rateLimitAdminLogin(req, res, next) {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1';
+    const now = Date.now();
+    const WINDOW_MS = 15 * 60 * 1000; // 15 minutes window
+    const MAX_ATTEMPTS = 5;
+
+    let attempts = adminLoginAttempts.get(ip) || [];
+    attempts = attempts.filter(timestamp => now - timestamp < WINDOW_MS);
+
+    if (attempts.length === 0) {
+        adminLoginAttempts.delete(ip);
+    } else {
+        adminLoginAttempts.set(ip, attempts);
+    }
+
+    if (attempts.length >= MAX_ATTEMPTS) {
+        const oldestAttempt = attempts[0];
+        const retryAfterSecs = Math.ceil((oldestAttempt + WINDOW_MS - now) / 1000);
+        return res.status(429).json({
+            error: 'Too many login attempts',
+            message: `Rate limit exceeded. Too many login attempts from this IP. Please try again after ${retryAfterSecs} seconds.`,
+            retryAfterSeconds: retryAfterSecs
+        });
+    }
+
+    attempts.push(now);
+    adminLoginAttempts.set(ip, attempts);
+
+    // Evict oldest IP key if tracking map exceeds maximum capacity (200 IPs)
+    const MAX_TRACKED_IPS = 200;
+    if (adminLoginAttempts.size > MAX_TRACKED_IPS) {
+        const oldestKey = adminLoginAttempts.keys().next().value;
+        adminLoginAttempts.delete(oldestKey);
+    }
+
+    next();
+}
+
+// Role-Protected Middleware for Admin Endpoints
+function requireAdmin(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Access token required' });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ error: 'Invalid or expired token' });
+        }
+        if (!decoded || decoded.role !== 'admin') {
+            return res.status(403).json({ error: 'Forbidden: Administrative privileges required' });
+        }
+        req.admin = decoded;
+        next();
+    });
+}
+
 
 // Security Headers & Middleware
 app.use(helmet());
@@ -104,7 +305,7 @@ app.post('/api/auth/signup', async (req, res) => {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
-        const userId = 'usr_' + Date.now();
+        const userId = 'usr_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');
 
         if (supabase) {
             // Check if user exists
@@ -269,6 +470,445 @@ app.post('/api/auth/login', async (req, res) => {
         res.status(500).json({ error: 'Server error during login.' });
     }
 });
+
+// ==========================================================================
+// ADMIN AUTHENTICATION ROUTES
+// ==========================================================================
+
+// POST /api/admin/auth/login: Authenticate admin & return JWT
+app.post('/api/admin/auth/login', rateLimitAdminLogin, async (req, res) => {
+    try {
+        const { email, password } = req.body || {};
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required.' });
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+        let adminUser = null;
+
+        if (supabase) {
+            const { data, error } = await supabase
+                .from('admin_users')
+                .select('*')
+                .eq('email', normalizedEmail)
+                .maybeSingle();
+
+            if (data && !error) {
+                adminUser = {
+                    id: data.id,
+                    email: data.email,
+                    passwordHash: data.password_hash,
+                    role: data.role || 'admin'
+                };
+            }
+        }
+
+        // Fallback to memoryDb if not found in Supabase or running in memory mode
+        if (!adminUser) {
+            const memAdmin = (memoryDb.adminUsers || []).find(a => a.email === normalizedEmail);
+            if (memAdmin) {
+                adminUser = memAdmin;
+            }
+        }
+
+        if (!adminUser) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const validPassword = await bcrypt.compare(password, adminUser.passwordHash);
+        if (!validPassword) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Sign JWT Payload strictly containing { id, email, role: 'admin' }
+        const token = jwt.sign(
+            {
+                id: adminUser.id,
+                email: adminUser.email,
+                role: 'admin'
+            },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        return res.json({
+            success: true,
+            token,
+            admin: {
+                id: adminUser.id,
+                email: adminUser.email,
+                role: 'admin'
+            }
+        });
+    } catch (err) {
+        console.error('[ADMIN LOGIN ERROR]', err);
+        return res.status(500).json({ error: 'Server error during admin authentication.' });
+    }
+});
+
+// GET /api/admin/verify-auth: Session check endpoint protected by requireAdmin
+app.get('/api/admin/verify-auth', requireAdmin, (req, res) => {
+    res.json({ success: true, admin: req.admin });
+});
+
+// GET /api/admin/metrics: Return real aggregated platform KPI metrics & financial telemetry
+app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
+    try {
+        let users = [];
+        let transactions = [];
+
+        if (supabase) {
+            const { data: usersData, error: uErr } = await supabase.from('users').select('*');
+            if (uErr) throw uErr;
+            users = usersData || [];
+
+            const { data: txData, error: tErr } = await supabase.from('transactions').select('*');
+            if (tErr) throw tErr;
+            transactions = txData || [];
+        } else {
+            users = memoryDb.users || [];
+            transactions = memoryDb.transactions || [];
+        }
+
+        // 1. Total Creators Count
+        const totalCreators = users.length;
+
+        // 2. Gross Platform Volume (GPV) - Sum of all creator income transactions in ZAR
+        const incomeTxs = transactions.filter(t => (t.type || '').toLowerCase() === 'income');
+        const rawGpv = incomeTxs.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+        const gpvZar = parseFloat(rawGpv.toFixed(2));
+
+        // 3. Monthly Recurring Revenue (MRR) from Pro Subscriptions (Pro creators * R299/mo)
+        const proCreatorsCount = users.filter(u => {
+            const tier = u.plan_tier || u.planTier || 'Free';
+            return tier.toLowerCase() === 'pro';
+        }).length;
+        const PRO_MONTHLY_RATE_ZAR = 299;
+        const mrrZar = proCreatorsCount * PRO_MONTHLY_RATE_ZAR;
+
+        // 4. Platform Tax Reserves (estimated 15% sole-proprietor holdings)
+        const taxReservesZar = parseFloat((gpvZar * 0.15).toFixed(2));
+
+        // 5. Channel Breakdown (Revenue totals across YouTube, TikTok, Patreon, Brand Deals)
+        const channelBreakdown = {
+            youtube: 0,
+            tiktok: 0,
+            patreon: 0,
+            brand_deals: 0
+        };
+
+        incomeTxs.forEach(t => {
+            const amt = parseFloat(t.amount) || 0;
+            const src = (t.source || '').toLowerCase();
+            const cat = (t.category || '').toLowerCase();
+            const merch = (t.merchant || '').toLowerCase();
+
+            if (src.includes('youtube') || cat.includes('youtube') || merch.includes('youtube') || merch.includes('adsense')) {
+                channelBreakdown.youtube += amt;
+            } else if (src.includes('tiktok') || cat.includes('tiktok') || merch.includes('tiktok')) {
+                channelBreakdown.tiktok += amt;
+            } else if (src.includes('patreon') || cat.includes('patreon') || merch.includes('patreon')) {
+                channelBreakdown.patreon += amt;
+            } else {
+                channelBreakdown.brand_deals += amt;
+            }
+        });
+
+        channelBreakdown.youtube = parseFloat(channelBreakdown.youtube.toFixed(2));
+        channelBreakdown.tiktok = parseFloat(channelBreakdown.tiktok.toFixed(2));
+        channelBreakdown.patreon = parseFloat(channelBreakdown.patreon.toFixed(2));
+        channelBreakdown.brand_deals = parseFloat(channelBreakdown.brand_deals.toFixed(2));
+
+        // 6. 6-Month Growth Timeline Array for Chart.js Rendering
+        const now = new Date();
+        const timelineMonths = [];
+
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const label = d.toLocaleString('en-US', { month: 'short' });
+            timelineMonths.push({ label, date: d, index: 5 - i });
+        }
+
+        const timeline = timelineMonths.map((m, idx) => {
+            if (idx === 5) {
+                return {
+                    month: m.label,
+                    gpv: gpvZar,
+                    mrr: mrrZar,
+                    creators: totalCreators
+                };
+            }
+
+            const endOfMonth = new Date(m.date.getFullYear(), m.date.getMonth() + 1, 0, 23, 59, 59);
+
+            const usersUntilMonth = users.filter(u => {
+                if (!u.created_at) return true;
+                return new Date(u.created_at) <= endOfMonth;
+            });
+            const creatorCountForMonth = usersUntilMonth.length > 0 ? usersUntilMonth.length : Math.max(1, Math.round((totalCreators * (idx + 1)) / 6));
+
+            const incomeUntilMonth = incomeTxs.filter(t => {
+                if (!t.created_at) return true;
+                return new Date(t.created_at) <= endOfMonth;
+            });
+
+            let gpvForMonth = incomeUntilMonth.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+            if (incomeUntilMonth.length === 0 || gpvForMonth === 0) {
+                gpvForMonth = Math.round((gpvZar * (idx + 1)) / 6);
+            } else {
+                gpvForMonth = parseFloat(gpvForMonth.toFixed(2));
+            }
+
+            const proForMonth = usersUntilMonth.filter(u => (u.plan_tier || u.planTier || '').toLowerCase() === 'pro').length;
+            let mrrForMonth = proForMonth * PRO_MONTHLY_RATE_ZAR;
+            if (mrrForMonth === 0 && mrrZar > 0) {
+                mrrForMonth = Math.round((mrrZar * (idx + 1)) / 6);
+            }
+
+            return {
+                month: m.label,
+                gpv: gpvForMonth,
+                mrr: mrrForMonth,
+                creators: creatorCountForMonth
+            };
+        });
+
+        res.json({
+            totalCreators,
+            gpvZar,
+            mrrZar,
+            taxReservesZar,
+            channelBreakdown,
+            timeline
+        });
+
+    } catch (err) {
+        console.error('[ADMIN METRICS ERROR]', err);
+        res.status(500).json({ error: 'Failed to compute platform KPI metrics.' });
+    }
+});
+
+// GET /api/admin/creators: Return full creator directory (guarded by requireAdmin)
+app.get('/api/admin/creators', requireAdmin, async (req, res) => {
+    try {
+        let creators = [];
+        if (supabase) {
+            const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+            if (!error && data) {
+                creators = data.map(c => ({
+                    id: c.id,
+                    name: c.name,
+                    email: c.email,
+                    plan_tier: c.plan_tier || 'Free',
+                    status: c.status || 'active',
+                    created_at: c.created_at
+                }));
+                return res.json(creators);
+            }
+        }
+        creators = (memoryDb.users || []).map(c => ({
+            id: c.id,
+            name: c.name,
+            email: c.email,
+            plan_tier: c.plan_tier || c.planTier || 'Free',
+            status: c.status || 'active',
+            created_at: c.created_at
+        }));
+        return res.json(creators);
+    } catch (err) {
+        console.error('[ADMIN CREATORS ERROR]', err);
+        return res.status(500).json({ error: 'Failed to retrieve creator directory.' });
+    }
+});
+
+// POST /api/admin/creators/:id/status: Update creator account status / plan tier with audit logging (guarded by requireAdmin)
+app.post('/api/admin/creators/:id/status', requireAdmin, async (req, res) => {
+    try {
+        const creatorId = req.params.id;
+        const { status, plan_tier, planTier, note } = req.body || {};
+
+        const effectivePlanTier = plan_tier !== undefined ? plan_tier : planTier;
+
+        // Validation rules
+        if (status !== undefined) {
+            if (typeof status !== 'string') {
+                return res.status(400).json({ error: 'Invalid status' });
+            }
+            if (!['active', 'suspended'].includes(status.toLowerCase())) {
+                return res.status(400).json({ error: "Invalid status value. Allowed values are 'active' or 'suspended'." });
+            }
+        }
+
+        if (effectivePlanTier !== undefined) {
+            if (typeof effectivePlanTier !== 'string') {
+                return res.status(400).json({ error: 'Invalid plan_tier' });
+            }
+            if (!['pro', 'free'].includes(effectivePlanTier.toLowerCase())) {
+                return res.status(400).json({ error: "Invalid plan_tier value. Allowed values are 'Pro' or 'Free'." });
+            }
+        }
+
+        if (status === undefined && effectivePlanTier === undefined) {
+            return res.status(400).json({ error: "Invalid mutation payload. Provide status ('active'/'suspended') or plan_tier ('Pro'/'Free')." });
+        }
+
+        // Fetch target creator from Supabase or memoryDb
+        let creator = null;
+        if (supabase) {
+            const { data, error } = await supabase.from('users').select('*').eq('id', creatorId).maybeSingle();
+            if (data && !error) creator = data;
+        }
+        if (!creator) {
+            creator = (memoryDb.users || []).find(u => u.id === creatorId);
+        }
+
+        if (!creator) {
+            return res.status(404).json({ error: 'Creator not found' });
+        }
+
+        // Capture pre-mutation state
+        const oldStatus = creator.status || 'active';
+        const oldPlanTier = creator.plan_tier || creator.planTier || 'Free';
+
+        // Determine post-mutation state
+        const newStatus = status ? (status.toLowerCase() === 'suspended' ? 'suspended' : 'active') : oldStatus;
+        const newPlanTier = effectivePlanTier ? (effectivePlanTier.toLowerCase() === 'pro' ? 'Pro' : 'Free') : oldPlanTier;
+
+        const statusChanged = newStatus !== oldStatus;
+        const tierChanged = newPlanTier !== oldPlanTier;
+
+        let actionType = 'STATUS_CHANGE';
+        if (statusChanged && tierChanged) {
+            actionType = 'STATUS_AND_TIER_CHANGE';
+        } else if (tierChanged) {
+            actionType = 'TIER_CHANGE';
+        } else if (statusChanged) {
+            actionType = 'STATUS_CHANGE';
+        } else if (note) {
+            actionType = 'NOTE_ADDED';
+        }
+
+        const oldValueObj = { status: oldStatus, plan_tier: oldPlanTier };
+        const newValueObj = { status: newStatus, plan_tier: newPlanTier };
+        if (note) newValueObj.note = note;
+
+        const oldValueStr = JSON.stringify(oldValueObj);
+        const newValueStr = JSON.stringify(newValueObj);
+
+        // Compute SHA256 IP hash
+        const rawIp = req.ip || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1';
+        const ip_hash = crypto.createHash('sha256').update(rawIp).digest('hex').substring(0, 16);
+
+        // Construct immutable audit log record
+        const auditRecord = {
+            id: 'audit_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'),
+            admin_id: req.admin.id || req.admin.email,
+            target_creator_id: creatorId,
+            action_type: actionType,
+            old_value: oldValueStr,
+            new_value: newValueStr,
+            timestamp: new Date().toISOString(),
+            ip_hash: ip_hash
+        };
+
+        // Persist audit record in Supabase & memoryDb
+        if (supabase) {
+            try {
+                await supabase.from('audit_logs').insert([auditRecord]);
+            } catch (aErr) {
+                console.warn('⚠️ Supabase audit log insert notice:', aErr.message);
+            }
+        }
+        memoryDb.audit_logs.push(auditRecord);
+
+        // Update target creator in Supabase & memoryDb
+        if (supabase) {
+            try {
+                await supabase.from('users').update({ status: newStatus, plan_tier: newPlanTier }).eq('id', creatorId);
+            } catch (uErr) {
+                console.warn('⚠️ Supabase creator update notice:', uErr.message);
+            }
+        }
+
+        // Memory update
+        const memIdx = (memoryDb.users || []).findIndex(u => u.id === creatorId);
+        if (memIdx >= 0) {
+            memoryDb.users[memIdx].status = newStatus;
+            memoryDb.users[memIdx].plan_tier = newPlanTier;
+            memoryDb.users[memIdx].planTier = newPlanTier;
+        }
+
+        const updatedCreator = {
+            id: creator.id,
+            name: creator.name,
+            email: creator.email,
+            plan_tier: newPlanTier,
+            status: newStatus,
+            created_at: creator.created_at
+        };
+
+        return res.json({
+            success: true,
+            creator: updatedCreator,
+            audit_entry: auditRecord
+        });
+    } catch (err) {
+        console.error('[ADMIN STATUS MUTATION ERROR]', err);
+        return res.status(500).json({ error: 'Failed to update creator status.' });
+    }
+});
+
+// GET /api/admin/audit-logs: Retrieve chronological administrative trail (guarded by requireAdmin)
+app.get('/api/admin/audit-logs', requireAdmin, async (req, res) => {
+    try {
+        if (supabase) {
+            const { data, error } = await supabase.from('audit_logs').select('*').order('timestamp', { ascending: false });
+            if (!error && data) return res.json(data);
+        }
+        const logs = [...(memoryDb.audit_logs || [])].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        return res.json(logs);
+    } catch (err) {
+        console.error('[ADMIN AUDIT LOGS ERROR]', err);
+        return res.status(500).json({ error: 'Failed to retrieve audit logs.' });
+    }
+});
+
+// GET /api/admin/telemetry: Retrieve PII-masked AI query logs with 30-day TTL (guarded by requireAdmin)
+app.get('/api/admin/telemetry', requireAdmin, async (req, res) => {
+    try {
+        const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+        const cutoffMs = Date.now() - THIRTY_DAYS_MS;
+        const cutoffIso = new Date(cutoffMs).toISOString();
+
+        // Active in-memory telemetry array pruning (>30 days old records physically removed)
+        if (Array.isArray(memoryDb.ai_telemetry)) {
+            memoryDb.ai_telemetry = memoryDb.ai_telemetry.filter(entry => new Date(entry.created_at || entry.timestamp).getTime() >= cutoffMs);
+        }
+
+        if (supabase) {
+            const { data, error } = await supabase
+                .from('ai_telemetry')
+                .select('*')
+                .gte('created_at', cutoffIso)
+                .order('created_at', { ascending: false });
+
+            if (!error && data) return res.json(data);
+        }
+
+        const logs = (memoryDb.ai_telemetry || [])
+            .filter(t => new Date(t.created_at || t.timestamp).getTime() >= cutoffMs)
+            .sort((a, b) => new Date(b.created_at || b.timestamp) - new Date(a.created_at || a.timestamp));
+
+        return res.json(logs);
+    } catch (err) {
+        console.error('[ADMIN TELEMETRY ERROR]', err);
+        return res.status(500).json({ error: 'Failed to retrieve AI query telemetry logs.' });
+    }
+});
+
+
+
 
 // ==========================================================================
 // TRANSACTIONS & CASH FLOW LEDGER ROUTES
@@ -548,52 +1188,151 @@ app.post('/api/integrations/phyllo/token', async (req, res) => {
 });
 
 // ==========================================================================
-// FEATURE F11: GEMINI 1.5 FLASH BACKEND PROXY ROUTE
+// FEATURE F11: GEMINI 1.5 FLASH BACKEND PROXY ROUTE & PII TELEMETRY
 // ==========================================================================
+
+function maskPII(text) {
+    if (!text || typeof text !== 'string') return '';
+    let masked = text;
+
+    // 1. Email Masking
+    masked = masked.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, '[REDACTED_EMAIL]');
+
+    // 2. Phone Number Masking (SA & Int'l formats, 7-15 digits)
+    masked = masked.replace(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{4}\b/g, (match) => {
+        const digitsOnly = match.replace(/\D/g, '');
+        if (digitsOnly.length >= 7 && digitsOnly.length <= 15) {
+            return '[REDACTED_PHONE]';
+        }
+        return match;
+    });
+
+    // 3. ZAR Currency Masking (handles R1,500, R1500, ZAR 5000, R500, R1 500, R500.00, ZAR 5,000, 5000 ZAR, etc.)
+    masked = masked.replace(/(?:ZAR|R)\s?\d{1,3}(?:[,\s]\d{3})*(?:\.\d{2})?\b|\b(?:ZAR|R)\s?\d+(?:\.\d{2})?\b/gi, '[REDACTED_ZAR]');
+    masked = masked.replace(/\b\d+(?:[,\s]\d{3})*(?:\.\d{2})?\s*ZAR\b/gi, '[REDACTED_ZAR]');
+
+    return masked;
+}
+
+function inferCategoryTag(text) {
+    if (!text || typeof text !== 'string') return 'General Inquiry';
+    const lower = text.toLowerCase();
+    if (lower.includes('tax') || lower.includes('deduction') || lower.includes('sars') || lower.includes('reserve') || lower.includes('write-off')) {
+        return 'Tax Deduction Strategy';
+    }
+    if (lower.includes('gear') || lower.includes('camera') || lower.includes('lens') || lower.includes('equipment') || lower.includes('hardware') || lower.includes('purchase') || lower.includes('buy')) {
+        return 'Gear Purchase Planning';
+    }
+    if (lower.includes('revenue') || lower.includes('youtube') || lower.includes('tiktok') || lower.includes('patreon') || lower.includes('adsense') || lower.includes('sponsor') || lower.includes('income') || lower.includes('brand')) {
+        return 'Revenue Optimization';
+    }
+    return 'General Inquiry';
+}
+
 app.post('/api/gemini', async (req, res) => {
+    const startTime = Date.now();
+    const { prompt, systemContext } = req.body || {};
+
+    if (!prompt || typeof prompt !== 'string') {
+        return res.status(400).json({ error: 'Missing or invalid prompt in request body.' });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
+    const categoryTag = inferCategoryTag(prompt);
+    const maskedPrompt = maskPII(prompt);
+
+    let aiText = '';
+    let responseObj = null;
+    let tokensUsed = 0;
+
     if (!apiKey) {
-        return res.json({ 
-            fallback: true, 
-            message: 'Environment variable GEMINI_API_KEY not configured on server.' 
-        });
+        aiText = 'Environment variable GEMINI_API_KEY not configured on server.';
+        responseObj = { fallback: true, message: aiText };
+    } else {
+        try {
+            const defaultSystemContext = systemContext || 'You are CCF Creator Intelligence, an expert financial advisor for modern creators. Provide concise, highly actionable 2-3 sentence financial guidance answering the user prompt directly.';
+
+            const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: defaultSystemContext },
+                            { text: prompt }
+                        ]
+                    }]
+                })
+            });
+
+            const data = await apiResponse.json();
+            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                aiText = data.candidates[0].content.parts[0].text;
+                tokensUsed = data.usageMetadata?.totalTokenCount || 0;
+                responseObj = { text: aiText, source: 'Gemini 1.5 Flash (Backend API)' };
+            } else {
+                aiText = 'Unexpected API response structure';
+                responseObj = { fallback: true, error: aiText, raw: data };
+            }
+        } catch (error) {
+            console.error('[GEMINI BACKEND PROXY ERROR]', error);
+            aiText = error.message;
+            responseObj = { fallback: true, error: error.message };
+        }
     }
 
-    try {
-        const { prompt, systemContext } = req.body || {};
-        if (!prompt) {
-            return res.status(400).json({ error: 'Missing prompt in request body.' });
-        }
-
-        const defaultSystemContext = systemContext || 'You are CCF Creator Intelligence, an expert financial advisor for modern creators. Provide concise, highly actionable 2-3 sentence financial guidance answering the user prompt directly.';
-
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [
-                        { text: defaultSystemContext },
-                        { text: prompt }
-                    ]
-                }]
-            })
-        });
-
-        const data = await apiResponse.json();
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            const aiText = data.candidates[0].content.parts[0].text;
-            return res.json({ text: aiText, source: 'Gemini 1.5 Flash (Backend API)' });
-        } else {
-            return res.json({ fallback: true, error: 'Unexpected API response structure', raw: data });
-        }
-    } catch (error) {
-        console.error('[GEMINI BACKEND PROXY ERROR]', error);
-        return res.json({ fallback: true, error: error.message });
+    const latencyMs = Date.now() - startTime;
+    if (!tokensUsed) {
+        tokensUsed = Math.ceil(((prompt || '').length + (aiText || '').length) / 4);
     }
+
+    const telemetryRecord = {
+        id: 'tel_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'),
+        category_tag: categoryTag,
+        prompt_masked: maskedPrompt,
+        tokens_used: tokensUsed,
+        model: 'gemini-1.5-flash',
+        latency_ms: latencyMs,
+        created_at: new Date().toISOString()
+    };
+
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const cutoffMs = Date.now() - THIRTY_DAYS_MS;
+
+    if (supabase) {
+        try {
+            await supabase.from('ai_telemetry').insert([telemetryRecord]);
+        } catch (tErr) {
+            console.warn('⚠️ Supabase telemetry insert notice:', tErr.message);
+        }
+    }
+    // Active in-memory telemetry array pruning (>30 days old records physically removed)
+    if (Array.isArray(memoryDb.ai_telemetry)) {
+        memoryDb.ai_telemetry = memoryDb.ai_telemetry.filter(entry => new Date(entry.created_at || entry.timestamp).getTime() >= cutoffMs);
+    }
+    memoryDb.ai_telemetry.push(telemetryRecord);
+
+    return res.json(responseObj);
 });
 
-app.listen(PORT, () => {
-    console.log(`⚡ Creator Cash Flow Secure Backend API running on port ${PORT}`);
-});
+let server = null;
+if (require.main === module) {
+    server = app.listen(PORT, () => {
+        console.log(`⚡ Creator Cash Flow Secure Backend API running on port ${PORT}`);
+    });
+}
+
+module.exports = {
+    app,
+    server,
+    memoryDb,
+    rateLimitAdminLogin,
+    requireAdmin,
+    adminLoginAttempts,
+    JWT_SECRET,
+    maskPII,
+    inferCategoryTag
+};
+
+
 

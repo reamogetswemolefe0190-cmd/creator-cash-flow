@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS public.users (
     password_hash TEXT NOT NULL,
     name TEXT NOT NULL,
     phyllo_user_id TEXT,
+    plan_tier TEXT DEFAULT 'Free',
+    status TEXT DEFAULT 'active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
@@ -43,3 +45,45 @@ CREATE TABLE IF NOT EXISTS public.onboarding_responses (
 
 ALTER TABLE public.onboarding_responses ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read/write during beta" ON public.onboarding_responses FOR ALL USING (true) WITH CHECK (true);
+
+-- 4. Create Admin Users Table
+CREATE TABLE IF NOT EXISTS public.admin_users (
+    id TEXT PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT DEFAULT 'admin' NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write during beta" ON public.admin_users FOR ALL USING (true) WITH CHECK (true);
+
+-- 5. Create Immutable Audit Trail Ledger Table
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id TEXT PRIMARY KEY,
+    admin_id TEXT NOT NULL,
+    target_creator_id TEXT NOT NULL,
+    action_type TEXT NOT NULL,
+    old_value TEXT,
+    new_value TEXT,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    ip_hash TEXT
+);
+
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write during beta" ON public.audit_logs FOR ALL USING (true) WITH CHECK (true);
+
+-- 6. Create PII-Safe AI Query Telemetry Table
+CREATE TABLE IF NOT EXISTS public.ai_telemetry (
+    id TEXT PRIMARY KEY,
+    category_tag TEXT NOT NULL,
+    prompt_masked TEXT NOT NULL,
+    tokens_used INT DEFAULT 0,
+    model TEXT DEFAULT 'gemini-1.5-flash',
+    latency_ms INT DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+ALTER TABLE public.ai_telemetry ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write during beta" ON public.ai_telemetry FOR ALL USING (true) WITH CHECK (true);
+

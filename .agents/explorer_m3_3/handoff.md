@@ -1,89 +1,50 @@
-# Handoff Report: Explorer M3_3 (Feature F11 & Feature F12)
-
-**From**: Explorer M3_3 (`.agents/explorer_m3_3`)  
-**To**: Orchestrator / Implementer  
-**Date**: 2026-08-06  
-**Subject**: Responsive Viewport Polish (F11) & Zero JS Console Errors (F12) Analysis  
-
----
+# Handoff Report: Milestone M3 — Audit Logging & PII Telemetry API Strategy
 
 ## 1. Observation
-
-### Key Codebase Evidence:
-1. **Navbar Layout & Width Constraints (`index.html:118-134`, `style.css:133-139`)**:
-   - Header class: `w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-5xl`.
-   - At 375px viewport width, header outer width = 351px. Inner pill nav padding `px-3.5` (28px total) leaves 323px available width.
-   - Logo text `<span class="font-display text-sm sm:text-base ... whitespace-nowrap">Creator Cash Flow</span>` + logo icon (32px) = ~170px width.
-   - Action buttons ("Sign In" `px-2.5 py-1.5` + "Get Started" `py-1.5 px-3.5`) = ~151px width.
-   - Total content width (170px + 151px = 321px) leaves only 2px safety margin inside 323px container on 375px viewports.
-
-2. **Touch Target Sizes (`index.html:274-281`, `index.html:866`, `style.css:120-127`)**:
-   - Mockup period toggle buttons (`#toggle-btn-monthly`, `#toggle-btn-annual`): height is `16px + 4px padding` = ~20px height. (WCAG target recommendation: ≥ 44px).
-   - Modal close button (`.modal-close`): `24×24px` icon without hit area padding.
-   - Onboarding choice cards (`.onboard-choice-card`): `p-md` (~72px height) -> Pass (WCAG > 44px).
-   - Mobile bottom nav items (`.mobile-bottom-nav a`): `w-[20%]` (~75×52px) -> Pass (WCAG > 44px).
-
-3. **Mobile Bottom Navigation Text at 375px (`index.html:836-858`)**:
-   - 5 navigation tabs across 375px screen = 75px per tab.
-   - Tab 2 label text `"Performance"` at `text-label-md` (12px font size) occupies ~70px. Margins on each side are ~2.5px.
-
-4. **DOM Null Checks & Event Listeners (`app.js:36-71`, `app.js:652-731`, `app.js:814-916`)**:
-   - Defensive guard for `PhylloConnect` is present: `typeof PhylloConnect === 'undefined'` (`app.js:374`).
-   - Defensive guard for `lucide` is present: `typeof lucide !== 'undefined'` (`app.js:37`).
-   - Missing guard for `Chart.js` in `initIntelligenceChart()` (`app.js:653`): calling `new Chart()` will throw `ReferenceError: Chart is not defined` if CDN is unavailable.
-   - Missing guard for `state.user.name` parsing (`app.js:54-57`): `state.user.name.split(' ')[0]` throws `TypeError` if `cachedUser` in `localStorage` lacks a `.name` field.
-   - Missing optional chaining on modal input DOM reads (`app.js:815`, `872`, `914`): `document.getElementById('reg-name').value` throws `TypeError` if called when inputs are absent.
-   - All 21 inline `onclick` functions in `index.html` exist in `app.js`.
-
----
+- **Project Structure**: Express application in `server.js` (1021 lines), database schema in `database_setup.sql` (90 lines).
+- **Existing Security Middleware**: `requireAdmin` in `server.js` (lines 204-222) validates JWT `Authorization: Bearer` headers and checks `decoded.role === 'admin'`. Returns HTTP 401 for missing/invalid tokens and HTTP 403 for non-admin tokens.
+- **Database Schema**:
+  - `audit_logs` table (lines 62-74 of `database_setup.sql`) contains `id`, `admin_id`, `target_creator_id`, `action_type`, `old_value`, `new_value`, `timestamp`, `ip_hash`.
+  - `ai_telemetry` table (lines 77-88 of `database_setup.sql`) contains `id`, `category_tag`, `prompt_masked`, `tokens_used`, `model`, `latency_ms`, `created_at`.
+- **In-Memory Fallback Structures**: `memoryDb.audit_logs` and `memoryDb.ai_telemetry` initialized on `memoryDb` object in `server.js` (lines 37-38).
+- **Gemini Route**: `POST /api/gemini` in `server.js` (lines 960-1001) currently proxies AI queries without telemetry storage or PII redaction.
 
 ## 2. Logic Chain
-
-1. **Observations 1 & 3 → Responsive Viewport Polish (F11)**:
-   - On 375px viewports (iPhone SE), content density in the floating pill navbar (321px content in 323px space) and mobile bottom nav ("Performance" label taking 70px of 75px slot) creates squeezing risks under non-standard font scaling.
-   - Solution: Adjust navbar padding slightly on `< 390px` screens (`px-2.5` / `px-3`), add `letter-spacing: -0.02em` or font size tweak (`11px`) to mobile nav labels, and add `min-h-[44px]` touch targets.
-
-2. **Observation 2 → Touch Target WCAG Compliance (F11)**:
-   - Several small controls (period toggle buttons, modal close button, navbar sign-in button) fall below 44px height.
-   - Solution: Apply CSS rules ensuring minimum touch target heights of 44px for primary actions and 36px for inline period toggles.
-
-3. **Observation 4 → Zero JS Console Errors (F12)**:
-   - While Phyllo, Lucide, and basic DOM element lookups contain guards, 4 edge cases remain where runtime errors could occur:
-     a) Unchecked `Chart.js` constructor instantiation when offline/blocked.
-     b) Unchecked `state.user.name.split()` when `localStorage` has malformed data.
-     c) Direct `.value` access on modal elements without optional chaining (`?.`).
-     d) Unchecked `.forEach` on `state.activities` if state is reset.
-   - Solution: Add `typeof Chart === 'undefined'`, optional chaining `?.`, and `(state.activities || [])` guards to guarantee zero console errors under all network and user interaction conditions.
-
----
+1. **Mutation Protection & Audit Trail**:
+   - `POST /api/admin/creators/:id/status` must use `requireAdmin` to enforce admin authentication.
+   - Fetching the existing creator record prior to mutation enables building precise `old_value` and `new_value` snapshots.
+   - Hashing request IP (`crypto.createHash('sha256').update(rawIp).digest('hex').substring(0, 16)`) satisfies privacy requirements for `ip_hash`.
+   - Dual-writing audit entries to Supabase `audit_logs` and `memoryDb.audit_logs` guarantees high availability in both cloud and memory modes.
+2. **Audit Retrieval**:
+   - `GET /api/admin/audit-logs` guarded by `requireAdmin` reads chronological entries from Supabase `audit_logs` table or `memoryDb.audit_logs`.
+3. **PII Masking & Telemetry**:
+   - Sanitizing input prompt in `POST /api/gemini` using regex rules masks emails (`[REDACTED_EMAIL]`), ZAR currencies like R1,500/ZAR 5000 (`[REDACTED_ZAR]`), and phone numbers (`[REDACTED_PHONE]`).
+   - Categorizing prompts automatically (`inferCategoryTag`) provides actionable insight without storing sensitive text.
+   - Enforcing a 30-day automated TTL policy during retrieval/cleanup (`created_at >= 30 days ago`) satisfies privacy retention rules.
+4. **Telemetry Retrieval & Operations Table API**:
+   - `GET /api/admin/telemetry` guarded by `requireAdmin` returns the PII-masked query telemetry logs.
+   - `GET /api/admin/creators` guarded by `requireAdmin` exposes creator records for admin portal table views.
 
 ## 3. Caveats
-
-- **Network Environment**: Real-world CDN availability (`cdn.tailwindcss.com`, `cdn.jsdelivr.net`, `cdn.getphyllo.com`) was analyzed statically. Offline fallback modes in `app.js` handle script loading failures gracefully when our recommended guards are applied.
-- **Device Emulator Variations**: System-level font scaling (e.g. iOS Accessibility font zoom) was simulated based on CSS box sizing calculations.
-- **Read-Only Scope**: No source code changes were made in `index.html`, `style.css`, `app.js`, or `server.js` per explorer role rules. Code changes are proposed in `analysis.md` for implementer execution.
-
----
+- **Supabase Connectivity**: If Supabase cloud connection is unavailable or unconfigured, all endpoints seamlessly operate against `memoryDb` fallback arrays.
+- **Token Usage Estimation**: When Gemini API response does not contain explicit `usageMetadata`, token usage falls back to standard character-based estimation (`Math.ceil((prompt.length + response.length) / 4)`).
 
 ## 4. Conclusion
-
-- **Feature F11 (Viewport Polish)** is 90% ready; needs targeted CSS tweaks for 375px navbar padding, 44px touch target minimums, and bottom nav text scaling.
-- **Feature F12 (Zero Console Errors)** is 85% ready; needs 4 minor defensive guards (`typeof Chart`, `state.user?.name`, optional chaining `?.value`, `(state.activities || [])`) to achieve complete console error immunity.
-
----
+Milestone M3 design is fully specified, aligned with `ORIGINAL_REQUEST.md` and `PROJECT.md` contracts, and ready for immediate implementation. Implementation involves updating `server.js` with creator status mutation routes, audit log retrieval, PII masking helper functions, Gemini telemetry logging, 30-day retention policies, telemetry GET endpoint, and creator list GET endpoint.
 
 ## 5. Verification Method
-
-To independently verify these findings:
-
-1. **Inspect Source Files**:
-   - `index.html`: Review lines 118-134 (Navbar), 274-281 (Period toggle), 836-858 (Mobile nav).
-   - `style.css`: Review lines 133-162 (Glass styles), 298-311 (Mobile ambient mesh).
-   - `app.js`: Review lines 36-71 (`DOMContentLoaded`), 361-438 (`simulatePlatformConnect`), 652-731 (`initIntelligenceChart`), 814-916 (`executeCreateAccount`/`executeLogin`/`submitActivity`).
-
-2. **Verify Browser Console Logs**:
-   - Open browser developer tools, switch device mode to 375px (iPhone SE), 390px (iPhone 14), and 430px (iPhone 14 Pro Max).
-   - Click all buttons and navigation links across marketing, onboarding wizard, and dashboard views. Check console log for zero errors.
-
-3. **Check Analysis Report**:
-   - Detailed findings and code patches are documented in: `c:\Users\User\OneDrive\Desktop\New folder (2)\.agents\explorer_m3_3\analysis.md`.
+1. **Unit Test Execution**:
+   Run the newly created M3 test suite:
+   ```bash
+   node test_admin_m3.js
+   ```
+   Expect 10/10 tests to pass.
+2. **Regression Check**:
+   Run previous test suites to ensure no regressions:
+   ```bash
+   node test_admin_auth.js
+   node test_admin_metrics.js
+   ```
+   Expect all tests in both suites to pass cleanly.
+3. **File Inspection**:
+   Inspect `analysis.md` and `handoff.md` in `c:\Users\User\OneDrive\Desktop\New folder (2)\.agents\explorer_m3_3`.
