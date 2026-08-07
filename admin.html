@@ -85,15 +85,15 @@
 <body class="bg-[#050505] text-white min-h-screen relative overflow-x-hidden selection:bg-emerald-500 selection:text-black">
 
     <!-- Ambient Mesh Glow Backdrops -->
-    <div class="ambient-mesh-wrapper">
-        <div class="ambient-orb ambient-orb-emerald"></div>
-        <div class="ambient-orb ambient-orb-teal"></div>
-        <div class="ambient-orb ambient-orb-indigo"></div>
-        <div class="ambient-mesh-center-glow"></div>
+    <div class="ambient-mesh-wrapper" style="pointer-events: none !important;">
+        <div class="ambient-orb ambient-orb-emerald" style="pointer-events: none !important;"></div>
+        <div class="ambient-orb ambient-orb-teal" style="pointer-events: none !important;"></div>
+        <div class="ambient-orb ambient-orb-indigo" style="pointer-events: none !important;"></div>
+        <div class="ambient-mesh-center-glow" style="pointer-events: none !important;"></div>
     </div>
 
     <!-- FLOATING LOGIN OVERLAY MODAL (M4 - Optional Re-auth) -->
-    <div id="admin-login-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 hidden">
+    <div id="admin-login-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 hidden" style="display: none;">
         <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden space-y-6">
             <!-- Glow effect behind modal -->
             <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -178,13 +178,13 @@
                         <i data-lucide="user-check" class="w-4 h-4"></i>
                     </div>
                     <div class="text-left text-xs">
-                        <span id="admin-email-display" class="block font-semibold text-white">admin@creatorcashflow.com</span>
-                        <span id="admin-status-badge" class="block text-[10px] text-emerald-400 font-medium">Active Admin (JWT Signed)</span>
+                        <span id="admin-email-display" class="block font-semibold text-white">reamogetswemolefe0190@gmail.com</span>
+                        <span id="admin-status-badge" class="block text-[10px] text-emerald-400 font-medium">Master Admin (JWT Verified)</span>
                     </div>
                 </div>
 
-                <button id="admin-logout-btn" title="Logout Session"
-                    class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center gap-1.5 text-xs font-semibold">
+                <button id="admin-logout-btn" title="Logout Session" onclick="handleLogout()"
+                    class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
                     <i data-lucide="log-out" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Logout</span>
                 </button>
@@ -192,27 +192,27 @@
         </header>
 
         <!-- Navigation Tabs -->
-        <nav class="flex space-x-2 border-b border-white/10 pb-3 overflow-x-auto">
-            <button id="tab-btn-overview" data-tab="overview" 
-                class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all">
+        <nav class="flex space-x-2 border-b border-white/10 pb-3 overflow-x-auto relative z-20">
+            <button id="tab-btn-overview" data-tab="overview" onclick="switchTab('overview')"
+                class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                 <span>Executive Overview</span>
             </button>
 
-            <button id="tab-btn-creators" data-tab="creators" 
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all">
+            <button id="tab-btn-creators" data-tab="creators" onclick="switchTab('creators')"
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
                 <i data-lucide="users" class="w-4 h-4"></i>
                 <span>Creator Directory</span>
             </button>
 
-            <button id="tab-btn-audit" data-tab="audit" 
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all">
+            <button id="tab-btn-audit" data-tab="audit" onclick="switchTab('audit')"
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
                 <i data-lucide="file-text" class="w-4 h-4"></i>
                 <span>Audit Trail</span>
             </button>
 
-            <button id="tab-btn-telemetry" data-tab="telemetry" 
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all">
+            <button id="tab-btn-telemetry" data-tab="telemetry" onclick="switchTab('telemetry')"
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
                 <i data-lucide="cpu" class="w-4 h-4"></i>
                 <span>AI Telemetry</span>
             </button>
@@ -935,10 +935,14 @@
                 panel.classList.add('hidden');
             });
             const activePanel = document.getElementById(`view-${tabName}`);
-            if (activePanel) activePanel.classList.remove('hidden');
+            if (activePanel) {
+                activePanel.classList.remove('hidden');
+                activePanel.style.display = 'block';
+            }
 
             renderIcons();
         }
+        window.switchTab = switchTab;
 
         // Render Creator Operations Table
         function renderCreatorsTable() {
