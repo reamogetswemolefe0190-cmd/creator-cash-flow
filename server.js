@@ -52,16 +52,36 @@ Object.defineProperty(memoryDb, 'aiTelemetry', {
     enumerable: true
 });
 
-// Admin Seeding & Configuration
-const DEFAULT_ADMIN_EMAIL = 'admin@creatorcashflow.com';
-const DEFAULT_ADMIN_PASS = process.env.ADMIN_PASSWORD || 'AdminPass2026!';
-const DEFAULT_ADMIN_HASH = bcrypt.hashSync(DEFAULT_ADMIN_PASS, 10);
+// Admin Seeding & Configuration (Primary Master Admin + Platform Fallback)
+const MASTER_ADMIN_EMAIL = 'reamogetswemolefe0190@gmail.com';
+const MASTER_ADMIN_PASS = process.env.ADMIN_PASSWORD || 'R3@m0g3tsw3M0l3f3';
+const MASTER_ADMIN_HASH = bcrypt.hashSync(MASTER_ADMIN_PASS, 10);
 
-if (!memoryDb.adminUsers.some(a => a.email === DEFAULT_ADMIN_EMAIL)) {
+const FALLBACK_ADMIN_EMAIL = 'admin@creatorcashflow.com';
+const FALLBACK_ADMIN_PASS = 'AdminPass2026!';
+const FALLBACK_ADMIN_HASH = bcrypt.hashSync(FALLBACK_ADMIN_PASS, 10);
+
+const DEFAULT_ADMIN_EMAIL = MASTER_ADMIN_EMAIL;
+const DEFAULT_ADMIN_PASS = MASTER_ADMIN_PASS;
+const DEFAULT_ADMIN_HASH = MASTER_ADMIN_HASH;
+
+// Seed primary master admin
+if (!memoryDb.adminUsers.some(a => a.email === MASTER_ADMIN_EMAIL)) {
+    memoryDb.adminUsers.push({
+        id: 'admin_master_1',
+        email: MASTER_ADMIN_EMAIL,
+        passwordHash: MASTER_ADMIN_HASH,
+        role: 'admin',
+        created_at: new Date().toISOString()
+    });
+}
+
+// Seed fallback admin
+if (!memoryDb.adminUsers.some(a => a.email === FALLBACK_ADMIN_EMAIL)) {
     memoryDb.adminUsers.push({
         id: 'admin_seed_1',
-        email: DEFAULT_ADMIN_EMAIL,
-        passwordHash: DEFAULT_ADMIN_HASH,
+        email: FALLBACK_ADMIN_EMAIL,
+        passwordHash: FALLBACK_ADMIN_HASH,
         role: 'admin',
         created_at: new Date().toISOString()
     });
@@ -71,20 +91,21 @@ if (!memoryDb.adminUsers.some(a => a.email === DEFAULT_ADMIN_EMAIL)) {
 async function seedAdminAccountInSupabase() {
     if (!supabase) return;
     try {
-        const { data: existing } = await supabase
-            .from('admin_users')
-            .select('id')
-            .eq('email', DEFAULT_ADMIN_EMAIL)
-            .maybeSingle();
+        const adminsToSeed = [
+            { id: 'admin_master_1', email: MASTER_ADMIN_EMAIL, password_hash: MASTER_ADMIN_HASH, role: 'admin' },
+            { id: 'admin_seed_1', email: FALLBACK_ADMIN_EMAIL, password_hash: FALLBACK_ADMIN_HASH, role: 'admin' }
+        ];
+        for (const adm of adminsToSeed) {
+            const { data: existing } = await supabase
+                .from('admin_users')
+                .select('id')
+                .eq('email', adm.email)
+                .maybeSingle();
 
-        if (!existing) {
-            await supabase.from('admin_users').insert([{
-                id: 'admin_seed_1',
-                email: DEFAULT_ADMIN_EMAIL,
-                password_hash: DEFAULT_ADMIN_HASH,
-                role: 'admin'
-            }]);
-            console.log('✅ Seeded default admin user in Supabase admin_users table.');
+            if (!existing) {
+                await supabase.from('admin_users').insert([adm]);
+                console.log(`✅ Seeded admin user (${adm.email}) in Supabase.`);
+            }
         }
     } catch (err) {
         console.warn('⚠️ Supabase admin seeding notice:', err.message);
