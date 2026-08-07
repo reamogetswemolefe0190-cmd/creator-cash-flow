@@ -1424,7 +1424,7 @@ function queryGeminiAPI(userPrompt) {
             <span class="material-symbols-outlined text-sm">auto_awesome</span>
         </div>
         <div class="p-md bg-surface border border-white/[0.08] rounded-2xl text-xs text-text-secondary">
-            Gemini AI is analyzing your ledger...
+            Creator Intelligence is auditing your ledger...
         </div>
     `;
     stream.appendChild(typingBubble);
@@ -1433,8 +1433,8 @@ function queryGeminiAPI(userPrompt) {
     const savedKey = localStorage.getItem('ccf_gemini_api_key');
 
     if (savedKey) {
-        // Live Gemini API Endpoint Call
-        const systemContext = `You are CCF AI, an expert financial advisor for modern creators.
+        // Live Generative AI Endpoint Call
+        const systemContext = `You are CCF Creator Intelligence, an expert financial advisor for modern creators.
 Current Creator P&L Summary:
 - Net Profit: R${state.balance.toLocaleString()}
 - Estimated Tax Obligation: R${Math.max(0, Math.round(state.balance * 0.15)).toLocaleString()} (15%)
@@ -1458,25 +1458,25 @@ Provide concise, highly actionable 2-3 sentence financial guidance answering the
             removeTypingIndicator();
             if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
-                appendGeminiBotBubble(aiResponse, 'Gemini 1.5 Flash API');
+                appendGeminiBotBubble(aiResponse, 'Live AI Model');
             } else {
-                console.warn('[GEMINI API] Unexpected payload structure. Reverting to Edge AI fallback.', data);
+                console.warn('[AI ADVISOR] Reverting to edge financial engine.', data);
                 const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
-                appendGeminiBotBubble(fallbackMsg, 'CCF Edge AI');
+                appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
             }
         })
         .catch(err => {
-            console.warn('[GEMINI API] Request failed. Reverting to local AI heuristics engine.', err);
+            console.warn('[AI ADVISOR] Reverting to local financial heuristics.', err);
             removeTypingIndicator();
             const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
-            appendGeminiBotBubble(fallbackMsg, 'CCF Edge AI');
+            appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
         });
     } else {
         // Fallback local heuristic response (works 100% offline & demo mode)
         setTimeout(() => {
             removeTypingIndicator();
             const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
-            appendGeminiBotBubble(fallbackMsg, 'CCF Edge AI');
+            appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
         }, 600);
     }
 }
@@ -1497,9 +1497,9 @@ function appendGeminiBotBubble(text, providerLabel) {
             <span class="material-symbols-outlined text-sm">auto_awesome</span>
         </div>
         <div class="p-md bg-surface border border-white/[0.08] rounded-2xl text-xs sm:text-sm text-text-primary space-y-xs max-w-xl">
-            <div class="flex justify-between items-center text-xs">
-                <span class="font-bold text-accent-emerald">CCF AI Assistant</span>
-                <span class="text-[10px] text-text-secondary bg-white/[0.04] px-xs py-[2px] rounded">${providerLabel}</span>
+            <div class="flex justify-between items-center text-xs mb-xs">
+                <span class="font-bold text-accent-emerald">CCF Creator Intelligence</span>
+                <span class="text-[10px] text-text-secondary bg-white/[0.04] px-xs py-[2px] rounded font-mono">${providerLabel || 'Active'}</span>
             </div>
             <div class="leading-relaxed space-y-xs">${formatMarkdownText(text)}</div>
         </div>
