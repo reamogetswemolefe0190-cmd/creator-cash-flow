@@ -57,12 +57,18 @@
 
         .admin-tab-btn {
             transition: all 0.2s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            user-select: none;
         }
         
         .admin-tab-btn.active {
-            background-color: rgba(34, 197, 94, 0.15) !important;
-            border-color: rgba(34, 197, 94, 0.4) !important;
+            background-color: rgba(34, 197, 94, 0.25) !important;
+            border-color: #22C55E !important;
             color: #22C55E !important;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3) !important;
         }
 
         /* Custom scrollbars for dark mode */
@@ -81,6 +87,49 @@
             background: rgba(34, 197, 94, 0.4);
         }
     </style>
+
+    <!-- Early Synchronous Tab Controller -->
+    <script>
+        window.switchTab = function(tabName) {
+            console.log('🔄 Switching tab to:', tabName);
+            var tabs = ['overview', 'creators', 'audit', 'telemetry'];
+            tabs.forEach(function(t) {
+                var panel = document.getElementById('view-' + t);
+                var btn = document.getElementById('tab-btn-' + t);
+                if (panel) {
+                    if (t === tabName) {
+                        panel.style.setProperty('display', 'block', 'important');
+                        panel.style.setProperty('visibility', 'visible', 'important');
+                        panel.style.setProperty('opacity', '1', 'important');
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.style.setProperty('display', 'none', 'important');
+                        panel.style.setProperty('visibility', 'hidden', 'important');
+                        panel.style.setProperty('opacity', '0', 'important');
+                        panel.classList.add('hidden');
+                    }
+                }
+                if (btn) {
+                    if (t === tabName) {
+                        btn.style.setProperty('background-color', 'rgba(34, 197, 94, 0.25)', 'important');
+                        btn.style.setProperty('color', '#22C55E', 'important');
+                        btn.style.setProperty('border-color', '#22C55E', 'important');
+                        btn.classList.add('active');
+                    } else {
+                        btn.style.setProperty('background-color', 'rgba(255, 255, 255, 0.05)', 'important');
+                        btn.style.setProperty('color', '#A1A1AA', 'important');
+                        btn.style.setProperty('border-color', 'rgba(255, 255, 255, 0.1)', 'important');
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+            if (typeof renderCreatorsTable === 'function' && tabName === 'creators') renderCreatorsTable();
+            if (typeof renderAuditLogs === 'function' && tabName === 'audit') renderAuditLogs();
+            if (typeof renderTelemetry === 'function' && tabName === 'telemetry') renderTelemetry();
+            if (typeof fetchMetrics === 'function' && tabName === 'overview') fetchMetrics();
+            if (window.lucide && typeof lucide.createIcons === 'function') lucide.createIcons();
+        };
+    </script>
 </head>
 <body class="bg-[#050505] text-white min-h-screen relative overflow-x-hidden selection:bg-emerald-500 selection:text-black">
 
@@ -93,7 +142,7 @@
     </div>
 
     <!-- FLOATING LOGIN OVERLAY MODAL (M4 - Optional Re-auth) -->
-    <div id="admin-login-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 hidden" style="display: none;">
+    <div id="admin-login-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 hidden" style="display: none !important; pointer-events: none !important;">
         <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden space-y-6">
             <!-- Glow effect behind modal -->
             <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -191,38 +240,63 @@
             </div>
         </header>
 
-        <!-- Navigation Tabs -->
-        <nav class="flex space-x-2 border-b border-white/10 pb-3 overflow-x-auto relative z-30" style="pointer-events: auto !important;">
-            <button type="button" id="tab-btn-overview" onclick="switchTab('overview')"
-                class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-emerald-500/50 bg-emerald-500/20 text-emerald-400 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
-                <i data-lucide="layout-dashboard" class="w-4 h-4 pointer-events-none"></i>
-                <span class="pointer-events-none">Executive Overview</span>
-            </button>
+        <!-- Navigation Tabs & Mode Toggle -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-white/10 pb-3">
+            <nav class="flex flex-wrap items-center gap-2 relative z-30" style="pointer-events: auto !important;">
+                <button type="button" id="tab-btn-overview" onclick="window.switchTab('overview')"
+                    class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-emerald-500/50 bg-emerald-500/20 text-emerald-400 hover:text-white transition-all cursor-pointer">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 pointer-events-none"></i>
+                    <span class="pointer-events-none">1. Executive Overview</span>
+                </button>
 
-            <button type="button" id="tab-btn-creators" onclick="switchTab('creators')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
-                <i data-lucide="users" class="w-4 h-4 pointer-events-none"></i>
-                <span class="pointer-events-none">Creator Directory</span>
-            </button>
+                <button type="button" id="tab-btn-creators" onclick="window.switchTab('creators')"
+                    class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
+                    <i data-lucide="users" class="w-4 h-4 pointer-events-none"></i>
+                    <span class="pointer-events-none">2. Creator Directory</span>
+                </button>
 
-            <button type="button" id="tab-btn-audit" onclick="switchTab('audit')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
-                <i data-lucide="file-text" class="w-4 h-4 pointer-events-none"></i>
-                <span class="pointer-events-none">Audit Trail</span>
-            </button>
+                <button type="button" id="tab-btn-audit" onclick="window.switchTab('audit')"
+                    class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
+                    <i data-lucide="file-text" class="w-4 h-4 pointer-events-none"></i>
+                    <span class="pointer-events-none">3. Audit Trail</span>
+                </button>
 
-            <button type="button" id="tab-btn-telemetry" onclick="switchTab('telemetry')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
-                <i data-lucide="cpu" class="w-4 h-4 pointer-events-none"></i>
-                <span class="pointer-events-none">AI Telemetry</span>
-            </button>
-        </nav>
+                <button type="button" id="tab-btn-telemetry" onclick="window.switchTab('telemetry')"
+                    class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
+                    <i data-lucide="cpu" class="w-4 h-4 pointer-events-none"></i>
+                    <span class="pointer-events-none">4. AI Telemetry</span>
+                </button>
+            </nav>
+
+            <!-- Quick Data Mode Switcher -->
+            <div class="flex items-center gap-2 text-xs">
+                <button type="button" id="btn-load-demo" onclick="window.loadDemoData()"
+                    class="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>⚡ Populate Demo Creators</span>
+                </button>
+                <button type="button" id="btn-reset-zero" onclick="window.resetZeroBaseline()"
+                    class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span>0-Baseline Real DB</span>
+                </button>
+            </div>
+        </div>
 
         <!-- =================================================================== -->
         <!-- VIEW 1: EXECUTIVE OVERVIEW & SCORECARDS (M4) -->
         <!-- =================================================================== -->
         <section id="view-overview" class="admin-view-panel space-y-6" style="display: block;">
             
+            <!-- Section Status Banner -->
+            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs">
+                <div class="flex items-center gap-2.5 text-emerald-400 font-bold">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>1. Executive Financial Overview & KPI Scorecards</span>
+                </div>
+                <span class="text-zinc-400 text-[11px] font-medium hidden sm:inline">Real-time ZAR Gross Platform Volume & SARS Provisions</span>
+            </div>
+
             <!-- 4 Executive KPI Scorecards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 
@@ -332,7 +406,17 @@
         <!-- =================================================================== -->
         <!-- VIEW 2: CREATOR DIRECTORY OPERATIONS TABLE (M5) -->
         <!-- =================================================================== -->
-        <section id="view-creators" class="admin-view-panel space-y-6 hidden">
+        <section id="view-creators" class="admin-view-panel space-y-6 hidden" style="display: none;">
+            
+            <!-- Section Status Banner -->
+            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs">
+                <div class="flex items-center gap-2.5 text-emerald-400 font-bold">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>2. Creator Directory Operations & Tier Management</span>
+                </div>
+                <span class="text-zinc-400 text-[11px] font-medium hidden sm:inline">Search, Filter, Inspect, and Mutate Creator Accounts</span>
+            </div>
+
             <div class="glass-card rounded-3xl p-6 border border-white/10 space-y-5">
                 
                 <!-- Controls & Filters Bar -->
@@ -390,7 +474,17 @@
         <!-- =================================================================== -->
         <!-- VIEW 3: AUDIT TRAIL VIEW (M6) -->
         <!-- =================================================================== -->
-        <section id="view-audit" class="admin-view-panel space-y-6 hidden">
+        <section id="view-audit" class="admin-view-panel space-y-6 hidden" style="display: none;">
+            
+            <!-- Section Status Banner -->
+            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs">
+                <div class="flex items-center gap-2.5 text-emerald-400 font-bold">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>3. Immutable Administrative Audit Trail</span>
+                </div>
+                <span class="text-zinc-400 text-[11px] font-medium hidden sm:inline">Cryptographic SHA256-Hashed Mutation Logs</span>
+            </div>
+
             <div class="glass-card rounded-3xl p-6 border border-white/10 space-y-5">
                 
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -420,8 +514,17 @@
         <!-- =================================================================== -->
         <!-- VIEW 4: AI TELEMETRY VIEW (M6) -->
         <!-- =================================================================== -->
-        <section id="view-telemetry" class="admin-view-panel space-y-6 hidden">
+        <section id="view-telemetry" class="admin-view-panel space-y-6 hidden" style="display: none;">
             
+            <!-- Section Status Banner -->
+            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs">
+                <div class="flex items-center gap-2.5 text-emerald-400 font-bold">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>4. PII-Masked Gemini 1.5 Flash AI Telemetry</span>
+                </div>
+                <span class="text-zinc-400 text-[11px] font-medium hidden sm:inline">Auto-Masked Prompts with 30-Day TTL Pruning</span>
+            </div>
+
             <!-- Telemetry Scorecards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="glass-card rounded-3xl p-5 border border-white/10 space-y-2">
@@ -834,6 +937,82 @@
             taxReservesZar: 0,
             channelBreakdown: { youtube: 0, tiktok: 0, patreon: 0, brand_deals: 0 },
             timeline: []
+        };
+
+        const DEMO_CREATORS = [
+            { id: 'usr_c1', name: 'Sphiwe Khumalo', email: 'sphiwe@gmail.com', plan_tier: 'Pro', status: 'active', created_at: '2026-06-12T10:30:00Z', gpv: 145000 },
+            { id: 'usr_c2', name: 'Naledi Dlamini', email: 'naledi.d@gmail.com', plan_tier: 'Pro', status: 'active', created_at: '2026-06-18T14:15:00Z', gpv: 98000 },
+            { id: 'usr_c3', name: 'Sipho Sithole', email: 'sipho.s@gmail.com', plan_tier: 'Free', status: 'active', created_at: '2026-06-25T09:00:00Z', gpv: 42000 },
+            { id: 'usr_c4', name: 'Kagiso Mokoena', email: 'kagiso.m@gmail.com', plan_tier: 'Pro', status: 'active', created_at: '2026-07-01T16:20:00Z', gpv: 73000 },
+            { id: 'usr_c5', name: 'Lerato Ndlovu', email: 'lerato.nd@gmail.com', plan_tier: 'Free', status: 'suspended', created_at: '2026-07-05T11:45:00Z', gpv: 18000 },
+            { id: 'usr_c6', name: 'Thabo Mthembu', email: 'thabo.mt@gmail.com', plan_tier: 'Pro', status: 'active', created_at: '2026-07-10T13:10:00Z', gpv: 110000 },
+            { id: 'usr_c7', name: 'Zanele Mabaso', email: 'zanele.m@gmail.com', plan_tier: 'Free', status: 'active', created_at: '2026-07-15T08:30:00Z', gpv: 29000 },
+            { id: 'usr_c8', name: 'Bongani Nkosi', email: 'bongani.nk@gmail.com', plan_tier: 'Pro', status: 'active', created_at: '2026-07-20T17:05:00Z', gpv: 84000 },
+            { id: 'usr_c9', name: 'Ayanda Cele', email: 'ayanda.c@gmail.com', plan_tier: 'Free', status: 'active', created_at: '2026-07-25T12:00:00Z', gpv: 31000 },
+            { id: 'usr_c10', name: 'Mandla Zulu', email: 'mandla.zulu@gmail.com', plan_tier: 'Pro', status: 'active', created_at: '2026-07-29T15:40:00Z', gpv: 165000 }
+        ];
+
+        const DEMO_METRICS = {
+            totalCreators: 10,
+            gpvZar: 795000.00,
+            mrrZar: 1794.00,
+            taxReservesZar: 119250.00,
+            channelBreakdown: { youtube: 420000, tiktok: 165000, patreon: 90000, brand_deals: 120000 },
+            timeline: [
+                { month: 'Mar', gpv: 95000, mrr: 299, creators: 2 },
+                { month: 'Apr', gpv: 210000, mrr: 598, creators: 4 },
+                { month: 'May', gpv: 390000, mrr: 897, creators: 6 },
+                { month: 'Jun', gpv: 580000, mrr: 1196, creators: 8 },
+                { month: 'Jul', gpv: 795000, mrr: 1794, creators: 10 }
+            ]
+        };
+
+        const DEMO_AUDIT = [
+            { id: 'aud_d1', admin_id: 'admin_master_1', target_creator_id: 'usr_c5', action_type: 'STATUS_CHANGE', old_value: 'active', new_value: 'suspended (SARS compliance review)', timestamp: '2026-08-01T09:30:00Z', ip_hash: '9f86d081884c7d65' },
+            { id: 'aud_d2', admin_id: 'admin_master_1', target_creator_id: 'usr_c10', action_type: 'TIER_CHANGE', old_value: 'Free', new_value: 'Pro (Monthly Subscription Upgrade)', timestamp: '2026-08-03T14:20:00Z', ip_hash: '5e884898da280471' }
+        ];
+
+        const DEMO_TELEMETRY = [
+            { id: 'tel_d1', category_tag: 'Tax Deduction Strategy', prompt_masked: 'What gear expenses can [REDACTED_EMAIL] claim against SARS on R[REDACTED_ZAR] YouTube revenue?', tokens_used: 142, latency_ms: 380, model: 'gemini-1.5-flash', created_at: new Date().toISOString() },
+            { id: 'tel_d2', category_tag: 'Patreon Tier Optimization', prompt_masked: 'Generate 3 tiered perks for South African subscribers at R[REDACTED_ZAR]/month', tokens_used: 198, latency_ms: 410, model: 'gemini-1.5-flash', created_at: new Date(Date.now() - 3600000).toISOString() }
+        ];
+
+        window.loadDemoData = function() {
+            state.creators = JSON.parse(JSON.stringify(DEMO_CREATORS));
+            state.metrics = JSON.parse(JSON.stringify(DEMO_METRICS));
+            state.auditLogs = JSON.parse(JSON.stringify(DEMO_AUDIT));
+            state.telemetry = JSON.parse(JSON.stringify(DEMO_TELEMETRY));
+            
+            document.getElementById('metric-total-creators').textContent = state.metrics.totalCreators;
+            document.getElementById('metric-gpv').textContent = formatZAR(state.metrics.gpvZar);
+            document.getElementById('metric-mrr').textContent = formatZAR(state.metrics.mrrZar);
+            document.getElementById('metric-tax-reserves').textContent = formatZAR(state.metrics.taxReservesZar);
+            
+            renderGrowthChart(state.metrics.timeline);
+            renderChannelChart(state.metrics.channelBreakdown);
+            renderCreatorsTable();
+            renderAuditLogs();
+            renderTelemetry();
+            renderIcons();
+        };
+
+        window.resetZeroBaseline = function() {
+            state.creators = [];
+            state.metrics = JSON.parse(JSON.stringify(EMPTY_METRICS));
+            state.auditLogs = [];
+            state.telemetry = [];
+            
+            document.getElementById('metric-total-creators').textContent = '0';
+            document.getElementById('metric-gpv').textContent = 'R 0.00';
+            document.getElementById('metric-mrr').textContent = 'R 0.00';
+            document.getElementById('metric-tax-reserves').textContent = 'R 0.00';
+            
+            renderGrowthChart([]);
+            renderChannelChart({ youtube: 0, tiktok: 0, patreon: 0, brand_deals: 0 });
+            renderCreatorsTable();
+            renderAuditLogs();
+            renderTelemetry();
+            renderIcons();
         };
 
         // Fetch Metrics (Scorecards & Charts)
