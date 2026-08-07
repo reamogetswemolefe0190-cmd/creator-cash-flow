@@ -826,17 +826,6 @@
             renderIcons();
         }
 
-        // Default Seed Data Generators for Instant Offline / Standalone Display
-        const SEED_METRICS = {
-            totalCreators: 10,
-            gpvZar: 486000.00,
-            mrrZar: 2093.00,
-            taxReservesZar: 72900.00,
-            channelBreakdown: { youtube: 295000, tiktok: 100000, patreon: 85000, brand_deals: 180000 },
-            timeline: [
-                { month: 'Mar', gpv: 81000, mrr: 299, creators: 2 },
-                { month: 'Apr', gpv: 162000, mrr: 598, creators: 4 },
-                { month: 'May', gpv: 243000, mrr: 897, creators: 6 },
         // Real Database Metric Baselines (0 until real users transact)
         const EMPTY_METRICS = {
             totalCreators: 0,
@@ -1147,6 +1136,13 @@
 
         // Render Audit Logs
         function renderAuditLogs() {
+            const container = document.getElementById('audit-log-container');
+            if (!container) return;
+
+            const actionFilter = (document.getElementById('audit-action-filter')?.value || 'all');
+            let filtered = state.auditLogs || [];
+            if (actionFilter !== 'all') {
+                filtered = filtered.filter(l => l.action_type === actionFilter);
             }
 
             if (filtered.length === 0) {
@@ -1155,7 +1151,7 @@
             }
 
             container.innerHTML = filtered.map(log => {
-                const dateStr = new Date(log.timestamp).toLocaleString('en-ZA');
+                const dateStr = log.timestamp ? new Date(log.timestamp).toLocaleString('en-ZA') : 'N/A';
                 return `
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-2">
@@ -1179,7 +1175,7 @@
                         </div>
                         <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono pt-1">
                             <span>Admin: ${log.admin_id}</span>
-                            <span>IP Hash: ${log.ip_hash || 'N/A'}</span>
+                            <span>IP Hash: ${(log.ip_hash || 'SHA256_EDGE').slice(0, 16)}...</span>
                         </div>
                     </div>
                 `;
