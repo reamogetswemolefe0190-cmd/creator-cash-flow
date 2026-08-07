@@ -12,6 +12,9 @@
     <!-- Tailwind CSS with Forms & Container Queries -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -88,19 +91,6 @@
             z-index: 9999;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
-        /* Ambient Glow behind Hero */
-        .hero-glow {
-            position: absolute;
-            top: -10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 800px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0) 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
         .card-shadow {
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
         }
@@ -116,18 +106,30 @@
        VIEW 1: LANDING PAGE REDESIGN
        ========================================================================== -->
     <div id="view-marketing" class="marketing-page-wrapper relative z-10 max-w-5xl mx-auto px-md">
-        <!-- Glow gradient -->
-        <div class="hero-glow"></div>
+        <!-- Ambient Multi-Color Mesh Backdrop (Arc & Framer - Feature F2) -->
+        <div class="ambient-mesh-wrapper pointer-events-none absolute top-[-80px] left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[750px] overflow-hidden z-0" aria-hidden="true">
+            <div class="ambient-orb ambient-orb-emerald"></div>
+            <div class="ambient-orb ambient-orb-teal"></div>
+            <div class="ambient-orb ambient-orb-indigo"></div>
+            <div class="ambient-mesh-center-glow"></div>
+        </div>
 
-        <!-- TopAppBar -->
-        <header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/[0.08] shadow-sm flex justify-between items-center px-lg py-md max-w-5xl mx-auto">
-            <div class="flex items-center gap-sm">
-                <span class="material-symbols-outlined text-accent-emerald text-headline-md" data-icon="account_balance_wallet">account_balance_wallet</span>
-                <span class="font-display text-headline-md font-extrabold text-white">Creator Cash Flow</span>
-            </div>
-            <div class="flex items-center gap-md">
-                <button class="font-label-lg text-text-secondary hover:text-white px-md py-xs rounded-xl active:scale-95 transition-transform" onclick="openAccountAuthModal()">Sign In</button>
-                <button class="bg-white text-black font-label-lg py-sm px-lg rounded-xl active:scale-95 transition-transform font-bold" onclick="switchView('onboarding')">Get Started</button>
+        <!-- Floating Glassmorphic Pill Navbar (Arc & Framer - Feature F1) -->
+        <header class="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-5xl transition-all duration-300">
+            <div class="glass-pill-nav flex justify-between items-center px-3.5 py-2 sm:px-6 sm:py-3 rounded-full bg-surface/70 backdrop-blur-xl border border-white/[0.12] shadow-[0_10px_30px_-5px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.15)]">
+                <!-- Left: Logo & Brand Name -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent-emerald/10 border border-accent-emerald/20 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-accent-emerald text-lg sm:text-xl" data-icon="account_balance_wallet">account_balance_wallet</span>
+                    </div>
+                    <span class="font-display text-sm sm:text-base md:text-lg font-extrabold text-white tracking-tight whitespace-nowrap">Creator Cash Flow</span>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-1.5 sm:gap-3">
+                    <button class="font-label-lg text-xs sm:text-sm text-text-secondary hover:text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-white/[0.05] active:scale-95 transition-all" onclick="openAccountAuthModal()">Sign In</button>
+                    <button class="bg-white text-black font-label-lg text-xs sm:text-sm py-1.5 px-3.5 sm:py-2 sm:px-5 rounded-full active:scale-95 transition-all font-bold hover:bg-white/90 shadow-md shadow-white/10 whitespace-nowrap" onclick="switchView('onboarding')">Get Started</button>
+                </div>
             </div>
         </header>
 
@@ -150,36 +152,194 @@
                 </div>
             </section>
 
-            <!-- Section 2: Crafted Mockup (Apple style) -->
-            <section class="mb-3xl max-w-3xl mx-auto">
-                <div class="relative p-lg rounded-3xl bg-surface border border-white/[0.08] card-shadow overflow-hidden">
-                    <div class="absolute -top-12 -right-12 w-64 h-64 bg-accent-emerald/10 rounded-full blur-3xl"></div>
-                    <div class="flex justify-between items-center mb-lg">
-                        <span class="text-xs font-bold text-accent-emerald uppercase tracking-wider">Creator HQ Command Center</span>
-                        <span class="flex h-2 w-2 relative">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-emerald opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-emerald"></span>
-                        </span>
+            <!-- Section 2: Arc Browser Hero Product Mockup (Feature F3) -->
+            <section class="mb-3xl max-w-4xl mx-auto px-xs sm:px-md relative z-10" id="hero-mockup-section">
+                <!-- Outer Interactive 3D Perspective Container -->
+                <div id="arc-hero-wrapper" class="relative group perspective-1000">
+                    
+                    <!-- Ambient Mesh Glow behind Mockup -->
+                    <div class="absolute -top-16 -left-16 w-72 h-72 bg-accent-emerald/15 rounded-full blur-[100px] pointer-events-none"></div>
+                    <div class="absolute -bottom-16 -right-16 w-72 h-72 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+                    <!-- Floating Badge 1: Top-Right AdSense Live Sync -->
+                    <div class="floating-badge badge-top-right absolute -top-6 right-0 sm:-top-8 sm:-right-8 z-30 bg-surface/90 backdrop-blur-xl border border-white/[0.12] p-xs sm:p-md rounded-2xl shadow-2xl flex items-center gap-xs sm:gap-sm animate-float">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-accent-emerald/20 border border-accent-emerald/40 flex items-center justify-center text-accent-emerald">
+                            <span class="material-symbols-outlined text-lg sm:text-xl">payments</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-xs">
+                                <span class="w-2 h-2 rounded-full bg-accent-emerald animate-ping"></span>
+                                <span class="text-[10px] sm:text-xs font-bold text-text-secondary uppercase tracking-wider">Live Sync</span>
+                            </div>
+                            <p class="text-xs sm:text-sm font-extrabold text-white">+R18,420 <span class="text-accent-emerald text-[11px] font-normal">AdSense</span></p>
+                        </div>
                     </div>
 
-                    <!-- Simplified Interactive Mockup Layout -->
-                    <div class="space-y-md">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-                            <div class="p-md bg-background border border-white/[0.05] rounded-2xl flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs text-text-secondary uppercase">Net Profit</p>
-                                    <p class="font-display font-extrabold text-2xl text-white">R24,650</p>
-                                </div>
-                                <span class="material-symbols-outlined text-accent-emerald text-3xl">trending_up</span>
+                    <!-- Floating Badge 2: Bottom-Left Smart Tax Guard -->
+                    <div class="floating-badge badge-bottom-left absolute -bottom-6 left-0 sm:-bottom-8 sm:-left-8 z-30 bg-surface/90 backdrop-blur-xl border border-white/[0.12] p-xs sm:p-md rounded-2xl shadow-2xl flex items-center gap-xs sm:gap-sm animate-float-delayed">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                            <span class="material-symbols-outlined text-lg sm:text-xl">verified_user</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] sm:text-xs font-bold text-text-secondary uppercase tracking-wider">Tax Guard</span>
+                            <p class="text-xs sm:text-sm font-extrabold text-white">R4,200 <span class="text-indigo-400 text-[11px] font-normal">Deducted</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Main Arc Browser Frame -->
+                    <div id="arc-browser-frame" class="relative rounded-2xl sm:rounded-3xl bg-surface/80 backdrop-blur-2xl border border-white/[0.1] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden transition-transform duration-200 ease-out">
+                        
+                        <!-- 1. Arc Window Header / Traffic Lights -->
+                        <div class="bg-black/60 border-b border-white/[0.08] px-xs sm:px-md py-xs sm:py-sm flex items-center justify-between select-none overflow-hidden">
+                            <!-- Traffic Light Action Controls -->
+                            <div class="flex items-center gap-xs flex-shrink-0">
+                                <span class="w-3 h-3 rounded-full bg-[#FF5F56] inline-block hover:opacity-80 transition-opacity"></span>
+                                <span class="w-3 h-3 rounded-full bg-[#FFBD2E] inline-block hover:opacity-80 transition-opacity"></span>
+                                <span class="w-3 h-3 rounded-full bg-[#27C93F] inline-block hover:opacity-80 transition-opacity"></span>
                             </div>
-                            <div class="p-md bg-background border border-white/[0.05] rounded-2xl">
-                                <p class="text-xs text-text-secondary uppercase mb-sm">Earnings Breakdown</p>
-                                <div class="w-full h-2 bg-white/[0.08] rounded-full overflow-hidden">
-                                    <div class="h-full bg-accent-emerald w-[74%]"></div>
+
+                            <!-- Arc URL Bar Pill -->
+                            <div class="flex-1 min-w-0 max-w-[120px] xs:max-w-[160px] sm:max-w-md mx-xs sm:mx-md bg-white/[0.04] border border-white/[0.06] rounded-xl px-xs sm:px-md py-xs flex items-center justify-center gap-xs text-xs text-text-secondary font-mono shadow-inner overflow-hidden">
+                                <span class="material-symbols-outlined text-accent-emerald text-sm flex-shrink-0">lock</span>
+                                <span class="text-white/90 truncate">app.creatorcashflow.com</span>
+                                <span class="text-text-secondary/60 hidden sm:inline flex-shrink-0">/hq</span>
+                            </div>
+
+                            <!-- Window Actions -->
+                            <div class="flex items-center gap-xs text-text-secondary flex-shrink-0">
+                                <button class="p-xs hover:text-white rounded-lg transition-colors" title="Sidebar Toggle" onclick="toggleArcSidebar()">
+                                    <span class="material-symbols-outlined text-sm">dock_to_right</span>
+                                </button>
+                                <button class="p-xs hover:text-white rounded-lg transition-colors" title="Reload Mockup" onclick="refreshHeroMockup()">
+                                    <span class="material-symbols-outlined text-sm">refresh</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Inner Arc Browser Workspace Layout (Sidebar + Main Canvas) -->
+                        <div class="flex min-h-[340px] sm:min-h-[400px]">
+                            
+                            <!-- Arc Left Sidebar Preview (Collapsible on mobile) -->
+                            <aside id="arc-sidebar-preview" class="w-48 bg-black/40 border-r border-white/[0.06] p-md flex flex-col justify-between hidden md:flex select-none">
+                                <div class="space-y-md">
+                                    <div class="flex items-center gap-xs px-xs text-xs font-bold text-text-secondary uppercase tracking-wider">
+                                        <span class="material-symbols-outlined text-accent-emerald text-base">dashboard</span>
+                                        <span>Spaces</span>
+                                    </div>
+                                    <nav class="space-y-xs text-xs">
+                                        <button class="arc-tab-btn active w-full flex items-center justify-between px-sm py-xs rounded-xl bg-white/[0.08] text-white font-semibold border border-white/[0.08] transition-all" data-tab="overview" onclick="switchHeroMockupTab('overview')">
+                                            <span class="flex items-center gap-xs">
+                                                <span class="material-symbols-outlined text-sm text-accent-emerald">space_dashboard</span>
+                                                Overview
+                                            </span>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-accent-emerald"></span>
+                                        </button>
+                                        <button class="arc-tab-btn w-full flex items-center justify-between px-sm py-xs rounded-xl text-text-secondary hover:text-white hover:bg-white/[0.03] transition-all" data-tab="revenue" onclick="switchHeroMockupTab('revenue')">
+                                            <span class="flex items-center gap-xs">
+                                                <span class="material-symbols-outlined text-sm">trending_up</span>
+                                                Streams
+                                            </span>
+                                            <span class="text-[10px] bg-white/[0.08] px-xs rounded text-text-secondary">3</span>
+                                        </button>
+                                        <button class="arc-tab-btn w-full flex items-center justify-between px-sm py-xs rounded-xl text-text-secondary hover:text-white hover:bg-white/[0.03] transition-all" data-tab="tax" onclick="switchHeroMockupTab('tax')">
+                                            <span class="flex items-center gap-xs">
+                                                <span class="material-symbols-outlined text-sm">shield</span>
+                                                Tax Guard
+                                            </span>
+                                            <span class="text-[10px] text-accent-emerald font-bold">Safe</span>
+                                        </button>
+                                    </nav>
                                 </div>
-                                <div class="flex justify-between text-xs mt-xs text-text-secondary">
-                                    <span>YouTube</span> <strong>74%</strong>
+
+                                <!-- Bottom Status Indicator -->
+                                <div class="pt-sm border-t border-white/[0.06] flex items-center gap-xs text-[11px] text-text-secondary">
+                                    <span class="w-2 h-2 rounded-full bg-accent-emerald"></span>
+                                    <span>Phyllo Engine v2</span>
                                 </div>
+                            </aside>
+
+                            <!-- Main Canvas Content -->
+                            <div class="flex-1 p-md sm:p-lg space-y-md bg-background/50">
+                                
+                                <!-- Top Bar: Title & Live Balance Status Toggle -->
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
+                                    <div>
+                                        <div class="flex items-center gap-xs">
+                                            <h4 class="font-display font-bold text-sm sm:text-base text-white" id="hero-mockup-tab-title">Creator Cash Flow Command Center</h4>
+                                        </div>
+                                        <p class="text-xs text-text-secondary">Real-time consolidated profit intelligence</p>
+                                    </div>
+
+                                    <!-- Live Interactive View Selector Toggle -->
+                                    <div class="flex items-center bg-black/50 border border-white/[0.08] p-1 rounded-xl text-xs select-none">
+                                        <button id="toggle-btn-monthly" class="px-sm py-1 rounded-lg font-semibold bg-accent-emerald text-black shadow transition-all" onclick="setHeroMockupPeriod('monthly')">
+                                            Monthly
+                                        </button>
+                                        <button id="toggle-btn-annual" class="px-sm py-1 rounded-lg font-semibold text-text-secondary hover:text-white transition-all" onclick="setHeroMockupPeriod('annual')">
+                                            Annual
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Metrics Cards Grid -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                                    
+                                    <!-- Metric Card 1: Net Profit -->
+                                    <div class="p-md glass-card-nested rounded-2xl space-y-xs relative overflow-hidden group/card hover:border-accent-emerald/40 transition-all">
+                                        <div class="flex justify-between items-center text-xs text-text-secondary uppercase tracking-wider font-semibold">
+                                            <span id="hero-mockup-period-label">Net Profit (July)</span>
+                                            <span class="material-symbols-outlined text-accent-emerald">trending_up</span>
+                                        </div>
+                                        <div class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight" id="hero-mockup-balance-display">
+                                            R24,650
+                                        </div>
+                                        <div class="flex items-center gap-xs text-xs text-accent-emerald font-semibold">
+                                            <span class="material-symbols-outlined text-sm">north_east</span>
+                                            <span id="hero-mockup-growth-tag">+18.4% vs last month</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Metric Card 2: Revenue Breakdown -->
+                                    <div class="p-md glass-card-nested rounded-2xl space-y-xs hover:border-white/[0.15] transition-all">
+                                        <div class="flex justify-between items-center text-xs text-text-secondary uppercase tracking-wider font-semibold">
+                                            <span>Platform Split</span>
+                                            <span class="text-white font-bold" id="hero-mockup-top-platform">YouTube 74%</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-white/[0.08] rounded-full overflow-hidden flex">
+                                            <div id="bar-youtube" class="h-full bg-accent-emerald transition-all duration-500" style="width: 74%;"></div>
+                                            <div id="bar-tiktok" class="h-full bg-indigo-500 transition-all duration-500" style="width: 18%;"></div>
+                                            <div id="bar-brand" class="h-full bg-amber-400 transition-all duration-500" style="width: 8%;"></div>
+                                        </div>
+                                        <div class="flex justify-between items-center text-[11px] text-text-secondary pt-1">
+                                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-emerald"></span> YouTube</span>
+                                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> TikTok</span>
+                                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span> Brands</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mini Live Cash Flow Sparkline Card -->
+                                <div class="p-md glass-card-nested rounded-2xl space-y-xs">
+                                    <div class="flex justify-between items-center text-xs text-text-secondary">
+                                        <span class="font-semibold uppercase tracking-wider">7-Day Profit Velocity</span>
+                                        <span class="text-accent-emerald font-bold text-xs" id="hero-mockup-peak">Peak R24,650</span>
+                                    </div>
+                                    <div class="w-full h-20 relative pt-2">
+                                        <!-- SVG Sparkline Chart -->
+                                        <svg class="w-full h-full overflow-visible" viewBox="0 0 300 60" preserveAspectRatio="none">
+                                            <defs>
+                                                <linearGradient id="heroChartGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stop-color="#22C55E" stop-opacity="0.35"/>
+                                                    <stop offset="100%" stop-color="#22C55E" stop-opacity="0.0"/>
+                                                </linearGradient>
+                                            </defs>
+                                            <path id="hero-chart-area" d="M 0,50 Q 50,45 100,30 T 200,20 T 300,5 L 300,60 L 0,60 Z" fill="url(#heroChartGradient)" />
+                                            <path id="hero-chart-line" d="M 0,50 Q 50,45 100,30 T 200,20 T 300,5" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" />
+                                            <circle cx="300" cy="5" r="4" fill="#22C55E" class="animate-pulse" />
+                                        </svg>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -191,20 +351,26 @@
                 <h3 class="font-display text-text-secondary font-bold text-lg mb-xs">The Reality</h3>
                 <h2 class="font-display text-headline-lg font-extrabold text-white mb-xl">Creators know their views.<br>Most don't know their business.</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-lg max-w-4xl mx-auto">
-                    <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl text-left">
-                        <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">account_tree</span>
-                        <h4 class="font-display font-bold text-lg text-white mb-sm">Scattered Income</h4>
-                        <p class="text-text-secondary text-sm">Earnings are spread across platforms, brands, and affiliate dashboards.</p>
+                    <div class="p-6 sm:p-8 rounded-3xl glass-card text-left flex flex-col justify-between">
+                        <div>
+                            <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">account_tree</span>
+                            <h4 class="font-display font-bold text-lg text-white mb-sm">Scattered Income</h4>
+                            <p class="text-text-secondary text-sm">Earnings are spread across platforms, brands, and affiliate dashboards.</p>
+                        </div>
                     </div>
-                    <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl text-left">
-                        <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">monitoring</span>
-                        <h4 class="font-display font-bold text-lg text-white mb-sm">Profitability Blindspot</h4>
-                        <p class="text-text-secondary text-sm">It's hard to understand actual net margins after expense write-offs.</p>
+                    <div class="p-6 sm:p-8 rounded-3xl glass-card text-left flex flex-col justify-between">
+                        <div>
+                            <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">monitoring</span>
+                            <h4 class="font-display font-bold text-lg text-white mb-sm">Profitability Blindspot</h4>
+                            <p class="text-text-secondary text-sm">It's hard to understand actual net margins after expense write-offs.</p>
+                        </div>
                     </div>
-                    <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl text-left">
-                        <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">query_stats</span>
-                        <h4 class="font-display font-bold text-lg text-white mb-sm">No Runway Forecasts</h4>
-                        <p class="text-text-secondary text-sm">Guessing tax obligations and predicting next month's cash flow models.</p>
+                    <div class="p-6 sm:p-8 rounded-3xl glass-card text-left flex flex-col justify-between">
+                        <div>
+                            <span class="material-symbols-outlined text-accent-emerald text-3xl mb-md">query_stats</span>
+                            <h4 class="font-display font-bold text-lg text-white mb-sm">No Runway Forecasts</h4>
+                            <p class="text-text-secondary text-sm">Guessing tax obligations and predicting next month's cash flow models.</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -216,7 +382,7 @@
                         <h3 class="font-display font-extrabold text-2xl text-white">Know where every rand comes from</h3>
                         <p class="text-text-secondary text-sm">Consolidate private analytics from YouTube Studio, TikTok rewards, and sponsorships into one secure screen automatically.</p>
                     </div>
-                    <div class="flex-1 w-full p-lg bg-surface border border-white/[0.08] rounded-3xl text-center">
+                    <div class="flex-1 w-full p-6 sm:p-8 rounded-3xl glass-card text-left">
                         <div class="text-xs text-text-secondary uppercase mb-sm">Earnings Hub</div>
                         <div class="font-display text-3xl font-extrabold text-white" id="marketing-val-earnings">R0</div>
                     </div>
@@ -227,7 +393,7 @@
                         <h3 class="font-display font-extrabold text-2xl text-white">Understand where it goes</h3>
                         <p class="text-text-secondary text-sm">Log business deductions, hosting bills, and production gear write-offs instantly. Keep your net margin high and tax bills small.</p>
                     </div>
-                    <div class="flex-1 w-full p-lg bg-surface border border-white/[0.08] rounded-3xl">
+                    <div class="flex-1 w-full p-6 sm:p-8 rounded-3xl glass-card text-left">
                         <div class="flex justify-between items-center text-sm border-b border-white/[0.05] pb-sm">
                             <span class="text-text-secondary">Adobe Creative Suite</span>
                             <span class="text-white font-bold">-R950</span>
@@ -246,8 +412,35 @@
     <!-- ==========================================================================
        VIEW 2: ONBOARDING REDESIGN (6-Step Premium Flow)
        ========================================================================== -->
-    <div id="view-onboarding" class="onboarding-wrapper hidden min-h-screen flex items-center justify-center p-md">
-        <div class="w-full max-w-xl bg-surface border border-white/[0.08] card-shadow rounded-3xl p-lg relative z-10 space-y-lg">
+    <div id="view-onboarding" class="onboarding-wrapper hidden min-h-screen flex items-center justify-center p-md relative overflow-hidden">
+        
+        <!-- Ambient Multi-Color Radial Gradient Glow Backdrop -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-accent-emerald/20 via-teal-500/10 to-indigo-600/20 rounded-full blur-[120px] opacity-60"></div>
+        </div>
+
+        <!-- Glassmorphic Card Container -->
+        <div class="w-full max-w-xl bg-surface/80 backdrop-blur-xl border border-white/[0.12] card-shadow rounded-3xl p-6 sm:p-8 relative z-10 space-y-md">
+            
+            <!-- Step Navigation Bar (Back Button & Counter) -->
+            <div class="flex items-center justify-between min-h-[24px]" id="onboard-nav-header">
+                <button id="onboard-back-btn" class="flex items-center gap-1 text-xs font-semibold text-text-secondary hover:text-white transition-colors invisible" onclick="prevOnboardStep()">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span>
+                    Back
+                </button>
+                <span id="onboard-step-counter" class="text-xs font-bold text-text-secondary tracking-wide">Step 1 of 6</span>
+            </div>
+
+            <!-- Step Progress Bar Fill Indicator -->
+            <div class="w-full h-1.5 bg-white/[0.08] rounded-full overflow-hidden mb-md">
+                <div id="onboard-progress-fill" class="h-full bg-accent-emerald transition-all duration-300 ease-out rounded-full" style="width: 16.666%;"></div>
+            </div>
+
+            <!-- Selection Validation Banner -->
+            <div id="onboard-validation-error" class="hidden p-xs px-sm bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs font-semibold flex items-center gap-xs">
+                <span class="material-symbols-outlined text-sm">error</span>
+                <span id="onboard-error-text">Please make a selection to continue.</span>
+            </div>
             
             <!-- Step 1: Welcome to Creator Cash Flow -->
             <div class="onboarding-step space-y-lg" id="onboard-step-1">
@@ -260,79 +453,194 @@
                     <h1 class="font-display text-3xl font-extrabold text-white">Welcome to Creator Cash Flow</h1>
                     <p class="font-body-md text-text-secondary">Let's set up your creator business dashboard.</p>
                 </div>
-                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform" onclick="nextOnboardStep(2)">Get Started</button>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform hover:bg-white/90" onclick="nextOnboardStep(2)">Get Started</button>
             </div>
 
             <!-- Step 2: Creator Type -->
             <div class="onboarding-step hidden space-y-md" id="onboard-step-2">
-                <h1 class="font-display text-2xl font-extrabold text-white text-center">What kind of creator are you?</h1>
+                <div class="text-center space-y-xs">
+                    <h1 class="font-display text-2xl font-extrabold text-white">What kind of creator are you?</h1>
+                    <p class="text-xs text-text-secondary">Select your primary content format to customize your revenue views.</p>
+                </div>
                 <div class="grid grid-cols-1 gap-md">
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background hover:bg-white/[0.02] p-md rounded-2xl cursor-pointer" data-value="YouTuber" onclick="selectCreatorType(this)">
-                        <div class="font-bold text-white">YouTube Creator</div>
-                        <p class="text-xs text-text-secondary">Longform video, shorts, and Google AdSense</p>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between group" data-value="YouTuber" onclick="selectCreatorType(this)">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center icon-container transition-colors">
+                                <span class="material-symbols-outlined text-red-500 text-xl">play_circle</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm sm:text-base">YouTube Creator</div>
+                                <p class="text-xs text-text-secondary">Longform video, shorts, and Google AdSense</p>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background hover:bg-white/[0.02] p-md rounded-2xl cursor-pointer" data-value="TikTok" onclick="selectCreatorType(this)">
-                        <div class="font-bold text-white">TikTok Creator</div>
-                        <p class="text-xs text-text-secondary">Shortform video, rewards, and brand sponsorships</p>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between group" data-value="TikTok" onclick="selectCreatorType(this)">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center icon-container transition-colors">
+                                <span class="material-symbols-outlined text-cyan-400 text-xl">music_note</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm sm:text-base">TikTok Creator</div>
+                                <p class="text-xs text-text-secondary">Shortform video, rewards, and brand sponsorships</p>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background hover:bg-white/[0.02] p-md rounded-2xl cursor-pointer" data-value="Streamer" onclick="selectCreatorType(this)">
-                        <div class="font-bold text-white">Streamer</div>
-                        <p class="text-xs text-text-secondary">Live broadcasts, subscriber support, and ads</p>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between group" data-value="Streamer" onclick="selectCreatorType(this)">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center icon-container transition-colors">
+                                <span class="material-symbols-outlined text-purple-400 text-xl">sensors</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm sm:text-base">Streamer</div>
+                                <p class="text-xs text-text-secondary">Live broadcasts, subscriber support, and ads</p>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
+                        </div>
                     </div>
                 </div>
-                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg" onclick="nextOnboardStep(3)">Continue</button>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg shadow-lg hover:bg-white/90" onclick="nextOnboardStep(3)">Continue</button>
             </div>
 
             <!-- Step 3: Revenue Sources -->
             <div class="onboarding-step hidden space-y-md" id="onboard-step-3">
-                <h1 class="font-display text-2xl font-extrabold text-white text-center">Which platforms generate revenue?</h1>
+                <div class="text-center space-y-xs">
+                    <h1 class="font-display text-2xl font-extrabold text-white">Which platforms generate revenue?</h1>
+                    <p class="text-xs text-text-secondary">Select all platforms you want to track in your dashboard.</p>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-md" id="onboard-choice-grid">
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="YouTube" onclick="togglePlatformChoice(this)">
-                        <div class="font-bold text-white">YouTube</div>
-                        <div class="text-xs text-text-secondary mt-xs">AdSense</div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between" data-value="YouTube" onclick="togglePlatformChoice(this)">
+                        <div class="flex items-center gap-sm">
+                            <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center icon-container">
+                                <span class="material-symbols-outlined text-red-500 text-base">play_circle</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm">YouTube</div>
+                                <div class="text-[11px] text-text-secondary">AdSense</div>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-lg">radio_button_unchecked</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="TikTok" onclick="togglePlatformChoice(this)">
-                        <div class="font-bold text-white">TikTok</div>
-                        <div class="text-xs text-text-secondary mt-xs">Rewards</div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between" data-value="TikTok" onclick="togglePlatformChoice(this)">
+                        <div class="flex items-center gap-sm">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center icon-container">
+                                <span class="material-symbols-outlined text-cyan-400 text-base">music_note</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm">TikTok</div>
+                                <div class="text-[11px] text-text-secondary">Rewards</div>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-lg">radio_button_unchecked</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Instagram" onclick="togglePlatformChoice(this)">
-                        <div class="font-bold text-white">Instagram</div>
-                        <div class="text-xs text-text-secondary mt-xs">Sponsorships</div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between" data-value="Instagram" onclick="togglePlatformChoice(this)">
+                        <div class="flex items-center gap-sm">
+                            <div class="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center icon-container">
+                                <span class="material-symbols-outlined text-pink-400 text-base">photo_camera</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm">Instagram</div>
+                                <div class="text-[11px] text-text-secondary">Sponsorships</div>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-lg">radio_button_unchecked</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Patreon" onclick="togglePlatformChoice(this)">
-                        <div class="font-bold text-white">Patreon</div>
-                        <div class="text-xs text-text-secondary mt-xs">Subscriptions</div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between" data-value="Patreon" onclick="togglePlatformChoice(this)">
+                        <div class="flex items-center gap-sm">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center icon-container">
+                                <span class="material-symbols-outlined text-amber-400 text-base">account_balance_wallet</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm">Patreon</div>
+                                <div class="text-[11px] text-text-secondary">Subscriptions</div>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-lg">radio_button_unchecked</span>
+                        </div>
                     </div>
                 </div>
-                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg" onclick="nextOnboardStep(4)">Continue</button>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg shadow-lg hover:bg-white/90" onclick="nextOnboardStep(4)">Continue</button>
             </div>
 
             <!-- Step 4: Primary Goal -->
             <div class="onboarding-step hidden space-y-md" id="onboard-step-4">
-                <h1 class="font-display text-2xl font-extrabold text-white text-center">What's your primary goal?</h1>
+                <div class="text-center space-y-xs">
+                    <h1 class="font-display text-2xl font-extrabold text-white">What's your primary goal?</h1>
+                    <p class="text-xs text-text-secondary">We'll prioritize your dashboard intelligence based on your objective.</p>
+                </div>
                 <div class="grid grid-cols-1 gap-md">
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Track Revenue" onclick="selectGoal(this)">
-                        <div class="font-bold text-white">Track Revenue</div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between" data-value="Track Revenue" onclick="selectGoal(this)">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center icon-container">
+                                <span class="material-symbols-outlined text-emerald-400 text-xl">trending_up</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm sm:text-base">Track Revenue</div>
+                                <p class="text-xs text-text-secondary">Consolidate income streams into a single live view</p>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Understand Profitability" onclick="selectGoal(this)">
-                        <div class="font-bold text-white">Understand Profitability</div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between" data-value="Understand Profitability" onclick="selectGoal(this)">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center icon-container">
+                                <span class="material-symbols-outlined text-teal-400 text-xl">pie_chart</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm sm:text-base">Understand Profitability</div>
+                                <p class="text-xs text-text-secondary">Calculate net margins after expenses and tax holds</p>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
+                        </div>
                     </div>
-                    <div class="onboard-choice-card border border-white/[0.08] bg-background p-md rounded-2xl cursor-pointer" data-value="Prepare Taxes" onclick="selectGoal(this)">
-                        <div class="font-bold text-white">Prepare Taxes</div>
+                    <div class="onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-md rounded-2xl cursor-pointer flex items-center justify-between" data-value="Prepare Taxes" onclick="selectGoal(this)">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center icon-container">
+                                <span class="material-symbols-outlined text-indigo-400 text-xl">shield</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-sm sm:text-base">Prepare Taxes</div>
+                                <p class="text-xs text-text-secondary">Automate tax write-offs and quarterly estimations</p>
+                            </div>
+                        </div>
+                        <div class="check-indicator text-white/20 transition-colors">
+                            <span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
+                        </div>
                     </div>
                 </div>
-                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg" onclick="nextOnboardStep(5)">Continue</button>
+                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform mt-lg shadow-lg hover:bg-white/90" onclick="nextOnboardStep(5)">Continue</button>
             </div>
 
             <!-- Step 5: Connect Platforms -->
             <div class="onboarding-step hidden space-y-md" id="onboard-step-5">
-                <h1 class="font-display text-2xl font-extrabold text-white text-center">Connect your platforms</h1>
+                <div class="text-center space-y-xs">
+                    <h1 class="font-display text-2xl font-extrabold text-white">Connect your platforms</h1>
+                    <p class="text-xs text-text-secondary">Link your accounts for real-time revenue sync.</p>
+                </div>
                 <div class="space-y-md" id="onboarding-connect-list">
                     <!-- Dynamically populated in app.js -->
                 </div>
                 <div class="flex flex-col gap-md mt-xl">
-                    <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl active:scale-95 transition-transform" onclick="nextOnboardStep(6)">Continue</button>
-                    <button class="w-full border border-white/[0.08] hover:bg-white/[0.02] text-text-secondary font-label-lg py-md rounded-xl" onclick="skipOnboardingConnection(event)">
+                    <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform hover:bg-white/90" onclick="nextOnboardStep(6)">Continue</button>
+                    <button class="w-full border border-white/[0.08] hover:bg-white/[0.02] text-text-secondary hover:text-white font-label-lg py-md rounded-xl transition-colors" onclick="skipOnboardingConnection(event)">
                         Skip & Enter Data Manually →
                     </button>
                 </div>
@@ -341,12 +649,12 @@
             <!-- Step 6: Magic Moment -->
             <div class="onboarding-step hidden text-center space-y-lg" id="onboard-step-6">
                 <div class="flex justify-center">
-                    <div class="w-16 h-16 bg-accent-emerald/10 border border-accent-emerald/20 rounded-3xl flex items-center justify-center">
+                    <div class="w-16 h-16 bg-accent-emerald/10 border border-accent-emerald/20 rounded-3xl flex items-center justify-center celebratory-icon">
                         <span class="material-symbols-outlined text-accent-emerald text-display">auto_awesome</span>
                     </div>
                 </div>
                 <h1 class="font-display text-2xl font-extrabold text-white">Your Creator HQ is Ready.</h1>
-                <div class="p-lg bg-background border border-white/[0.08] rounded-2xl text-left space-y-md">
+                <div class="p-lg bg-background/80 border border-white/[0.08] rounded-2xl text-left space-y-md">
                     <div class="flex justify-between font-label-lg">
                         <span class="text-text-secondary">Platforms Connected</span>
                         <strong class="text-white" id="magic-onboard-platforms">0</strong>
@@ -360,7 +668,7 @@
                         <strong class="text-accent-emerald">Active</strong>
                     </div>
                 </div>
-                <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform" onclick="switchView('app')">Launch Command Center</button>
+                <button id="btn-launch-command-center" class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform hover:bg-white/90" onclick="executeLaunchSequence()">Launch Command Center</button>
             </div>
         </div>
     </div>

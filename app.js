@@ -23,10 +23,12 @@ const state = {
 
 // Onboarding State
 const onboardingState = {
+    currentStep: 1,
     creatorType: '',
     platforms: [],
     goal: '',
-    connected: []
+    connected: [],
+    isManual: false
 };
 
 let intelligenceChartInstance = null;
@@ -64,6 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const syncBtn = document.getElementById('btn-sync-trigger');
     if (syncBtn) syncBtn.addEventListener('click', syncData);
+
+    setupHeroMockupInteractions();
 });
 
 // Load real transactions from Supabase cloud database
@@ -151,17 +155,107 @@ function loadLocalBackupData() {
 // ONBOARDING MODULES (6-Step Wizard)
 // ==========================================================================
 
-function nextOnboardStep(stepNum) {
+// Step validation engine
+function validateStep(stepNum) {
+    let isValid = true;
+    let errorMsg = '';
+
+    if (stepNum === 2) {
+        if (!onboardingState.creatorType) {
+            isValid = false;
+            errorMsg = 'Please select your creator type to continue.';
+        }
+    } else if (stepNum === 3) {
+        if (!onboardingState.platforms || onboardingState.platforms.length === 0) {
+            isValid = false;
+            errorMsg = 'Please select at least one revenue platform.';
+        }
+    } else if (stepNum === 4) {
+        if (!onboardingState.goal) {
+            isValid = false;
+            errorMsg = 'Please select your primary goal.';
+        }
+    }
+
+    const errorEl = document.getElementById('onboard-validation-error');
+    const errorText = document.getElementById('onboard-error-text');
+
+    if (!isValid) {
+        if (errorEl && errorText) {
+            errorText.innerText = errorMsg;
+            errorEl.classList.remove('hidden');
+        }
+        // Shake step container for visual feedback
+        const currentStepEl = document.getElementById(`onboard-step-${stepNum}`);
+        if (currentStepEl) {
+            currentStepEl.classList.add('animate-shake');
+            setTimeout(() => currentStepEl.classList.remove('animate-shake'), 450);
+        }
+    } else {
+        if (errorEl) {
+            errorEl.classList.add('hidden');
+        }
+    }
+
+    return isValid;
+}
+
+// Progress Bar & Navigation Header Synchronizer
+function updateOnboardingProgress(stepNum) {
+    onboardingState.currentStep = stepNum;
+
+    // Update Step Counter Text
+    const counterEl = document.getElementById('onboard-step-counter');
+    if (counterEl) {
+        counterEl.innerText = `Step ${stepNum} of 6`;
+    }
+
+    // Update Progress Bar Fill Width
+    const progressFill = document.getElementById('onboard-progress-fill');
+    if (progressFill) {
+        const percentage = Math.min(100, Math.max(0, (stepNum / 6) * 100));
+        progressFill.style.width = `${percentage}%`;
+    }
+
+    // Update Back Button Visibility
+    const backBtn = document.getElementById('onboard-back-btn');
+    if (backBtn) {
+        if (stepNum > 1) {
+            backBtn.classList.remove('invisible');
+        } else {
+            backBtn.classList.add('invisible');
+        }
+    }
+
+    // Clear validation error message on step navigation
+    const errorEl = document.getElementById('onboard-validation-error');
+    if (errorEl) {
+        errorEl.classList.add('hidden');
+    }
+}
+
+function nextOnboardStep(targetStepNum) {
+    const currentStepNum = onboardingState.currentStep || 1;
+
+    // Validate current step before advancing forward
+    if (targetStepNum > currentStepNum) {
+        if (!validateStep(currentStepNum)) {
+            return false;
+        }
+    }
+
     document.querySelectorAll('.onboarding-step').forEach(step => {
         step.classList.add('hidden');
     });
 
-    const nextStep = document.getElementById(`onboard-step-${stepNum}`);
+    const nextStep = document.getElementById(`onboard-step-${targetStepNum}`);
     if (nextStep) {
         nextStep.classList.remove('hidden');
     }
 
-    if (stepNum === 5) {
+    updateOnboardingProgress(targetStepNum);
+
+    if (targetStepNum === 5) {
         const connectList = document.getElementById('onboarding-connect-list');
         if (connectList) {
             connectList.innerHTML = '';
@@ -170,7 +264,8 @@ function nextOnboardStep(stepNum) {
             }
             onboardingState.platforms.forEach(platform => {
                 const card = document.createElement('div');
-                card.className = "connection-platform-card flex justify-between items-center p-md bg-surface border border-white/[0.08] rounded-2xl cursor-pointer hover:bg-white/[0.02] transition-all";
+                const isConn = onboardingState.connected.includes(platform);
+                card.className = `connection-platform-card flex justify-between items-center p-md bg-surface/60 border border-white/[0.08] rounded-2xl cursor-pointer hover:bg-white/[0.04] transition-all ${isConn ? 'connected' : ''}`;
                 card.onclick = (e) => simulatePlatformConnect(card, platform);
                 
                 card.innerHTML = `
@@ -178,64 +273,111 @@ function nextOnboardStep(stepNum) {
                         <span class="material-symbols-outlined text-accent-emerald">${platform === 'YouTube' ? 'play_circle' : platform === 'TikTok' ? 'music_note' : platform === 'Instagram' ? 'photo_camera' : 'account_balance_wallet'}</span>
                         <span class="font-body-md font-semibold text-white">${platform} Channel</span>
                     </div>
-                    <span class="connect-badge text-xs font-bold border border-white/[0.08] bg-background px-md py-xs rounded-xl" id="connect-${platform}">Connect</span>
+                    <span class="connect-badge text-xs font-bold border border-white/[0.08] bg-background px-md py-xs rounded-xl" id="connect-${platform}">${isConn ? 'Connected' : 'Connect'}</span>
                 `;
                 connectList.appendChild(card);
             });
         }
     }
 
-    if (stepNum === 6) {
+    if (targetStepNum === 6) {
         triggerMagicMoment();
+    }
+
+    return true;
+}
+
+function prevOnboardStep() {
+    const currentStepNum = onboardingState.currentStep || 1;
+    if (currentStepNum > 1) {
+        nextOnboardStep(currentStepNum - 1);
     }
 }
 
 function selectCreatorType(element) {
     document.querySelectorAll('#onboard-step-2 .onboard-choice-card').forEach(opt => {
         opt.classList.remove('active');
+        const icon = opt.querySelector('.check-indicator span');
+        if (icon) icon.innerText = 'radio_button_unchecked';
     });
     element.classList.add('active');
+    const icon = element.querySelector('.check-indicator span');
+    if (icon) icon.innerText = 'check_circle';
     onboardingState.creatorType = element.getAttribute('data-value');
+
+    const errorEl = document.getElementById('onboard-validation-error');
+    if (errorEl) errorEl.classList.add('hidden');
 }
 
 function togglePlatformChoice(element) {
     element.classList.toggle('active');
     const val = element.getAttribute('data-value');
+    const icon = element.querySelector('.check-indicator span');
     
     if (element.classList.contains('active')) {
+        if (icon) icon.innerText = 'check_circle';
         if (!onboardingState.platforms.includes(val)) {
             onboardingState.platforms.push(val);
         }
     } else {
+        if (icon) icon.innerText = 'radio_button_unchecked';
         onboardingState.platforms = onboardingState.platforms.filter(p => p !== val);
     }
+
+    const errorEl = document.getElementById('onboard-validation-error');
+    if (errorEl) errorEl.classList.add('hidden');
 }
 
 function selectGoal(element) {
     document.querySelectorAll('#onboard-step-4 .onboard-choice-card').forEach(opt => {
         opt.classList.remove('active');
+        const icon = opt.querySelector('.check-indicator span');
+        if (icon) icon.innerText = 'radio_button_unchecked';
     });
     element.classList.add('active');
+    const icon = element.querySelector('.check-indicator span');
+    if (icon) icon.innerText = 'check_circle';
     onboardingState.goal = element.getAttribute('data-value');
+
+    const errorEl = document.getElementById('onboard-validation-error');
+    if (errorEl) errorEl.classList.add('hidden');
 }
 
 function skipOnboardingConnection(e) {
     if (e) e.preventDefault();
     console.log('[ONBOARDING] Skipping connection and entering manual mode.');
+    onboardingState.isManual = true;
     nextOnboardStep(6);
 }
 
+function fallbackToMockConnect(element, platform, badge) {
+    element.classList.add('connected');
+    if (badge) badge.innerText = 'Connected';
+    if (!onboardingState.connected.includes(platform)) {
+        onboardingState.connected.push(platform);
+    }
+}
+
 function simulatePlatformConnect(element, platform) {
+    const badge = document.getElementById(`connect-${platform}`);
+
     if (element.classList.contains('connected')) {
         element.classList.remove('connected');
-        const badge = document.getElementById(`connect-${platform}`);
         if (badge) badge.innerText = 'Connect';
         onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
         return;
     }
 
-    const badge = document.getElementById(`connect-${platform}`);
     if (badge) badge.innerText = 'Linking...';
+
+    // Defensive Guard: Check if PhylloConnect SDK script is loaded in window
+    if (typeof PhylloConnect === 'undefined') {
+        console.warn('[PHYLLO] PhylloConnect SDK script not detected in DOM. Falling back to mock connection.');
+        setTimeout(() => {
+            fallbackToMockConnect(element, platform, badge);
+        }, 400);
+        return;
+    }
 
     const headers = {};
     if (state.token) {
@@ -248,9 +390,9 @@ function simulatePlatformConnect(element, platform) {
     })
     .then(res => res.json())
     .then(data => {
-        if (!data.sdkToken) {
-            alert('Failed to initialize connection token. Check server configurations.');
-            if (badge) badge.innerText = 'Connect';
+        if (!data.sdkToken || typeof PhylloConnect === 'undefined') {
+            console.warn('[PHYLLO] Token or SDK missing. Executing mock connection fallback.');
+            fallbackToMockConnect(element, platform, badge);
             return;
         }
 
@@ -266,31 +408,32 @@ function simulatePlatformConnect(element, platform) {
             config.workPlatformId = platformId;
         }
 
-        const phylloConnect = PhylloConnect.initialize(config);
+        try {
+            const phylloConnect = PhylloConnect.initialize(config);
 
-        phylloConnect.on("accountConnected", (accountId, workPlatformId, userId) => {
-            element.classList.add('connected');
-            if (badge) badge.innerText = 'Connected';
-            if (!onboardingState.connected.includes(platform)) {
-                onboardingState.connected.push(platform);
-            }
-        });
+            phylloConnect.on("accountConnected", (accountId, workPlatformId, userId) => {
+                element.classList.add('connected');
+                if (badge) badge.innerText = 'Connected';
+                if (!onboardingState.connected.includes(platform)) {
+                    onboardingState.connected.push(platform);
+                }
+            });
 
-        phylloConnect.on("accountDisconnected", (accountId, workPlatformId, userId) => {
-            element.classList.remove('connected');
-            if (badge) badge.innerText = 'Connect';
-            onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
-        });
+            phylloConnect.on("accountDisconnected", (accountId, workPlatformId, userId) => {
+                element.classList.remove('connected');
+                if (badge) badge.innerText = 'Connect';
+                onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
+            });
 
-        phylloConnect.open();
+            phylloConnect.open();
+        } catch (err) {
+            console.warn('[PHYLLO] Initialization exception caught. Executing mock fallback.', err);
+            fallbackToMockConnect(element, platform, badge);
+        }
     })
     .catch(err => {
-        console.warn('Backend connection failed. Reverting to mock connect simulation.', err);
-        element.classList.add('connected');
-        if (badge) badge.innerText = 'Connected';
-        if (!onboardingState.connected.includes(platform)) {
-            onboardingState.connected.push(platform);
-        }
+        console.warn('[PHYLLO] Network request failed. Reverting to mock connect simulation.', err);
+        fallbackToMockConnect(element, platform, badge);
     });
 }
 
@@ -307,8 +450,14 @@ function findPlatformId(platformName, platformMap) {
 }
 
 async function triggerMagicMoment() {
-    const platformsCount = onboardingState.platforms.length || 3;
-    document.getElementById('magic-onboard-platforms').innerText = platformsCount;
+    const platformsCount = onboardingState.connected.length || onboardingState.platforms.length || 3;
+    const connectedBadge = document.getElementById('magic-onboard-platforms');
+    if (connectedBadge) {
+        connectedBadge.innerText = `${platformsCount} ${onboardingState.isManual ? '(Manual Mode)' : 'Connected'}`;
+    }
+
+    // Synchronously back up state to LocalStorage
+    localStorage.setItem('creator_cashflow_onboarding', JSON.stringify(onboardingState));
 
     if (state.token) {
         try {
@@ -321,13 +470,40 @@ async function triggerMagicMoment() {
                 body: JSON.stringify({
                     creatorType: onboardingState.creatorType,
                     platforms: onboardingState.platforms,
-                    goal: onboardingState.goal
+                    goal: onboardingState.goal,
+                    connected: onboardingState.connected,
+                    isManual: onboardingState.isManual
                 })
             });
         } catch (e) {
-            console.error('Failed to sync onboarding to cloud database', e);
+            console.warn('[ONBOARDING] Cloud sync warning:', e);
         }
     }
+}
+
+function executeLaunchSequence() {
+    const wizardCard = document.querySelector('#view-onboarding .w-full.max-w-xl');
+    const launchBtn = document.getElementById('btn-launch-command-center');
+    
+    if (launchBtn) {
+        launchBtn.innerText = 'Launching Command Center...';
+        launchBtn.disabled = true;
+    }
+
+    if (wizardCard) {
+        wizardCard.classList.add('launching-pulse');
+    }
+
+    triggerMagicMoment();
+
+    setTimeout(() => {
+        if (wizardCard) wizardCard.classList.remove('launching-pulse');
+        if (launchBtn) {
+            launchBtn.innerText = 'Launch Command Center';
+            launchBtn.disabled = false;
+        }
+        switchView('app');
+    }, 1100);
 }
 
 // ==========================================================================
@@ -1060,3 +1236,136 @@ function recalculateBusinessMetrics() {
         });
     }
 }
+
+// ==========================================================================
+// FEATURE F3: ARC HERO MOCKUP CONTROLLER & 3D TILT
+// ==========================================================================
+
+let heroMockupState = {
+    period: 'monthly', // 'monthly' | 'annual'
+    activeTab: 'overview' // 'overview' | 'revenue' | 'tax'
+};
+
+const HERO_MOCKUP_DATA = {
+    monthly: {
+        balance: 'R24,650',
+        periodLabel: 'Net Profit (July)',
+        growth: '+18.4% vs last month',
+        topPlatform: 'YouTube 74%',
+        bars: { youtube: '74%', tiktok: '18%', brand: '8%' },
+        peak: 'Peak R24,650',
+        linePath: 'M 0,50 Q 50,45 100,30 T 200,20 T 300,5',
+        areaPath: 'M 0,50 Q 50,45 100,30 T 200,20 T 300,5 L 300,60 L 0,60 Z'
+    },
+    annual: {
+        balance: 'R295,800',
+        periodLabel: 'Net Profit (YTD 2026)',
+        growth: '+34.2% YoY Growth',
+        topPlatform: 'YouTube 70%',
+        bars: { youtube: '70%', tiktok: '20%', brand: '10%' },
+        peak: 'Peak R295,800',
+        linePath: 'M 0,55 Q 50,40 100,25 T 200,15 T 300,2',
+        areaPath: 'M 0,55 Q 50,40 100,25 T 200,15 T 300,2 L 300,60 L 0,60 Z'
+    }
+};
+
+function setupHeroMockupInteractions() {
+    const wrapper = document.getElementById('arc-hero-wrapper');
+    const frame = document.getElementById('arc-browser-frame');
+    if (!wrapper || !frame) return;
+
+    // 3D Perspective Tilt on Mousemove
+    wrapper.addEventListener('mousemove', (e) => {
+        if (window.innerWidth < 640 || window.matchMedia('(pointer: coarse)').matches) return;
+        const rect = wrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -6; // max 6deg
+        const rotateY = ((x - centerX) / centerX) * 6;  // max 6deg
+
+        frame.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+        frame.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    });
+}
+
+function setHeroMockupPeriod(period) {
+    heroMockupState.period = period;
+    const btnMonthly = document.getElementById('toggle-btn-monthly');
+    const btnAnnual = document.getElementById('toggle-btn-annual');
+    const data = HERO_MOCKUP_DATA[period];
+
+    if (!data) return;
+
+    if (btnMonthly && btnAnnual) {
+        if (period === 'monthly') {
+            btnMonthly.className = 'px-sm py-1 rounded-lg font-semibold bg-accent-emerald text-black shadow transition-all';
+            btnAnnual.className = 'px-sm py-1 rounded-lg font-semibold text-text-secondary hover:text-white transition-all';
+        } else {
+            btnAnnual.className = 'px-sm py-1 rounded-lg font-semibold bg-accent-emerald text-black shadow transition-all';
+            btnMonthly.className = 'px-sm py-1 rounded-lg font-semibold text-text-secondary hover:text-white transition-all';
+        }
+    }
+
+    // Dynamic Text Updates
+    const elBalance = document.getElementById('hero-mockup-balance-display');
+    const elLabel = document.getElementById('hero-mockup-period-label');
+    const elGrowth = document.getElementById('hero-mockup-growth-tag');
+    const elTopPlatform = document.getElementById('hero-mockup-top-platform');
+    const elPeak = document.getElementById('hero-mockup-peak');
+
+    if (elBalance) elBalance.innerText = data.balance;
+    if (elLabel) elLabel.innerText = data.periodLabel;
+    if (elGrowth) elGrowth.innerText = data.growth;
+    if (elTopPlatform) elTopPlatform.innerText = data.topPlatform;
+    if (elPeak) elPeak.innerText = data.peak;
+
+    // Bar Progress Animations
+    const barYT = document.getElementById('bar-youtube');
+    const barTT = document.getElementById('bar-tiktok');
+    const barBD = document.getElementById('bar-brand');
+    if (barYT) barYT.style.width = data.bars.youtube;
+    if (barTT) barTT.style.width = data.bars.tiktok;
+    if (barBD) barBD.style.width = data.bars.brand;
+
+    // SVG Line Animate
+    const linePath = document.getElementById('hero-chart-line');
+    const areaPath = document.getElementById('hero-chart-area');
+    if (linePath) linePath.setAttribute('d', data.linePath);
+    if (areaPath) areaPath.setAttribute('d', data.areaPath);
+}
+
+function switchHeroMockupTab(tabName) {
+    heroMockupState.activeTab = tabName;
+    document.querySelectorAll('.arc-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    const titleEl = document.getElementById('hero-mockup-tab-title');
+    if (titleEl) {
+        if (tabName === 'overview') titleEl.innerText = 'Creator Cash Flow Command Center';
+        if (tabName === 'revenue') titleEl.innerText = 'Consolidated Revenue Streams';
+        if (tabName === 'tax') titleEl.innerText = 'Tax Deduction & Savings Engine';
+    }
+}
+
+function toggleArcSidebar() {
+    const sidebar = document.getElementById('arc-sidebar-preview');
+    if (sidebar) {
+        sidebar.classList.toggle('hidden');
+    }
+}
+
+function refreshHeroMockup() {
+    setHeroMockupPeriod(heroMockupState.period);
+}
+
