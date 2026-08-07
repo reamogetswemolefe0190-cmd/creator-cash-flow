@@ -142,6 +142,8 @@ app.post('/api/auth/signup', async (req, res) => {
 
         // 3. Dispatch Live Transactional Email via Resend
         const RESEND_API_KEY = process.env.RESEND_API_KEY;
+        const FROM_EMAIL = process.env.FROM_EMAIL || 'Creator Cash Flow <onboarding@resend.dev>';
+        
         if (RESEND_API_KEY) {
             console.log(`[RESEND] Sending welcome verification email to: ${email}`);
             try {
@@ -152,24 +154,45 @@ app.post('/api/auth/signup', async (req, res) => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        from: 'Creator HQ <onboarding@resend.dev>',
+                        from: FROM_EMAIL,
                         to: email.toLowerCase(),
-                        subject: 'Verify your Creator Command Center',
+                        subject: 'Welcome to Creator Cash Flow — Your Business Command Center is Active',
                         html: `
-                            <div style="background-color: #050505; color: #ffffff; padding: 48px 24px; font-family: 'Inter', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08);">
-                                <h2 style="color: #22C55E; font-size: 24px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.02em;">Welcome to Creator HQ, ${name}!</h2>
-                                <p style="color: #8E8E93; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Your digital business command center is active and ready to import platform metrics.</p>
-                                <div style="background-color: #0B0B0B; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px;">
-                                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                                        <span style="color: #8E8E93;">Creator Account:</span>
+                            <div style="background-color: #050505; color: #ffffff; padding: 48px 24px; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08);">
+                                <!-- Header Logo -->
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                                    <div style="background-color: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #22C55E; font-size: 20px; font-weight: bold;">💸</div>
+                                    <span style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">Creator Cash Flow</span>
+                                </div>
+
+                                <h2 style="color: #22C55E; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em;">Welcome aboard, ${name}!</h2>
+                                <p style="color: #A1A1AA; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Your Creator Business Command Center account is verified and ready. Track earnings, understand growth, and build a sustainable creator business.</p>
+                                
+                                <!-- Status Card -->
+                                <div style="background-color: #0B0B0B; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+                                    <div style="margin-bottom: 12px; font-size: 13px; display: flex; justify-content: space-between;">
+                                        <span style="color: #71717A;">Creator Account:</span>
                                         <strong style="color: #ffffff;">${email}</strong>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                                        <span style="color: #8E8E93;">Command Center Status:</span>
-                                        <strong style="color: #22C55E;">Verified Active Sync</strong>
+                                    <div style="font-size: 13px; display: flex; justify-content: space-between;">
+                                        <span style="color: #71717A;">Command Center Status:</span>
+                                        <strong style="color: #22C55E;">🟢 Verified & Active Sync</strong>
                                     </div>
                                 </div>
-                                <p style="color: #8E8E93; font-size: 12px; opacity: 0.6; line-height: 1.4; margin-top: 24px;">If you did not initiate this activation, please contact support immediately.</p>
+
+                                <!-- Quickstart Steps -->
+                                <h3 style="color: #ffffff; font-size: 15px; font-weight: 700; margin-bottom: 12px;">3 Steps to Get Started:</h3>
+                                <ul style="color: #A1A1AA; font-size: 13px; line-height: 1.8; margin-bottom: 28px; padding-left: 20px;">
+                                    <li><strong>Connect Revenue Channels:</strong> Link YouTube, TikTok, or Patreon to auto-sync income.</li>
+                                    <li><strong>Tax Reserve Engine:</strong> View your automated 15% sole-proprietor tax reserve holding.</li>
+                                    <li><strong>AI Financial Intelligence:</strong> Chat with CCF AI for real-time equipment & P&L advice.</li>
+                                </ul>
+
+                                <!-- Footer -->
+                                <div style="border-t: 1px solid rgba(255,255,255,0.08); pt: 20px; margin-top: 24px; text-align: center;">
+                                    <p style="color: #71717A; font-size: 12px; line-height: 1.5; margin: 0;">© 2026 REM Technological Solutions. All rights reserved.</p>
+                                    <p style="color: #52525B; font-size: 11px; margin-top: 6px;">Creator Cash Flow — Financial Intelligence for Modern Creators</p>
+                                </div>
                             </div>
                         `
                     })
@@ -178,7 +201,7 @@ app.post('/api/auth/signup', async (req, res) => {
                 if (!emailResponse.ok) {
                     console.error('[RESEND ERROR]', emailData);
                 } else {
-                    console.log('[RESEND SUCCESS] Email sent:', emailData.id);
+                    console.log('[RESEND SUCCESS] Welcome email sent:', emailData.id);
                 }
             } catch (err) {
                 console.error('[RESEND DISPATCH ERROR]', err);
