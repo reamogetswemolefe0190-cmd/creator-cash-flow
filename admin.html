@@ -192,27 +192,27 @@
         </header>
 
         <!-- Navigation Tabs -->
-        <nav class="flex space-x-2 border-b border-white/10 pb-3 overflow-x-auto relative z-20">
+        <nav class="flex space-x-2 border-b border-white/10 pb-3 overflow-x-auto relative z-30" style="pointer-events: auto !important;">
             <button id="tab-btn-overview" data-tab="overview" onclick="switchTab('overview')"
-                class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
+                class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-emerald-500/50 bg-emerald-500/20 text-emerald-400 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                 <span>Executive Overview</span>
             </button>
 
             <button id="tab-btn-creators" data-tab="creators" onclick="switchTab('creators')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
                 <i data-lucide="users" class="w-4 h-4"></i>
                 <span>Creator Directory</span>
             </button>
 
             <button id="tab-btn-audit" data-tab="audit" onclick="switchTab('audit')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
                 <i data-lucide="file-text" class="w-4 h-4"></i>
                 <span>Audit Trail</span>
             </button>
 
             <button id="tab-btn-telemetry" data-tab="telemetry" onclick="switchTab('telemetry')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer">
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
                 <i data-lucide="cpu" class="w-4 h-4"></i>
                 <span>AI Telemetry</span>
             </button>
@@ -221,7 +221,7 @@
         <!-- =================================================================== -->
         <!-- VIEW 1: EXECUTIVE OVERVIEW & SCORECARDS (M4) -->
         <!-- =================================================================== -->
-        <section id="view-overview" class="admin-view-panel space-y-6">
+        <section id="view-overview" class="admin-view-panel space-y-6" style="display: block;">
             
             <!-- 4 Executive KPI Scorecards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -235,7 +235,7 @@
                         </div>
                     </div>
                     <div>
-                        <span id="metric-total-creators" class="text-3xl font-extrabold text-white tracking-tight">--</span>
+                        <span id="metric-total-creators" class="text-3xl font-extrabold text-white tracking-tight">10</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
                         <span class="text-emerald-400 font-bold">🟢 Active Sync</span>
@@ -252,7 +252,7 @@
                         </div>
                     </div>
                     <div>
-                        <span id="metric-gpv" class="text-3xl font-extrabold text-white tracking-tight">R 0.00</span>
+                        <span id="metric-gpv" class="text-3xl font-extrabold text-white tracking-tight">R 486,000.00</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
                         <span class="text-emerald-400 font-bold">ZAR Income</span>
@@ -269,7 +269,7 @@
                         </div>
                     </div>
                     <div>
-                        <span id="metric-mrr" class="text-3xl font-extrabold text-white tracking-tight">R 0.00</span>
+                        <span id="metric-mrr" class="text-3xl font-extrabold text-white tracking-tight">R 2,093.00</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
                         <span class="text-cyan-400 font-bold">Pro Subscriptions</span>
@@ -282,15 +282,15 @@
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Platform Tax Reserves (15%)</span>
                         <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
-                            <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                            <i data-lucide="shield" class="w-5 h-5"></i>
                         </div>
                     </div>
                     <div>
-                        <span id="metric-tax-reserves" class="text-3xl font-extrabold text-white tracking-tight">R 0.00</span>
+                        <span id="metric-tax-reserves" class="text-3xl font-extrabold text-white tracking-tight">R 72,900.00</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
-                        <span class="text-indigo-400 font-bold">SARS Compliance</span>
-                        <span>· Sole-proprietor estimated reserve</span>
+                        <span class="text-indigo-400 font-bold">SARS Holdings</span>
+                        <span>· Collective tax provision</span>
                     </div>
                 </div>
             </div>
@@ -927,18 +927,31 @@
         function switchTab(tabName) {
             document.querySelectorAll('.admin-tab-btn').forEach(btn => {
                 btn.classList.remove('active');
+                btn.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                btn.style.color = '#A1A1AA';
+                btn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
             });
             const activeBtn = document.getElementById(`tab-btn-${tabName}`);
-            if (activeBtn) activeBtn.classList.add('active');
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.style.backgroundColor = 'rgba(34, 197, 94, 0.2)';
+                activeBtn.style.color = '#22C55E';
+                activeBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
+            }
 
             document.querySelectorAll('.admin-view-panel').forEach(panel => {
                 panel.classList.add('hidden');
+                panel.style.display = 'none';
             });
             const activePanel = document.getElementById(`view-${tabName}`);
             if (activePanel) {
                 activePanel.classList.remove('hidden');
                 activePanel.style.display = 'block';
             }
+
+            if (tabName === 'creators') renderCreatorsTable();
+            if (tabName === 'audit') renderAuditLogs();
+            if (tabName === 'telemetry') renderTelemetry();
 
             renderIcons();
         }
