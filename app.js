@@ -1369,3 +1369,219 @@ function refreshHeroMockup() {
     setHeroMockupPeriod(heroMockupState.period);
 }
 
+// ==========================================================================
+// FEATURE F11: GEMINI AI FINANCIAL ASSISTANT & FALLBACK ENGINE
+// ==========================================================================
+
+function handleGeminiSubmit(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('gemini-chat-input');
+    if (!input) return;
+    const userPrompt = input.value.trim();
+    if (!userPrompt) return;
+
+    input.value = '';
+    appendGeminiUserBubble(userPrompt);
+    queryGeminiAPI(userPrompt);
+}
+
+function sendPresetPrompt(promptText) {
+    const input = document.getElementById('gemini-chat-input');
+    if (input) {
+        input.value = promptText;
+        handleGeminiSubmit();
+    }
+}
+
+function appendGeminiUserBubble(text) {
+    const stream = document.getElementById('gemini-chat-stream');
+    if (!stream) return;
+
+    const userBubble = document.createElement('div');
+    userBubble.className = 'flex items-start justify-end gap-sm';
+    userBubble.innerHTML = `
+        <div class="p-md bg-accent-emerald/10 border border-accent-emerald/30 rounded-2xl text-xs sm:text-sm text-white max-w-xl text-left">
+            <p class="font-semibold text-accent-emerald text-[11px] uppercase mb-xs">You</p>
+            <p>${escapeHTML(text)}</p>
+        </div>
+        <div class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white flex-shrink-0 font-bold text-xs">
+            ME
+        </div>
+    `;
+    stream.appendChild(userBubble);
+    stream.scrollTop = stream.scrollHeight;
+}
+
+function queryGeminiAPI(userPrompt) {
+    const stream = document.getElementById('gemini-chat-stream');
+    if (!stream) return;
+
+    const typingBubble = document.createElement('div');
+    typingBubble.id = 'gemini-typing-indicator';
+    typingBubble.className = 'flex items-start gap-sm animate-pulse';
+    typingBubble.innerHTML = `
+        <div class="w-8 h-8 rounded-xl bg-accent-emerald/20 border border-accent-emerald/40 flex items-center justify-center text-accent-emerald flex-shrink-0">
+            <span class="material-symbols-outlined text-sm">auto_awesome</span>
+        </div>
+        <div class="p-md bg-surface border border-white/[0.08] rounded-2xl text-xs text-text-secondary">
+            Gemini AI is analyzing your ledger...
+        </div>
+    `;
+    stream.appendChild(typingBubble);
+    stream.scrollTop = stream.scrollHeight;
+
+    const savedKey = localStorage.getItem('ccf_gemini_api_key');
+
+    if (savedKey) {
+        // Live Gemini API Endpoint Call
+        const systemContext = `You are CCF AI, an expert financial advisor for modern creators.
+Current Creator P&L Summary:
+- Net Profit: R${state.balance.toLocaleString()}
+- Estimated Tax Obligation: R${Math.max(0, Math.round(state.balance * 0.15)).toLocaleString()} (15%)
+- Top Revenue Channels: ${state.sources.map(s => `${s.name} (${s.percent})`).join(', ') || 'YouTube (74%), TikTok (18%)'}
+Provide concise, highly actionable 2-3 sentence financial guidance answering the user's prompt directly.`;
+
+        fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${savedKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        { text: systemContext },
+                        { text: userPrompt }
+                    ]
+                }]
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            removeTypingIndicator();
+            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                appendGeminiBotBubble(aiResponse, 'Gemini 1.5 Flash API');
+            } else {
+                console.warn('[GEMINI API] Unexpected payload structure. Reverting to Edge AI fallback.', data);
+                const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
+                appendGeminiBotBubble(fallbackMsg, 'CCF Edge AI');
+            }
+        })
+        .catch(err => {
+            console.warn('[GEMINI API] Request failed. Reverting to local AI heuristics engine.', err);
+            removeTypingIndicator();
+            const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
+            appendGeminiBotBubble(fallbackMsg, 'CCF Edge AI');
+        });
+    } else {
+        // Fallback local heuristic response (works 100% offline & demo mode)
+        setTimeout(() => {
+            removeTypingIndicator();
+            const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
+            appendGeminiBotBubble(fallbackMsg, 'CCF Edge AI');
+        }, 600);
+    }
+}
+
+function removeTypingIndicator() {
+    const indicator = document.getElementById('gemini-typing-indicator');
+    if (indicator) indicator.remove();
+}
+
+function appendGeminiBotBubble(text, providerLabel) {
+    const stream = document.getElementById('gemini-chat-stream');
+    if (!stream) return;
+
+    const botBubble = document.createElement('div');
+    botBubble.className = 'flex items-start gap-sm';
+    botBubble.innerHTML = `
+        <div class="w-8 h-8 rounded-xl bg-accent-emerald/20 border border-accent-emerald/40 flex items-center justify-center text-accent-emerald flex-shrink-0">
+            <span class="material-symbols-outlined text-sm">auto_awesome</span>
+        </div>
+        <div class="p-md bg-surface border border-white/[0.08] rounded-2xl text-xs sm:text-sm text-text-primary space-y-xs max-w-xl">
+            <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-accent-emerald">CCF AI Assistant</span>
+                <span class="text-[10px] text-text-secondary bg-white/[0.04] px-xs py-[2px] rounded">${providerLabel}</span>
+            </div>
+            <div class="leading-relaxed space-y-xs">${formatMarkdownText(text)}</div>
+        </div>
+    `;
+    stream.appendChild(botBubble);
+    stream.scrollTop = stream.scrollHeight;
+}
+
+function generateLocalAIFinancialAdvice(prompt) {
+    const p = prompt.toLowerCase();
+    const estTax = Math.max(0, Math.round(state.balance * 0.15));
+
+    if (p.includes('camera') || p.includes('upgrade') || p.includes('afford') || p.includes('equipment')) {
+        if (state.balance >= 20000) {
+            return `Yes, based on your current net profit of **R${state.balance.toLocaleString()}**, you can safely afford a R15,000 camera upgrade. You will maintain a healthy runway buffer of **R${(state.balance - 15000).toLocaleString()}**. Remember to log the purchase as an operational tax deduction!`;
+        } else {
+            return `With a current balance of **R${state.balance.toLocaleString()}**, spending R15,000 on new equipment would reduce your liquidity buffer below 30%. I recommend holding off until next month's payouts sync or opting for gear rental.`;
+        }
+    }
+
+    if (p.includes('tax') || p.includes('reserve') || p.includes('hold')) {
+        return `Based on your sole-proprietorship net profit (R${state.balance.toLocaleString()}), your recommended tax reserve is **R${estTax.toLocaleString()}** (15%). Setting this aside in a high-yield account protects your business from quarterly tax shocks.`;
+    }
+
+    if (p.includes('platform') || p.includes('focus') || p.includes('youtube') || p.includes('growth')) {
+        const topSource = state.sources[0] ? `${state.sources[0].name} (${state.sources[0].percent})` : 'YouTube (74%)';
+        return `Your highest yield channel is currently **${topSource}**. However, because your roster concentration is over 70%, your AI briefing recommends reinvesting 20% of your production time into diversifying your secondary platforms like TikTok or Patreon.`;
+    }
+
+    return `Based on your live ledger (Net Income: R${state.balance.toLocaleString()}, Tax Hold: R${estTax.toLocaleString()}), your business health is strong! Keep logging write-offs to optimize tax obligations.`;
+}
+
+function openGeminiKeyModal() {
+    const currentKey = localStorage.getItem('ccf_gemini_api_key') || '';
+    openModal('Configure Gemini AI Key', `
+        <div class="space-y-md text-left">
+            <p class="text-xs text-text-secondary">Enter your free Google Gemini API Key to enable live generative AI financial chat. If left empty, CCF will use the built-in edge AI engine.</p>
+            <div class="space-y-xs">
+                <label class="text-xs font-bold text-text-secondary uppercase">Gemini API Key</label>
+                <input type="password" id="input-gemini-key" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white text-xs focus:border-accent-emerald focus:ring-0" placeholder="AIzaSy..." value="${currentKey}">
+            </div>
+            <div class="flex gap-md pt-sm">
+                <button class="flex-1 bg-white text-black font-bold py-sm rounded-xl text-xs active:scale-95 transition-transform" onclick="saveGeminiKey()">Save Key</button>
+                <button class="flex-1 border border-white/[0.08] text-text-secondary py-sm rounded-xl text-xs hover:text-white" onclick="clearGeminiKey()">Reset to Free Fallback</button>
+            </div>
+        </div>
+    `);
+}
+
+function saveGeminiKey() {
+    const val = document.getElementById('input-gemini-key').value.trim();
+    if (val) {
+        localStorage.setItem('ccf_gemini_api_key', val);
+        const status = document.getElementById('gemini-key-status');
+        if (status) status.innerText = 'Gemini 1.5 Flash (Custom Key)';
+        alert('✅ Gemini API Key saved! Live generative AI response mode active.');
+    } else {
+        clearGeminiKey();
+    }
+    closeModal();
+}
+
+function clearGeminiKey() {
+    localStorage.removeItem('ccf_gemini_api_key');
+    const status = document.getElementById('gemini-key-status');
+    if (status) status.innerText = 'Gemini 1.5 Flash (Free Tier)';
+    alert('Reset to built-in CCF Edge AI engine.');
+    closeModal();
+}
+
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
+}
+
+function formatMarkdownText(str) {
+    let formatted = escapeHTML(str);
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    formatted = formatted.replace(/\n/g, '<br>');
+    return formatted;
+}
+
+

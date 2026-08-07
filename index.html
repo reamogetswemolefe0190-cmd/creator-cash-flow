@@ -824,11 +824,63 @@
                 </div>
             </section>
 
-            <!-- TAB 5: INSIGHTS -->
-            <section id="tab-insights" class="tab-pane hidden">
-                <div class="p-lg bg-surface border border-white/[0.08] rounded-3xl card-shadow">
-                    <h3 class="font-display text-headline-md mb-lg text-white">Business Intelligence</h3>
-                    <p class="font-body-md text-text-secondary">Comprehensive narrative briefings and platform metrics.</p>
+            <!-- TAB 5: INSIGHTS (Gemini AI Financial Assistant) -->
+            <section id="tab-insights" class="tab-pane hidden space-y-xl">
+                <div class="p-6 sm:p-8 bg-surface border border-white/[0.08] rounded-3xl card-shadow space-y-lg">
+                    <!-- Header -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md pb-md border-b border-white/[0.06]">
+                        <div>
+                            <div class="flex items-center gap-xs">
+                                <span class="material-symbols-outlined text-accent-emerald text-2xl">auto_awesome</span>
+                                <h3 class="font-display text-2xl font-extrabold text-white">Gemini AI Financial Assistant</h3>
+                            </div>
+                            <p class="text-xs sm:text-sm text-text-secondary mt-xs">Real-time generative P&L analysis, tax strategy, and growth recommendations.</p>
+                        </div>
+                        <button class="flex items-center gap-xs text-xs font-semibold text-text-secondary hover:text-white px-md py-xs rounded-xl border border-white/[0.08] bg-background hover:bg-white/[0.03] transition-colors" onclick="openGeminiKeyModal()">
+                            <span class="material-symbols-outlined text-sm">key</span>
+                            <span id="gemini-key-status">Gemini 1.5 Flash (Free Tier)</span>
+                        </button>
+                    </div>
+
+                    <!-- Preset Quick Prompt Pills -->
+                    <div class="space-y-xs">
+                        <span class="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Suggested Queries</span>
+                        <div class="flex flex-wrap gap-xs text-xs">
+                            <button class="px-md py-xs rounded-xl border border-white/[0.08] bg-background hover:bg-white/[0.04] text-text-secondary hover:text-white transition-all text-left" onclick="sendPresetPrompt('Can I afford a R15,000 equipment upgrade this month?')">
+                                💬 "Can I afford a R15,000 equipment upgrade?"
+                            </button>
+                            <button class="px-md py-xs rounded-xl border border-white/[0.08] bg-background hover:bg-white/[0.04] text-text-secondary hover:text-white transition-all text-left" onclick="sendPresetPrompt('How much tax should I reserve based on my net profit?')">
+                                🛡️ "How much tax should I set aside?"
+                            </button>
+                            <button class="px-md py-xs rounded-xl border border-white/[0.08] bg-background hover:bg-white/[0.04] text-text-secondary hover:text-white transition-all text-left" onclick="sendPresetPrompt('Which platform provides the highest return for my time?')">
+                                📈 "Which platform should I focus on?"
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Message Stream -->
+                    <div id="gemini-chat-stream" class="min-h-[260px] max-h-[420px] overflow-y-auto space-y-md p-md bg-background/60 border border-white/[0.06] rounded-2xl">
+                        <!-- Bot Initial Welcome Message -->
+                        <div class="flex items-start gap-sm">
+                            <div class="w-8 h-8 rounded-xl bg-accent-emerald/20 border border-accent-emerald/40 flex items-center justify-center text-accent-emerald flex-shrink-0">
+                                <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                            </div>
+                            <div class="p-md bg-surface border border-white/[0.08] rounded-2xl text-xs sm:text-sm text-text-primary space-y-xs max-w-xl">
+                                <p class="font-bold text-accent-emerald">CCF Gemini AI</p>
+                                <p>Hello! I've analyzed your live financial ledger. Your net profit stands at <strong class="text-white">R24,650</strong> with a projected tax hold of <strong class="text-white">R3,125</strong> (15%).</p>
+                                <p class="text-text-secondary text-xs">How can I assist your creator business today?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Box -->
+                    <form onsubmit="handleGeminiSubmit(event)" class="flex gap-sm items-center">
+                        <input type="text" id="gemini-chat-input" class="flex-1 px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white placeholder-text-secondary text-xs sm:text-sm focus:border-accent-emerald focus:ring-0" placeholder="Ask Gemini AI about tax, write-offs, or revenue targets...">
+                        <button type="submit" id="gemini-send-btn" class="bg-white text-black font-bold px-lg py-sm rounded-xl shadow active:scale-95 transition-transform flex items-center gap-xs text-xs sm:text-sm">
+                            <span>Send</span>
+                            <span class="material-symbols-outlined text-sm">send</span>
+                        </button>
+                    </form>
                 </div>
             </section>
         </main>
