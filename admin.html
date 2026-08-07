@@ -104,7 +104,7 @@
             </div>
 
             <!-- Login Form -->
-            <form id="admin-login-form" class="space-y-4">
+            <form id="admin-login-form" onsubmit="handleLoginSubmit(event); return false;" class="space-y-4">
                 <div>
                     <label for="admin-email" class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Admin Email</label>
                     <div class="relative">
@@ -1306,6 +1306,15 @@
                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#6366F1]"></span><span>Brands (${((dataValues[3]/total)*100).toFixed(0)}%)</span></div>
                 `;
             }
+        }
+
+        // Immediate Execution Safeguard
+        try {
+            renderIcons();
+            setupEventListeners();
+            checkSession();
+        } catch (e) {
+            console.warn('Immediate execution notice:', e);
         }
     </script>
 </body>
