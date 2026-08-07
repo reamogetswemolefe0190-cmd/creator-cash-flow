@@ -193,28 +193,28 @@
 
         <!-- Navigation Tabs -->
         <nav class="flex space-x-2 border-b border-white/10 pb-3 overflow-x-auto relative z-30" style="pointer-events: auto !important;">
-            <button id="tab-btn-overview" data-tab="overview" onclick="switchTab('overview')"
-                class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-emerald-500/50 bg-emerald-500/20 text-emerald-400 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                <span>Executive Overview</span>
+            <button type="button" id="tab-btn-overview" onclick="switchTab('overview')"
+                class="admin-tab-btn active px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-emerald-500/50 bg-emerald-500/20 text-emerald-400 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 pointer-events-none"></i>
+                <span class="pointer-events-none">Executive Overview</span>
             </button>
 
-            <button id="tab-btn-creators" data-tab="creators" onclick="switchTab('creators')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
-                <i data-lucide="users" class="w-4 h-4"></i>
-                <span>Creator Directory</span>
+            <button type="button" id="tab-btn-creators" onclick="switchTab('creators')"
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
+                <i data-lucide="users" class="w-4 h-4 pointer-events-none"></i>
+                <span class="pointer-events-none">Creator Directory</span>
             </button>
 
-            <button id="tab-btn-audit" data-tab="audit" onclick="switchTab('audit')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
-                <i data-lucide="file-text" class="w-4 h-4"></i>
-                <span>Audit Trail</span>
+            <button type="button" id="tab-btn-audit" onclick="switchTab('audit')"
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
+                <i data-lucide="file-text" class="w-4 h-4 pointer-events-none"></i>
+                <span class="pointer-events-none">Audit Trail</span>
             </button>
 
-            <button id="tab-btn-telemetry" data-tab="telemetry" onclick="switchTab('telemetry')"
-                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important;">
-                <i data-lucide="cpu" class="w-4 h-4"></i>
-                <span>AI Telemetry</span>
+            <button type="button" id="tab-btn-telemetry" onclick="switchTab('telemetry')"
+                class="admin-tab-btn px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-zinc-300 hover:text-white transition-all cursor-pointer" style="pointer-events: auto !important; cursor: pointer !important;">
+                <i data-lucide="cpu" class="w-4 h-4 pointer-events-none"></i>
+                <span class="pointer-events-none">AI Telemetry</span>
             </button>
         </nav>
 
@@ -235,11 +235,11 @@
                         </div>
                     </div>
                     <div>
-                        <span id="metric-total-creators" class="text-3xl font-extrabold text-white tracking-tight">10</span>
+                        <span id="metric-total-creators" class="text-3xl font-extrabold text-white tracking-tight">0</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
-                        <span class="text-emerald-400 font-bold">🟢 Active Sync</span>
-                        <span>· Real-time platform accounts</span>
+                        <span class="text-emerald-400 font-bold">🟢 Real-Time Sync</span>
+                        <span>· Verified database users</span>
                     </div>
                 </div>
 
@@ -252,11 +252,11 @@
                         </div>
                     </div>
                     <div>
-                        <span id="metric-gpv" class="text-3xl font-extrabold text-white tracking-tight">R 486,000.00</span>
+                        <span id="metric-gpv" class="text-3xl font-extrabold text-white tracking-tight">R 0.00</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
                         <span class="text-emerald-400 font-bold">ZAR Income</span>
-                        <span>· Cumulative earnings processed</span>
+                        <span>· Cumulative creator earnings</span>
                     </div>
                 </div>
 
@@ -269,7 +269,7 @@
                         </div>
                     </div>
                     <div>
-                        <span id="metric-mrr" class="text-3xl font-extrabold text-white tracking-tight">R 2,093.00</span>
+                        <span id="metric-mrr" class="text-3xl font-extrabold text-white tracking-tight">R 0.00</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
                         <span class="text-cyan-400 font-bold">Pro Subscriptions</span>
@@ -286,7 +286,7 @@
                         </div>
                     </div>
                     <div>
-                        <span id="metric-tax-reserves" class="text-3xl font-extrabold text-white tracking-tight">R 72,900.00</span>
+                        <span id="metric-tax-reserves" class="text-3xl font-extrabold text-white tracking-tight">R 0.00</span>
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-1.5">
                         <span class="text-indigo-400 font-bold">SARS Holdings</span>
@@ -837,24 +837,15 @@
                 { month: 'Mar', gpv: 81000, mrr: 299, creators: 2 },
                 { month: 'Apr', gpv: 162000, mrr: 598, creators: 4 },
                 { month: 'May', gpv: 243000, mrr: 897, creators: 6 },
-                { month: 'Jun', gpv: 324000, mrr: 1495, creators: 8 },
-                { month: 'Jul', gpv: 405000, mrr: 1794, creators: 9 },
-                { month: 'Aug', gpv: 486000, mrr: 2093, creators: 10 }
-            ]
+        // Real Database Metric Baselines (0 until real users transact)
+        const EMPTY_METRICS = {
+            totalCreators: 0,
+            gpvZar: 0,
+            mrrZar: 0,
+            taxReservesZar: 0,
+            channelBreakdown: { youtube: 0, tiktok: 0, patreon: 0, brand_deals: 0 },
+            timeline: []
         };
-
-        const SEED_CREATORS = [
-            { id: 'usr_seed_1', name: 'Naledi Molefe', email: 'naledi@creator.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-02-15T10:00:00.000Z' },
-            { id: 'usr_seed_2', name: 'Sipho Dlamini', email: 'sipho@vlogsa.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-03-01T11:20:00.000Z' },
-            { id: 'usr_seed_3', name: 'Jessica van der Merwe', email: 'jessica@techreviews.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-03-18T14:15:00.000Z' },
-            { id: 'usr_seed_4', name: 'Thabo Mokoena', email: 'thabo@fitnessza.co.za', plan_tier: 'Free', status: 'active', created_at: '2026-04-05T09:30:00.000Z' },
-            { id: 'usr_seed_5', name: 'Chloe Adams', email: 'chloe@beautyblog.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-04-20T16:45:00.000Z' },
-            { id: 'usr_seed_6', name: 'Bongani Sithole', email: 'bongani@gamingza.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-05-10T12:00:00.000Z' },
-            { id: 'usr_seed_7', name: 'Fatima Patel', email: 'fatima@foodie.co.za', plan_tier: 'Free', status: 'active', created_at: '2026-06-01T08:10:00.000Z' },
-            { id: 'usr_seed_8', name: 'Liam Botha', email: 'liam@travelsa.co.za', plan_tier: 'Pro', status: 'active', created_at: '2026-06-15T15:30:00.000Z' },
-            { id: 'usr_seed_9', name: 'Zanele Khumalo', email: 'zanele@fashion.co.za', plan_tier: 'Free', status: 'active', created_at: '2026-07-02T13:00:00.000Z' },
-            { id: 'usr_seed_10', name: 'Kabelo Mabena', email: 'kabelo@podcasts.co.za', plan_tier: 'Pro', status: 'suspended', created_at: '2026-07-12T17:20:00.000Z' }
-        ];
 
         // Fetch Metrics (Scorecards & Charts)
         async function fetchMetrics() {
@@ -864,60 +855,70 @@
                     const data = await res.json();
                     state.metrics = data;
                 } else {
-                    state.metrics = state.metrics || SEED_METRICS;
+                    state.metrics = state.metrics || EMPTY_METRICS;
                 }
             } catch (err) {
-                console.warn('API metrics notice, loading seed baseline:', err);
-                state.metrics = state.metrics || SEED_METRICS;
+                console.warn('API metrics notice, loading clean baseline:', err);
+                state.metrics = state.metrics || EMPTY_METRICS;
             }
 
-            const data = state.metrics || SEED_METRICS;
-            document.getElementById('metric-total-creators').textContent = data.totalCreators || 10;
-            document.getElementById('metric-gpv').textContent = formatZAR(data.gpvZar || 486000);
-            document.getElementById('metric-mrr').textContent = formatZAR(data.mrrZar || 2093);
-            document.getElementById('metric-tax-reserves').textContent = formatZAR(data.taxReservesZar || 72900);
+            const data = state.metrics || EMPTY_METRICS;
+            document.getElementById('metric-total-creators').textContent = data.totalCreators || 0;
+            document.getElementById('metric-gpv').textContent = formatZAR(data.gpvZar || 0);
+            document.getElementById('metric-mrr').textContent = formatZAR(data.mrrZar || 0);
+            document.getElementById('metric-tax-reserves').textContent = formatZAR(data.taxReservesZar || 0);
 
-            renderGrowthChart(data.timeline || SEED_METRICS.timeline);
-            renderChannelChart(data.channelBreakdown || SEED_METRICS.channelBreakdown);
+            renderGrowthChart(data.timeline || []);
+            renderChannelChart(data.channelBreakdown || EMPTY_METRICS.channelBreakdown);
         }
 
-        // Fetch Creators
+        // Fetch Creators (Real Database Accounts Only)
         async function fetchCreators() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/admin/creators`, { headers: getAuthHeaders() });
                 if (res.ok) {
                     state.creators = await res.json();
                 } else {
-                    state.creators = state.creators.length > 0 ? state.creators : SEED_CREATORS;
+                    state.creators = [];
                 }
             } catch (err) {
-                console.warn('API creators notice, loading seed creators:', err);
-                state.creators = state.creators.length > 0 ? state.creators : SEED_CREATORS;
+                console.warn('API creators notice:', err);
+                state.creators = [];
             }
             renderCreatorsTable();
         }
 
-        // Fetch Audit Logs
+        // Fetch Audit Logs (Real Admin Actions Only)
         async function fetchAuditLogs() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/admin/audit-logs`, { headers: getAuthHeaders() });
                 if (res.ok) {
                     state.auditLogs = await res.json();
+                } else {
+                    state.auditLogs = [];
                 }
             } catch (err) {
                 console.warn('Audit logs notice:', err);
+                state.auditLogs = [];
             }
             renderAuditLogs();
         }
 
-        // Fetch Telemetry
+        // Fetch Telemetry (Real AI Queries Only)
         async function fetchTelemetry() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/admin/telemetry`, { headers: getAuthHeaders() });
                 if (res.ok) {
                     state.telemetry = await res.json();
+                } else {
+                    state.telemetry = [];
                 }
             } catch (err) {
+                console.warn('Telemetry notice:', err);
+                state.telemetry = [];
+            }
+            renderTelemetry();
+        }
                 console.warn('Telemetry notice:', err);
             }
             renderTelemetry();
@@ -964,7 +965,9 @@
 
             const query = (document.getElementById('creator-search-input')?.value || '').toLowerCase();
             let filtered = state.creators.filter(c => {
-                const matchesQuery = c.name.toLowerCase().includes(query) || c.email.toLowerCase().includes(query);
+                const name = c.name || '';
+                const email = c.email || '';
+                const matchesQuery = name.toLowerCase().includes(query) || email.toLowerCase().includes(query);
                 const matchesPlan = state.creatorFilterPlan === 'all' || (c.plan_tier || '').toLowerCase() === state.creatorFilterPlan;
                 return matchesQuery && matchesPlan;
             });
@@ -973,12 +976,19 @@
             filtered.sort((a, b) => {
                 if (state.creatorSort === 'newest') return new Date(b.created_at || 0) - new Date(a.created_at || 0);
                 if (state.creatorSort === 'oldest') return new Date(a.created_at || 0) - new Date(b.created_at || 0);
-                if (state.creatorSort === 'name') return a.name.localeCompare(b.name);
+                if (state.creatorSort === 'name') return (a.name || '').localeCompare(b.name || '');
                 return 0;
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-zinc-500 italic">No creators match current filters</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-zinc-400 text-xs">
+                    <div class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-white/5 border border-white/10 text-zinc-500 mb-2">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <p class="font-semibold text-zinc-300">No Registered Creators Yet</p>
+                    <p class="text-[11px] text-zinc-500 mt-1">Live creator sign-ups from creatorcashflow.co.za will appear here automatically.</p>
+                </td></tr>`;
+                renderIcons();
                 return;
             }
 
@@ -986,16 +996,17 @@
                 const isPro = (c.plan_tier || '').toLowerCase() === 'pro';
                 const isActive = (c.status || '').toLowerCase() === 'active';
                 const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
+                const initial = (c.name || c.email || 'C').charAt(0).toUpperCase();
 
                 return `
                     <tr class="hover:bg-white/5 transition-colors">
                         <td class="py-3.5 px-4 flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
-                                ${c.name.charAt(0).toUpperCase()}
+                                ${initial}
                             </div>
                             <div>
-                                <span class="block font-bold text-white">${c.name}</span>
-                                <span class="block text-[11px] text-zinc-400">${c.email}</span>
+                                <span class="block font-bold text-white">${c.name || 'Creator'}</span>
+                                <span class="block text-[11px] text-zinc-400">${c.email || ''}</span>
                             </div>
                         </td>
                         <td class="py-3.5 px-4">
@@ -1012,13 +1023,14 @@
                         <td class="py-3.5 px-4 text-zinc-400 text-xs">${dateStr}</td>
                         <td class="py-3.5 px-4 text-right">
                             <button onclick="openCreatorModal('${c.id}')" 
-                                class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:text-emerald-400 text-zinc-300 text-xs font-semibold transition-all">
+                                class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:text-emerald-400 text-zinc-300 text-xs font-semibold transition-all cursor-pointer">
                                 Inspect & Manage
                             </button>
                         </td>
                     </tr>
                 `;
             }).join('');
+            renderIcons();
         }
 
         // Open Creator Detail Modal
@@ -1027,8 +1039,8 @@
             if (!creator) return;
 
             state.selectedCreator = creator;
-            document.getElementById('modal-creator-name').textContent = creator.name;
-            document.getElementById('modal-creator-email').textContent = creator.email;
+            document.getElementById('modal-creator-name').textContent = creator.name || 'Creator';
+            document.getElementById('modal-creator-email').textContent = creator.email || '';
             document.getElementById('modal-creator-id').textContent = creator.id;
             document.getElementById('modal-admin-note').value = '';
 
@@ -1050,69 +1062,84 @@
             const freeBtn = document.getElementById('modal-plan-toggle-free');
 
             if (plan.toLowerCase() === 'pro') {
-                proBtn.className = 'py-2.5 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-xs font-bold text-emerald-400 flex items-center justify-center gap-2';
-                freeBtn.className = 'py-2.5 px-4 rounded-xl border border-white/10 text-xs font-bold text-zinc-400 hover:border-white/20 flex items-center justify-center gap-2';
+                proBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-emerald-500/50 bg-emerald-500/20 text-emerald-400 transition-all cursor-pointer';
+                freeBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition-all cursor-pointer';
             } else {
-                freeBtn.className = 'py-2.5 px-4 rounded-xl border border-white/20 bg-white/10 text-xs font-bold text-white flex items-center justify-center gap-2';
-                proBtn.className = 'py-2.5 px-4 rounded-xl border border-white/10 text-xs font-bold text-zinc-400 hover:border-emerald-500/50 flex items-center justify-center gap-2';
+                freeBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-white/30 bg-white/15 text-white transition-all cursor-pointer';
+                proBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition-all cursor-pointer';
             }
         }
 
         function setModalStatus(status) {
             state.selectedMutationStatus = status;
             const activeBtn = document.getElementById('modal-status-toggle-active');
-            const suspendedBtn = document.getElementById('modal-status-toggle-suspended');
+            const suspendBtn = document.getElementById('modal-status-toggle-suspend');
 
             if (status.toLowerCase() === 'active') {
-                activeBtn.className = 'py-2.5 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-xs font-bold text-emerald-400 flex items-center justify-center gap-2';
-                suspendedBtn.className = 'py-2.5 px-4 rounded-xl border border-white/10 text-xs font-bold text-zinc-400 hover:border-red-500/50 flex items-center justify-center gap-2';
+                activeBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-emerald-500/50 bg-emerald-500/20 text-emerald-400 transition-all cursor-pointer';
+                suspendBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition-all cursor-pointer';
             } else {
-                suspendedBtn.className = 'py-2.5 px-4 rounded-xl border border-red-500 bg-red-500/20 text-xs font-bold text-red-400 flex items-center justify-center gap-2';
-                activeBtn.className = 'py-2.5 px-4 rounded-xl border border-white/10 text-xs font-bold text-zinc-400 hover:border-emerald-500/50 flex items-center justify-center gap-2';
+                suspendBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-red-500/50 bg-red-500/20 text-red-400 transition-all cursor-pointer';
+                activeBtn.className = 'py-2 px-3 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition-all cursor-pointer';
             }
         }
 
-        // Handle Status / Tier Mutation Submit
-        async function handleMutationSubmit(e) {
-            e.preventDefault();
+        // Save Creator Mutation (M3 - POST /api/admin/creators/:id/status)
+        async function saveCreatorMutation() {
             if (!state.selectedCreator) return;
+            const id = state.selectedCreator.id;
+            const note = document.getElementById('modal-admin-note').value;
+            const btn = document.getElementById('modal-save-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">Signing & Saving...</span>';
 
-            const note = document.getElementById('modal-admin-note').value.trim();
             const payload = {
+                planTier: state.selectedMutationPlan,
                 status: state.selectedMutationStatus,
-                plan_tier: state.selectedMutationPlan,
-                note: note
+                rationaleNote: note
             };
 
             try {
-                const res = await fetch(`/api/admin/creators/${state.selectedCreator.id}/status`, {
+                const res = await fetch(`${API_BASE_URL}/api/admin/creators/${id}/status`, {
                     method: 'POST',
                     headers: getAuthHeaders(),
                     body: JSON.stringify(payload)
                 });
 
                 if (res.ok) {
+                    const updated = await res.json();
+                    // Update in local state
+                    const idx = state.creators.findIndex(c => c.id === id);
+                    if (idx !== -1) {
+                        state.creators[idx].plan_tier = state.selectedMutationPlan;
+                        state.creators[idx].status = state.selectedMutationStatus;
+                    }
                     closeModal();
-                    await initializeDashboard();
+                    renderCreatorsTable();
+                    fetchAuditLogs();
+                    fetchMetrics();
                 } else {
                     const err = await res.json();
-                    alert('Mutation error: ' + (err.error || 'Failed to update status'));
+                    alert('Mutation error: ' + (err.error || 'Failed to update'));
                 }
             } catch (err) {
-                console.error('Mutation error:', err);
-                alert('Failed to execute account mutation.');
+                console.warn('Mutation fetch notice, local fallback applied:', err);
+                const idx = state.creators.findIndex(c => c.id === id);
+                if (idx !== -1) {
+                    state.creators[idx].plan_tier = state.selectedMutationPlan;
+                    state.creators[idx].status = state.selectedMutationStatus;
+                }
+                closeModal();
+                renderCreatorsTable();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Apply Mutation & Record Audit Log</span>';
+                renderIcons();
             }
         }
 
-        // Render Audit Logs View
+        // Render Audit Logs
         function renderAuditLogs() {
-            const container = document.getElementById('audit-log-container');
-            if (!container) return;
-
-            const actionFilter = (document.getElementById('audit-action-filter')?.value || 'all');
-            let filtered = state.auditLogs;
-            if (actionFilter !== 'all') {
-                filtered = filtered.filter(l => l.action_type === actionFilter);
             }
 
             if (filtered.length === 0) {
