@@ -474,8 +474,8 @@
     <!-- =================================================================== -->
     <!-- CREATOR DETAIL & STATUS MUTATION MODAL (M5) -->
     <!-- =================================================================== -->
-    <div id="creator-detail-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-card w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl relative space-y-6">
+    <div id="creator-detail-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden" style="display: none !important; pointer-events: none !important;">
+        <div class="glass-card w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl relative space-y-6" style="pointer-events: auto !important;">
             
             <!-- Modal Header -->
             <div class="flex items-start justify-between border-b border-white/10 pb-4">
@@ -484,7 +484,7 @@
                     <p id="modal-creator-email" class="text-xs text-zinc-400">creator@email.com</p>
                     <p class="text-[10px] text-zinc-500 font-mono mt-0.5">ID: <span id="modal-creator-id">usr_123</span></p>
                 </div>
-                <button id="modal-close-btn" class="p-2 rounded-xl bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition-all">
+                <button id="modal-close-btn" onclick="closeModal()" class="p-2 rounded-xl bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -1043,14 +1043,25 @@
             setModalPlan(creator.plan_tier || 'Free');
             setModalStatus(creator.status || 'active');
 
-            document.getElementById('creator-detail-modal').classList.remove('hidden');
+            const m = document.getElementById('creator-detail-modal');
+            if (m) {
+                m.classList.remove('hidden');
+                m.style.setProperty('display', 'flex', 'important');
+                m.style.setProperty('pointer-events', 'auto', 'important');
+            }
             renderIcons();
         };
 
         function closeModal() {
-            document.getElementById('creator-detail-modal').classList.add('hidden');
+            const m = document.getElementById('creator-detail-modal');
+            if (m) {
+                m.classList.add('hidden');
+                m.style.setProperty('display', 'none', 'important');
+                m.style.setProperty('pointer-events', 'none', 'important');
+            }
             state.selectedCreator = null;
         }
+        window.closeModal = closeModal;
 
         function setModalPlan(plan) {
             state.selectedMutationPlan = plan;
