@@ -786,11 +786,9 @@
                 localStorage.setItem('adminToken', fallbackToken);
                 localStorage.setItem('admin_token', fallbackToken);
 
-                setTimeout(async () => {
-                    hideLoginModal();
-                    await initializeDashboard();
-                    if (btnText) btnText.textContent = 'Authenticate Session';
-                }, 250);
+                hideLoginModal();
+                initializeDashboard();
+                if (btnText) btnText.textContent = 'Authenticate Session';
             } else {
                 if (btnText) btnText.textContent = 'Authenticate Session';
                 if (errorText) errorText.textContent = 'Invalid administrator credentials';
@@ -809,23 +807,38 @@
         }
 
         function showLoginModal() {
-            document.getElementById('admin-login-modal').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
+            const modal = document.getElementById('admin-login-modal');
+            const dash = document.getElementById('admin-dashboard');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+            if (dash) {
+                dash.classList.add('hidden');
+                dash.style.display = 'none';
+            }
         }
 
         function hideLoginModal() {
-            document.getElementById('admin-login-modal').classList.add('hidden');
-            document.getElementById('admin-dashboard').classList.remove('hidden');
+            const modal = document.getElementById('admin-login-modal');
+            const dash = document.getElementById('admin-dashboard');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+            if (dash) {
+                dash.classList.remove('hidden');
+                dash.style.display = 'block';
+            }
+            renderIcons();
         }
 
-        // Initialize Dashboard Data
+        // Initialize Dashboard Data safely
         async function initializeDashboard() {
-            await Promise.all([
-                fetchMetrics(),
-                fetchCreators(),
-                fetchAuditLogs(),
-                fetchTelemetry()
-            ]);
+            try { await fetchMetrics(); } catch (e) { console.warn('fetchMetrics error:', e); }
+            try { await fetchCreators(); } catch (e) { console.warn('fetchCreators error:', e); }
+            try { await fetchAuditLogs(); } catch (e) { console.warn('fetchAuditLogs error:', e); }
+            try { await fetchTelemetry(); } catch (e) { console.warn('fetchTelemetry error:', e); }
             renderIcons();
         }
 
