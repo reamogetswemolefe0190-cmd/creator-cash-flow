@@ -524,6 +524,53 @@ app.post('/api/integrations/phyllo/token', async (req, res) => {
     }
 });
 
+// ==========================================================================
+// FEATURE F11: GEMINI 1.5 FLASH BACKEND PROXY ROUTE
+// ==========================================================================
+app.post('/api/gemini', async (req, res) => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        return res.json({ 
+            fallback: true, 
+            message: 'Environment variable GEMINI_API_KEY not configured on server.' 
+        });
+    }
+
+    try {
+        const { prompt, systemContext } = req.body || {};
+        if (!prompt) {
+            return res.status(400).json({ error: 'Missing prompt in request body.' });
+        }
+
+        const defaultSystemContext = systemContext || 'You are CCF Creator Intelligence, an expert financial advisor for modern creators. Provide concise, highly actionable 2-3 sentence financial guidance answering the user prompt directly.';
+
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        { text: defaultSystemContext },
+                        { text: prompt }
+                    ]
+                }]
+            })
+        });
+
+        const data = await apiResponse.json();
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            const aiText = data.candidates[0].content.parts[0].text;
+            return res.json({ text: aiText, source: 'Gemini 1.5 Flash (Backend API)' });
+        } else {
+            return res.json({ fallback: true, error: 'Unexpected API response structure', raw: data });
+        }
+    } catch (error) {
+        console.error('[GEMINI BACKEND PROXY ERROR]', error);
+        return res.json({ fallback: true, error: error.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`⚡ Creator Cash Flow Secure Backend API running on port ${PORT}`);
 });
+

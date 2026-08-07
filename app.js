@@ -1437,14 +1437,11 @@ Current Creator P&L Summary:
 - Top Revenue Channels: ${state.sources.map(s => `${s.name} (${s.percent})`).join(', ') || 'YouTube (74%), TikTok (18%)'}
 Provide concise, highly actionable 2-3 sentence financial guidance answering the user's prompt directly.`;
 
-    // 1. Attempt Serverless Proxy Endpoint Call (/api/gemini)
+    // 1. Attempt Serverless Proxy Endpoint Call (/api/gemini or Render API_BASE_URL/gemini)
     fetch('/api/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            prompt: userPrompt,
-            systemContext: systemContext
-        })
+        body: JSON.stringify({ prompt: userPrompt, systemContext: systemContext })
     })
     .then(res => res.json())
     .then(data => {
@@ -1453,12 +1450,23 @@ Provide concise, highly actionable 2-3 sentence financial guidance answering the
             appendGeminiBotBubble(data.text, 'Live AI Model');
             return;
         }
-        
-        // 2. If proxy returns fallback flag, check local browser key or use Edge AI
-        handleLocalOrDirectGeminiQuery(userPrompt, systemContext);
+        // Fallback to Render backend API_BASE_URL
+        return fetch(`${API_BASE_URL}/gemini`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: userPrompt, systemContext: systemContext })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.text) {
+                removeTypingIndicator();
+                appendGeminiBotBubble(data.text, 'Live AI Model');
+                return;
+            }
+            handleLocalOrDirectGeminiQuery(userPrompt, systemContext);
+        });
     })
     .catch(() => {
-        // 3. Network or local file protocol fallback
         handleLocalOrDirectGeminiQuery(userPrompt, systemContext);
     });
 }
