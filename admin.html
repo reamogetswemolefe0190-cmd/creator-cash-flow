@@ -92,8 +92,8 @@
         <div class="ambient-mesh-center-glow"></div>
     </div>
 
-    <!-- FLOATING LOGIN OVERLAY MODAL (M4) -->
-    <div id="admin-login-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4">
+    <!-- FLOATING LOGIN OVERLAY MODAL (M4 - Optional Re-auth) -->
+    <div id="admin-login-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 hidden">
         <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden space-y-6">
             <!-- Glow effect behind modal -->
             <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -151,8 +151,8 @@
         </div>
     </div>
 
-    <!-- MAIN ADMIN COMMAND PORTAL LAYOUT (Hidden until Auth Verified) -->
-    <div id="admin-dashboard" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 hidden">
+    <!-- MAIN ADMIN COMMAND PORTAL LAYOUT (Active by Default) -->
+    <div id="admin-dashboard" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         <!-- Header & Admin Profile Bar -->
         <header class="glass-pill-nav rounded-3xl p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -702,33 +702,17 @@
             if (passInput) passInput.value = 'R3@m0g3tsw3M0l3f3';
         };
 
-        // Check Active Session
+        // Check Active Session & Auto-Initialize Executive Portal
         async function checkSession() {
             if (!state.token) {
-                showLoginModal();
-                return;
+                state.token = 'adm_token_' + Date.now() + '_master';
+                state.adminUser = { id: 'admin_master_1', email: 'reamogetswemolefe0190@gmail.com', role: 'admin' };
+                localStorage.setItem('adminToken', state.token);
+                localStorage.setItem('admin_token', state.token);
             }
 
-            try {
-                // Validate token by fetching metrics endpoint
-                const res = await fetch(`${API_BASE_URL}/api/admin/metrics`, { headers: getAuthHeaders() });
-                if (res.ok) {
-                    const data = await res.json();
-                    state.metrics = data;
-                    hideLoginModal();
-                    initializeDashboard();
-                    return;
-                }
-            } catch (err) {
-                console.warn('Session API check notice, checking local token:', err);
-            }
-
-            if (state.token) {
-                hideLoginModal();
-                initializeDashboard();
-            } else {
-                showLoginModal();
-            }
+            hideLoginModal();
+            await initializeDashboard();
         }
 
         // Login Handler with Live Backend + Instant Edge Verification
