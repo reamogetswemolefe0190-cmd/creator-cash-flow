@@ -1430,17 +1430,43 @@ function queryGeminiAPI(userPrompt) {
     stream.appendChild(typingBubble);
     stream.scrollTop = stream.scrollHeight;
 
-    const savedKey = localStorage.getItem('ccf_gemini_api_key');
-
-    if (savedKey) {
-        // Live Generative AI Endpoint Call
-        const systemContext = `You are CCF Creator Intelligence, an expert financial advisor for modern creators.
+    const systemContext = `You are CCF Creator Intelligence, an expert financial advisor for modern creators.
 Current Creator P&L Summary:
 - Net Profit: R${state.balance.toLocaleString()}
 - Estimated Tax Obligation: R${Math.max(0, Math.round(state.balance * 0.15)).toLocaleString()} (15%)
 - Top Revenue Channels: ${state.sources.map(s => `${s.name} (${s.percent})`).join(', ') || 'YouTube (74%), TikTok (18%)'}
 Provide concise, highly actionable 2-3 sentence financial guidance answering the user's prompt directly.`;
 
+    // 1. Attempt Serverless Proxy Endpoint Call (/api/gemini)
+    fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            prompt: userPrompt,
+            systemContext: systemContext
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.text) {
+            removeTypingIndicator();
+            appendGeminiBotBubble(data.text, 'Live AI Model');
+            return;
+        }
+        
+        // 2. If proxy returns fallback flag, check local browser key or use Edge AI
+        handleLocalOrDirectGeminiQuery(userPrompt, systemContext);
+    })
+    .catch(() => {
+        // 3. Network or local file protocol fallback
+        handleLocalOrDirectGeminiQuery(userPrompt, systemContext);
+    });
+}
+
+function handleLocalOrDirectGeminiQuery(userPrompt, systemContext) {
+    const savedKey = localStorage.getItem('ccf_gemini_api_key');
+
+    if (savedKey) {
         fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${savedKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1460,19 +1486,16 @@ Provide concise, highly actionable 2-3 sentence financial guidance answering the
                 const aiResponse = data.candidates[0].content.parts[0].text;
                 appendGeminiBotBubble(aiResponse, 'Live AI Model');
             } else {
-                console.warn('[AI ADVISOR] Reverting to edge financial engine.', data);
                 const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
                 appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
             }
         })
         .catch(err => {
-            console.warn('[AI ADVISOR] Reverting to local financial heuristics.', err);
             removeTypingIndicator();
             const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
             appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
         });
     } else {
-        // Fallback local heuristic response (works 100% offline & demo mode)
         setTimeout(() => {
             removeTypingIndicator();
             const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
