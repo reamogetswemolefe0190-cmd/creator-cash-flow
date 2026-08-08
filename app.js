@@ -33,6 +33,38 @@ const onboardingState = {
 
 let intelligenceChartInstance = null;
 
+// Global Platform Logo SVG Helper
+function getPlatformLogoSvg(platform, sizeClass = 'w-6 h-6') {
+    const p = (platform || '').toLowerCase();
+    if (p.includes('youtube') || p.includes('adsense')) {
+        return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" fill="#FF0000"/>
+            <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FFFFFF"/>
+        </svg>`;
+    } else if (p.includes('tiktok') || p.includes('rewards')) {
+        return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none">
+            <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-2.887 2.887 2.896 2.896 0 0 1-2.888-2.887 2.896 2.896 0 0 1 2.888-2.887c.36 0 .7.067 1.014.187V9.452a6.31 6.31 0 0 0-1.014-.082A6.332 6.332 0 0 0 3.155 15.7a6.332 6.332 0 0 0 6.332 6.332 6.332 6.332 0 0 0 6.332-6.332V9.014a8.212 8.212 0 0 0 4.887 1.583v-3.445a4.814 4.814 0 0 1-1.117-.466z" fill="#00F2FE"/>
+            <path d="M18.8 6.2a4.8 4.8 0 0 1-3.4-3.8V2h-2.5v13.7a3.5 3.5 0 0 1-3.5 3.5 3.5 3.5 0 0 1-3.5-3.5 3.5 3.5 0 0 1 3.5-3.5c.3 0 .6.05.9.15V9.8a6.3 6.3 0 0 0-.9-.07 5.7 5.7 0 0 0-5.7 5.7 5.7 5.7 0 0 0 5.7 5.7 5.7 5.7 0 0 0 5.7-5.7V8.5a7.5 7.5 0 0 0 4.2 1.3V7.2a4.8 4.8 0 0 1-.5-1z" fill="#FE2C55"/>
+            <path d="M18.2 5.8a4.8 4.8 0 0 1-3-3.4V2h-2.2v13.7a2.9 2.9 0 0 1-2.9 2.9 2.9 2.9 0 0 1-2.9-2.9 2.9 2.9 0 0 1 2.9-2.9c.3 0 .6.06.9.18V9.5a5.5 5.5 0 0 0-.9-.08 5.1 5.1 0 0 0-5.1 5.1 5.1 5.1 0 0 0 5.1 5.1 5.1 5.1 0 0 0 5.1-5.1V8.2a7 7 0 0 0 4.1 1.2V6.6a4.8 4.8 0 0 1-3.1-.8z" fill="#FFFFFF"/>
+        </svg>`;
+    } else if (p.includes('stream') || p.includes('twitch')) {
+        return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M2.149 0L.537 4.119v16.478h5.373V24l3.761-3.403h3.762L23.463 10.537V0H2.15zm19.343 9.463l-3.224 3.224h-4.298l-3.224 3.223v-3.223H5.91V2.149h15.582v7.314zm-9.134-3.761h2.149v6.448H12.358V5.702zm5.373 0h2.149v6.448h-2.149V5.702z" fill="#A970FF"/>
+        </svg>`;
+    } else if (p.includes('instagram') || p.includes('sponsor')) {
+        return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#E1306C"/>
+            <path d="M12 5.838c3.07 0 3.434.012 4.646.067 1.12.051 1.73.238 2.135.395.536.208.92.456 1.322.858.402.402.65.786.858 1.322.157.405.344 1.015.395 2.135.055 1.212.067 1.576.067 4.646s-.012 3.434-.067 4.646c-.051 1.12-.238 1.73-.395 2.135-.208.536-.456.92-.858 1.322-.402.402-.786.65-1.322.858-.405.157-1.015.344-2.135.395-1.212.055-1.576.067-4.646.067s-3.434-.012-4.646-.067c-1.12-.051-1.73-.238-2.135-.395a3.57 3.57 0 0 1-1.322-.858 3.57 3.57 0 0 1-.858-1.322c-.157-.405-.344-1.015-.395-2.135C2.26 15.434 2.248 15.07 2.248 12s.012-3.434.067-4.646c.051-1.12.238-1.73.395-2.135.208-.536.456-.92.858-1.322.402-.402.786-.65 1.322-.858.405-.157 1.015-.344 2.135-.395C8.566 5.85 8.93 5.838 12 5.838zm0-2.162c-3.123 0-3.514.013-4.74.069-1.222.056-2.056.25-2.786.533a5.733 5.733 0 0 0-2.072 1.35 5.733 5.733 0 0 0-1.35 2.072c-.283.73-.477 1.564-.533 2.786C.46 11.71.447 12.102.447 15.225s.013 3.514.069 4.74c.056 1.222.25 2.056.533 2.786a5.733 5.733 0 0 0 1.35 2.072 5.733 5.733 0 0 0 2.072 1.35c.73.283 1.564.477 2.786.533 1.226.056 1.617.069 4.74.069s3.514-.013 4.74-.069c1.222-.056 2.056-.25 2.786-.533a5.733 5.733 0 0 0 2.072-1.35 5.733 5.733 0 0 0 1.35-2.072c.283-.73.477-1.564.533-2.786.056-1.226.069-1.617.069-4.74s-.013-3.514-.069-4.74c-.056-1.222-.25-2.056-.533-2.786a5.733 5.733 0 0 0-1.35-2.072 5.733 5.733 0 0 0-2.072-1.35c-.73-.283-1.564-.477-2.786-.533-1.226-.056-1.617-.069-4.74-.069zM12 7.748a4.252 4.252 0 1 0 0 8.504 4.252 4.252 0 0 0 0-8.504zm0 7.004a2.752 2.752 0 1 1 0-5.504 2.752 2.752 0 0 1 0 5.504zm6.406-7.845a.993.993 0 1 0 0 1.986.993.993 0 0 0 0-1.986z" fill="#FFFFFF"/>
+        </svg>`;
+    } else if (p.includes('patreon') || p.includes('sub')) {
+        return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.82 2.41c-4.46 0-8.08 3.62-8.08 8.08 0 4.42 3.58 8.02 8.01 8.08 4.46 0 8.08-3.62 8.08-8.08 0-4.46-3.62-8.08-8.01-8.08zm-13.63.15h3.63v18.91H1.19V2.56z" fill="#FF424D"/>
+        </svg>`;
+    }
+    return `<span class="material-symbols-outlined text-accent-emerald text-xl">account_balance_wallet</span>`;
+}
+window.getPlatformLogoSvg = getPlatformLogoSvg;
+
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -268,10 +300,16 @@ function nextOnboardStep(targetStepNum) {
                 card.className = `connection-platform-card flex justify-between items-center p-md bg-surface/60 border border-white/[0.08] rounded-2xl cursor-pointer hover:bg-white/[0.04] transition-all ${isConn ? 'connected' : ''}`;
                 card.onclick = (e) => simulatePlatformConnect(card, platform);
                 
+                const logoSvg = getPlatformLogoSvg(platform, 'w-6 h-6');
                 card.innerHTML = `
                     <div class="flex items-center gap-sm">
-                        <span class="material-symbols-outlined text-accent-emerald">${platform === 'YouTube' ? 'play_circle' : platform === 'TikTok' ? 'music_note' : platform === 'Instagram' ? 'photo_camera' : 'account_balance_wallet'}</span>
-                        <span class="font-body-md font-semibold text-white">${platform} Channel</span>
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                            ${logoSvg}
+                        </div>
+                        <div>
+                            <span class="font-body-md font-semibold text-white block">${platform}</span>
+                            <span class="text-[11px] text-text-secondary">Official API Channel Integration</span>
+                        </div>
                     </div>
                     <span class="connect-badge text-xs font-bold border border-white/[0.08] bg-background px-md py-xs rounded-xl" id="connect-${platform}">${isConn ? 'Connected' : 'Connect'}</span>
                 `;
