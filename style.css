@@ -428,11 +428,27 @@ aside nav a.active, .mobile-bottom-nav a.active {
     color: #FFFFFF !important;
 }
 
+/* 3D iPhone 16 Pro Titanium Styling */
+.perspective-1200 {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+.iphone-chassis {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    will-change: transform, box-shadow;
+}
+
+.iphone-chassis:hover {
+    transform: rotateY(-3deg) rotateX(3deg) translateY(-4px);
+    box-shadow: 0 35px 100px -15px rgba(34, 197, 94, 0.25), 0 30px 80px rgba(0, 0, 0, 0.9);
+}
+
 @media (pointer: coarse), (max-width: 640px) {
-    .perspective-1000 {
+    .perspective-1000, .perspective-1200 {
         perspective: none !important;
     }
-    #arc-browser-frame {
+    #arc-browser-frame, .iphone-chassis {
         transform: none !important;
     }
 }

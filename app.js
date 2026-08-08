@@ -1330,7 +1330,45 @@ function setupHeroMockupInteractions() {
     wrapper.addEventListener('mouseleave', () => {
         frame.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
     });
+
+    // Auto-detect mobile smartphone and show iPhone 3D mockup
+    if (window.innerWidth < 768) {
+        setHeroDeviceView('iphone');
+    }
 }
+
+// Interactive Device Switcher (Mac Desktop vs 3D iPhone 16 Pro)
+function setHeroDeviceView(device) {
+    const macMockup = document.getElementById('hero-mac-mockup');
+    const iphoneMockup = document.getElementById('hero-iphone-mockup');
+    const btnMac = document.getElementById('device-btn-mac');
+    const btnIphone = document.getElementById('device-btn-iphone');
+
+    if (!macMockup || !iphoneMockup) return;
+
+    if (device === 'iphone') {
+        macMockup.classList.add('hidden');
+        macMockup.classList.remove('block', 'md:block');
+        iphoneMockup.classList.remove('hidden', 'md:hidden');
+        iphoneMockup.classList.add('block');
+
+        if (btnIphone && btnMac) {
+            btnIphone.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 bg-white/10 text-white border border-white/10 shadow-sm cursor-pointer';
+            btnMac.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 text-text-secondary hover:text-white cursor-pointer';
+        }
+    } else {
+        iphoneMockup.classList.add('hidden');
+        iphoneMockup.classList.remove('block');
+        macMockup.classList.remove('hidden');
+        macMockup.classList.add('block');
+
+        if (btnIphone && btnMac) {
+            btnMac.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 bg-white/10 text-white border border-white/10 shadow-sm cursor-pointer';
+            btnIphone.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 text-text-secondary hover:text-white cursor-pointer';
+        }
+    }
+}
+window.setHeroDeviceView = setHeroDeviceView;
 
 function setHeroMockupPeriod(period) {
     heroMockupState.period = period;
