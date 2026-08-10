@@ -463,6 +463,14 @@ function simulatePlatformConnect(element, platform) {
                 onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
             });
 
+            phylloConnect.on('tokenExpired', () => {
+                // Phyllo SDK tokens are short-lived. Start the flow again so the
+                // backend can issue a fresh token before the user reconnects.
+                console.info('[PHYLLO] SDK token expired. Requesting a fresh token.');
+                if (badge) badge.innerText = 'Refreshing...';
+                simulatePlatformConnect(element, platform);
+            });
+
             phylloConnect.open();
         } catch (err) {
             console.warn('[PHYLLO] Initialization exception caught. Executing mock fallback.', err);

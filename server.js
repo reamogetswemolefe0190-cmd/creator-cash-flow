@@ -1191,7 +1191,7 @@ app.post('/api/integrations/phyllo/token', async (req, res) => {
                     platformMap[p.name] = p.id;
                 });
             }
-            console.log(`[PHYLLO] Map: ${JSON.stringify(platformMap)}`);
+            console.log(`[PHYLLO] Loaded ${Object.keys(platformMap).length} active work platforms.`);
         } catch (e) {
             console.error('[PHYLLO PLATFORMS FETCH ERROR]', e);
         }
