@@ -463,12 +463,19 @@ function simulatePlatformConnect(element, platform) {
                 onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
             });
 
-            phylloConnect.on('tokenExpired', () => {
+            phylloConnect.on('tokenExpired', (userId) => {
                 // Phyllo SDK tokens are short-lived. Start the flow again so the
                 // backend can issue a fresh token before the user reconnects.
                 console.info('[PHYLLO] SDK token expired. Requesting a fresh token.');
                 if (badge) badge.innerText = 'Refreshing...';
                 simulatePlatformConnect(element, platform);
+            });
+
+            phylloConnect.on('exit', (reason, userId) => {
+                console.info('[PHYLLO] Connect flow closed.', reason);
+                if (!element.classList.contains('connected') && badge) {
+                    badge.innerText = 'Connect';
+                }
             });
 
             phylloConnect.open();
