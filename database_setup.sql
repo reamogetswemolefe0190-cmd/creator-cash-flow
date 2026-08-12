@@ -87,3 +87,11 @@ CREATE TABLE IF NOT EXISTS public.ai_telemetry (
 ALTER TABLE public.ai_telemetry ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read/write during beta" ON public.ai_telemetry FOR ALL USING (true) WITH CHECK (true);
 
+-- 7. Performance B-tree Indexes for High-Concurrency Queries
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON public.transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON public.transactions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON public.users(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON public.audit_logs(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_telemetry_created_at ON public.ai_telemetry(created_at DESC);
+
+

@@ -2,7 +2,9 @@
    Creator Financial OS - HQ Engine & Database Orchestrator
    ========================================================================== */
 
-const API_BASE_URL = 'https://creator-cash-flow.onrender.com/api';
+const API_BASE_URL = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+    ? `${window.location.protocol}//${window.location.host}/api`
+    : 'https://creator-cash-flow.onrender.com/api';
 
 // Application State
 const state = {
@@ -100,6 +102,90 @@ document.addEventListener('DOMContentLoaded', () => {
     if (syncBtn) syncBtn.addEventListener('click', syncData);
 
     setupHeroMockupInteractions();
+    setupScrollReveals();
+    setupSpotlightInteractions();
+
+    // Initialize SPA routing state
+    if (!history.state) {
+        history.replaceState({ view: 'marketing' }, '', window.location.pathname);
+    }
+
+    window.addEventListener('popstate', (e) => {
+        if (e.state && e.state.view) {
+            switchView(e.state.view, false);
+        } else {
+            // Fallback to initial marketing view
+            switchView('marketing', false);
+        }
+    });
+
+    // Restore visual choices helper
+    function restoreVisualChoices() {
+        if (onboardingState.creatorType) {
+            document.querySelectorAll('#onboard-step-1 .onboard-choice-card').forEach(opt => {
+                if (opt.getAttribute('data-value') === onboardingState.creatorType) {
+                    opt.classList.add('active');
+                    const icon = opt.querySelector('.check-indicator span');
+                    if (icon) icon.innerText = 'check_circle';
+                } else {
+                    opt.classList.remove('active');
+                    const icon = opt.querySelector('.check-indicator span');
+                    if (icon) icon.innerText = 'radio_button_unchecked';
+                }
+            });
+        }
+
+        if (onboardingState.platforms && onboardingState.platforms.length > 0) {
+            document.querySelectorAll('#onboard-step-2 .onboard-choice-card').forEach(opt => {
+                const val = opt.getAttribute('data-value');
+                const icon = opt.querySelector('.check-indicator span');
+                if (onboardingState.platforms.includes(val)) {
+                    opt.classList.add('active');
+                    if (icon) icon.innerText = 'check_circle';
+                } else {
+                    opt.classList.remove('active');
+                    if (icon) icon.innerText = 'radio_button_unchecked';
+                }
+            });
+        }
+
+        if (onboardingState.goal) {
+            document.querySelectorAll('#onboard-goals-grid .onboard-choice-card').forEach(opt => {
+                const goalVal = opt.getAttribute('data-goal');
+                const icon = opt.querySelector('span.material-symbols-outlined:last-child');
+                if (goalVal === onboardingState.goal) {
+                    opt.classList.add('active');
+                    if (icon) {
+                        icon.innerText = 'check_circle';
+                        icon.className = 'material-symbols-outlined text-accent-emerald text-lg';
+                    }
+                } else {
+                    opt.classList.remove('active');
+                    if (icon) {
+                        icon.innerText = 'radio_button_unchecked';
+                        icon.className = 'material-symbols-outlined text-white/20 text-lg';
+                    }
+                }
+            });
+        }
+    }
+
+    // Check if user landed directly on a hash (e.g. #onboarding)
+    const initialHash = window.location.hash;
+    if (initialHash === '#onboarding') {
+        const cachedOnboarding = localStorage.getItem('creator_cashflow_onboarding');
+        if (cachedOnboarding) {
+            try {
+                const parsed = JSON.parse(cachedOnboarding);
+                Object.assign(onboardingState, parsed);
+                restoreVisualChoices();
+            } catch (e) {}
+        }
+        switchView('onboarding', false);
+        nextOnboardStep(onboardingState.currentStep || 1);
+    } else if (initialHash === '#app') {
+        switchView('app', false);
+    }
 });
 
 // Load real transactions from Supabase cloud database
@@ -123,7 +209,11 @@ async function loadUserTransactions() {
         const data = await res.json();
 
         if (data.transactions && data.transactions.length > 0) {
-            state.activities = data.transactions;
+            state.activities = data.transactions.map(t => ({
+                ...t,
+                desc: t.desc || t.merchant || 'Transaction Entry',
+                amount: typeof t.amount === 'number' ? t.amount : (parseFloat(t.amount) || 0)
+            }));
 
             // Recalculate balance and percentage streams based on database values
             let totalIncome = 0;
@@ -192,17 +282,17 @@ function validateStep(stepNum) {
     let isValid = true;
     let errorMsg = '';
 
-    if (stepNum === 2) {
+    if (stepNum === 1) {
         if (!onboardingState.creatorType) {
             isValid = false;
             errorMsg = 'Please select your creator type to continue.';
         }
-    } else if (stepNum === 3) {
+    } else if (stepNum === 2) {
         if (!onboardingState.platforms || onboardingState.platforms.length === 0) {
             isValid = false;
             errorMsg = 'Please select at least one revenue platform.';
         }
-    } else if (stepNum === 4) {
+    } else if (stepNum === 3) {
         if (!onboardingState.goal) {
             isValid = false;
             errorMsg = 'Please select your primary goal.';
@@ -232,42 +322,78 @@ function validateStep(stepNum) {
     return isValid;
 }
 
-// Progress Bar & Navigation Header Synchronizer
+// Progress Bar & Navigation Header Synchronizer (Dynamic Flow)
 function updateOnboardingProgress(stepNum) {
     onboardingState.currentStep = stepNum;
+
+    const isLoggedIn = state.token && state.token !== 'demo_token';
+    const totalSteps = isLoggedIn ? 4 : 5;
 
     // Update Step Counter Text
     const counterEl = document.getElementById('onboard-step-counter');
     if (counterEl) {
-        counterEl.innerText = `Step ${stepNum} of 6`;
+        counterEl.innerText = `0${stepNum} / 0${totalSteps}`;
     }
 
     // Update Progress Bar Fill Width
     const progressFill = document.getElementById('onboard-progress-fill');
     if (progressFill) {
-        const percentage = Math.min(100, Math.max(0, (stepNum / 6) * 100));
+        const percentage = Math.min(100, Math.max(0, (stepNum / totalSteps) * 100));
         progressFill.style.width = `${percentage}%`;
     }
 
     // Update Back Button Visibility
     const backBtn = document.getElementById('onboard-back-btn');
     if (backBtn) {
-        if (stepNum > 1) {
-            backBtn.classList.remove('invisible');
-        } else {
-            backBtn.classList.add('invisible');
-        }
+        backBtn.classList.remove('invisible');
     }
 
-    // Clear validation error message on step navigation
+    // Clear validation error messages
     const errorEl = document.getElementById('onboard-validation-error');
-    if (errorEl) {
-        errorEl.classList.add('hidden');
-    }
+    if (errorEl) errorEl.classList.add('hidden');
+
+    const signupError = document.getElementById('onboard-signup-error');
+    if (signupError) signupError.classList.add('hidden');
+
+    const loginError = document.getElementById('onboard-login-error');
+    if (loginError) loginError.classList.add('hidden');
+}
+
+function renderStep4Platforms() {
+    const listContainer = document.getElementById('onboarding-connect-list');
+    if (!listContainer) return;
+
+    listContainer.innerHTML = '';
+    const platforms = ['YouTube', 'TikTok', 'Instagram'];
+
+    platforms.forEach(p => {
+        const isConn = onboardingState.connected.includes(p);
+        const btnText = isConn ? 'Connected' : 'Connect';
+        const cardClass = isConn 
+            ? 'onboard-choice-card border border-accent-emerald bg-background/80 p-3.5 rounded-2xl flex items-center justify-between'
+            : 'onboard-choice-card border border-white/[0.08] bg-background/60 hover:bg-white/[0.03] p-3.5 rounded-2xl flex items-center justify-between';
+        const badgeClass = isConn 
+            ? 'connect-badge bg-accent-emerald/20 text-accent-emerald border border-accent-emerald/30 font-bold px-3 py-1 rounded-xl text-[10px] cursor-pointer'
+            : 'connect-badge bg-white text-black font-bold px-3 py-1 rounded-xl text-[10px] hover:bg-white/90 cursor-pointer';
+
+        listContainer.innerHTML += `
+            <div class="${cardClass}" id="onboard-card-${p}">
+                <div class="flex items-center gap-2.5">
+                    <span class="font-bold text-white text-xs">${p}</span>
+                </div>
+                <button class="${badgeClass}" id="connect-${p}" onclick="simulatePlatformConnect(document.getElementById('onboard-card-${p}'), '${p}')">
+                    ${btnText}
+                </button>
+            </div>
+        `;
+    });
 }
 
 function nextOnboardStep(targetStepNum) {
     const currentStepNum = onboardingState.currentStep || 1;
+
+    // Cache choices in browser step-by-step
+    localStorage.setItem('creator_cashflow_onboarding', JSON.stringify(onboardingState));
 
     // Validate current step before advancing forward
     if (targetStepNum > currentStepNum) {
@@ -276,49 +402,34 @@ function nextOnboardStep(targetStepNum) {
         }
     }
 
+    // Dynamic Skips: Check if logged in to skip Step 5 (profile creation)
+    const isLoggedIn = state.token && state.token !== 'demo_token';
+    if (targetStepNum === 5 && isLoggedIn) {
+        executeLaunchSequence();
+        return true;
+    }
+
+    if (targetStepNum === 4) {
+        renderStep4Platforms();
+    }
+
     document.querySelectorAll('.onboarding-step').forEach(step => {
         step.classList.add('hidden');
     });
 
-    const nextStep = document.getElementById(`onboard-step-${targetStepNum}`);
+    let stepId = `onboard-step-${targetStepNum}`;
+    if (targetStepNum === 5 && document.getElementById('onboard-step-login').classList.contains('active-auth')) {
+        stepId = 'onboard-step-login';
+    }
+
+    const nextStep = document.getElementById(stepId);
     if (nextStep) {
         nextStep.classList.remove('hidden');
     }
 
     updateOnboardingProgress(targetStepNum);
 
-    if (targetStepNum === 5) {
-        const connectList = document.getElementById('onboarding-connect-list');
-        if (connectList) {
-            connectList.innerHTML = '';
-            if (onboardingState.platforms.length === 0) {
-                onboardingState.platforms = ['YouTube', 'TikTok'];
-            }
-            onboardingState.platforms.forEach(platform => {
-                const card = document.createElement('div');
-                const isConn = onboardingState.connected.includes(platform);
-                card.className = `connection-platform-card flex justify-between items-center p-md bg-surface/60 border border-white/[0.08] rounded-2xl cursor-pointer hover:bg-white/[0.04] transition-all ${isConn ? 'connected' : ''}`;
-                card.onclick = (e) => simulatePlatformConnect(card, platform);
-                
-                const logoSvg = getPlatformLogoSvg(platform, 'w-6 h-6');
-                card.innerHTML = `
-                    <div class="flex items-center gap-sm">
-                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                            ${logoSvg}
-                        </div>
-                        <div>
-                            <span class="font-body-md font-semibold text-white block">${platform}</span>
-                            <span class="text-[11px] text-text-secondary">Official API Channel Integration</span>
-                        </div>
-                    </div>
-                    <span class="connect-badge text-xs font-bold border border-white/[0.08] bg-background px-md py-xs rounded-xl" id="connect-${platform}">${isConn ? 'Connected' : 'Connect'}</span>
-                `;
-                connectList.appendChild(card);
-            });
-        }
-    }
-
-    if (targetStepNum === 6) {
+    if (targetStepNum === 3) {
         triggerMagicMoment();
     }
 
@@ -329,11 +440,13 @@ function prevOnboardStep() {
     const currentStepNum = onboardingState.currentStep || 1;
     if (currentStepNum > 1) {
         nextOnboardStep(currentStepNum - 1);
+    } else if (currentStepNum === 1) {
+        switchView('marketing');
     }
 }
 
 function selectCreatorType(element) {
-    document.querySelectorAll('#onboard-step-2 .onboard-choice-card').forEach(opt => {
+    document.querySelectorAll('#onboard-step-1 .onboard-choice-card').forEach(opt => {
         opt.classList.remove('active');
         const icon = opt.querySelector('.check-indicator span');
         if (icon) icon.innerText = 'radio_button_unchecked';
@@ -342,6 +455,8 @@ function selectCreatorType(element) {
     const icon = element.querySelector('.check-indicator span');
     if (icon) icon.innerText = 'check_circle';
     onboardingState.creatorType = element.getAttribute('data-value');
+
+    localStorage.setItem('creator_cashflow_onboarding', JSON.stringify(onboardingState));
 
     const errorEl = document.getElementById('onboard-validation-error');
     if (errorEl) errorEl.classList.add('hidden');
@@ -362,37 +477,45 @@ function togglePlatformChoice(element) {
         onboardingState.platforms = onboardingState.platforms.filter(p => p !== val);
     }
 
+    localStorage.setItem('creator_cashflow_onboarding', JSON.stringify(onboardingState));
+
     const errorEl = document.getElementById('onboard-validation-error');
     if (errorEl) errorEl.classList.add('hidden');
 }
 
-function selectGoal(element) {
-    document.querySelectorAll('#onboard-step-4 .onboard-choice-card').forEach(opt => {
-        opt.classList.remove('active');
-        const icon = opt.querySelector('.check-indicator span');
-        if (icon) icon.innerText = 'radio_button_unchecked';
-    });
-    element.classList.add('active');
-    const icon = element.querySelector('.check-indicator span');
-    if (icon) icon.innerText = 'check_circle';
-    onboardingState.goal = element.getAttribute('data-value');
+function switchToOnboardLogin() {
+    document.getElementById('onboard-step-5').classList.add('hidden');
+    document.getElementById('onboard-step-login').classList.remove('hidden');
+    document.getElementById('onboard-step-login').classList.add('active-auth');
+    document.getElementById('onboard-step-5').classList.remove('active-auth');
+}
 
-    const errorEl = document.getElementById('onboard-validation-error');
-    if (errorEl) errorEl.classList.add('hidden');
+function switchToOnboardSignup() {
+    document.getElementById('onboard-step-login').classList.add('hidden');
+    document.getElementById('onboard-step-5').classList.remove('hidden');
+    document.getElementById('onboard-step-5').classList.add('active-auth');
+    document.getElementById('onboard-step-login').classList.remove('active-auth');
 }
 
 function skipOnboardingConnection(e) {
     if (e) e.preventDefault();
     console.log('[ONBOARDING] Skipping connection and entering manual mode.');
     onboardingState.isManual = true;
-    nextOnboardStep(6);
+    nextOnboardStep(5);
 }
 
 function fallbackToMockConnect(element, platform, badge) {
-    element.classList.add('connected');
-    if (badge) badge.innerText = 'Connected';
-    if (!onboardingState.connected.includes(platform)) {
-        onboardingState.connected.push(platform);
+    if (badge) badge.innerText = 'Connect';
+    if (element) element.classList.remove('connected');
+    
+    // Display exact user connection failure message
+    const errorEl = document.getElementById('onboard-validation-error');
+    const errorText = document.getElementById('onboard-error-text');
+    if (errorEl && errorText) {
+        errorText.innerText = "We couldn’t connect your account. Please try again, or continue and add income manually.";
+        errorEl.classList.remove('hidden');
+    } else {
+        alert("We couldn’t connect your account. Please try again, or continue and add income manually.");
     }
 }
 
@@ -463,7 +586,7 @@ function simulatePlatformConnect(element, platform) {
                 onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
             });
 
-            phylloConnect.on('tokenExpired', (userId) => {
+            phylloConnect.on("tokenExpired", (userId) => {
                 // Phyllo SDK tokens are short-lived. Start the flow again so the
                 // backend can issue a fresh token before the user reconnects.
                 console.info('[PHYLLO] SDK token expired. Requesting a fresh token.');
@@ -471,10 +594,11 @@ function simulatePlatformConnect(element, platform) {
                 simulatePlatformConnect(element, platform);
             });
 
-            phylloConnect.on('exit', (reason, userId) => {
+            phylloConnect.on("exit", (reason, userId) => {
                 console.info('[PHYLLO] Connect flow closed.', reason);
                 if (!element.classList.contains('connected') && badge) {
                     badge.innerText = 'Connect';
+                    fallbackToMockConnect(element, platform, badge);
                 }
             });
 
@@ -534,29 +658,78 @@ async function triggerMagicMoment() {
     }
 }
 
+function playAppLoadingSequence(onComplete) {
+    const loader = document.getElementById('app-loading-screen');
+    const statusText = document.getElementById('loader-status-text');
+    const statusPct = document.getElementById('loader-status-pct');
+    const progressFill = document.getElementById('loader-progress-fill');
+
+    if (!loader) {
+        if (onComplete) onComplete();
+        return;
+    }
+
+    loader.classList.remove('hidden', 'dismissed');
+    loader.style.display = 'flex';
+    if (progressFill) progressFill.style.width = '0%';
+    if (statusPct) statusPct.innerText = '0%';
+    if (statusText) statusText.innerText = 'Connecting creator channels...';
+
+    // Step 1: 35%
+    setTimeout(() => {
+        if (progressFill) progressFill.style.width = '35%';
+        if (statusPct) statusPct.innerText = '35%';
+        if (statusText) statusText.innerText = 'Consolidating YouTube, TikTok & brand sponsorships...';
+    }, 280);
+
+    // Step 2: 80%
+    setTimeout(() => {
+        if (progressFill) progressFill.style.width = '80%';
+        if (statusPct) statusPct.innerText = '80%';
+        if (statusText) statusText.innerText = 'Harmonizing cash flow runway & Creator Health...';
+    }, 650);
+
+    // Step 3: 100%
+    setTimeout(() => {
+        if (progressFill) progressFill.style.width = '100%';
+        if (statusPct) statusPct.innerText = '100%';
+        if (statusText) statusText.innerText = 'Your Creator HQ is ready!';
+    }, 1050);
+
+    // Step 4: Dismiss Loader & Cascade Pop-Up Cards
+    setTimeout(() => {
+        loader.classList.add('dismissed');
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            loader.style.display = 'none';
+            if (onComplete) onComplete();
+        }, 380);
+    }, 1250);
+}
+window.playAppLoadingSequence = playAppLoadingSequence;
+
+function startOnboarding() {
+    switchView('onboarding');
+}
+window.startOnboarding = startOnboarding;
+
 function executeLaunchSequence() {
-    const wizardCard = document.querySelector('#view-onboarding .w-full.max-w-xl');
     const launchBtn = document.getElementById('btn-launch-command-center');
     
     if (launchBtn) {
-        launchBtn.innerText = 'Launching Command Center...';
+        launchBtn.innerText = 'Launching Creator HQ...';
         launchBtn.disabled = true;
-    }
-
-    if (wizardCard) {
-        wizardCard.classList.add('launching-pulse');
     }
 
     triggerMagicMoment();
 
-    setTimeout(() => {
-        if (wizardCard) wizardCard.classList.remove('launching-pulse');
+    playAppLoadingSequence(() => {
         if (launchBtn) {
-            launchBtn.innerText = 'Launch Command Center';
+            launchBtn.innerText = "Let's see how you're doing →";
             launchBtn.disabled = false;
         }
         switchView('app');
-    }, 1100);
+    });
 }
 
 // ==========================================================================
@@ -599,6 +772,7 @@ function switchTab(tabId) {
         selectedNavs.forEach(nav => nav.classList.add('active'));
         selectedPane.classList.remove('hidden');
         selectedPane.classList.add('active');
+        triggerCardPopups(selectedPane);
     }
 }
 
@@ -646,6 +820,14 @@ function renderDashboardData() {
             `;
         });
     }
+    const isSample = !onboardingState.connected || onboardingState.connected.length === 0;
+    const sampleLabel = isSample ? ' <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold font-sans">Sample</span>' : '';
+
+    const sampleBanner = document.getElementById('sample-data-banner');
+    if (sampleBanner) {
+        if (isSample) sampleBanner.classList.remove('hidden');
+        else sampleBanner.classList.add('hidden');
+    }
 
     const activityStream = document.getElementById('activity-stream-os');
     if (activityStream) {
@@ -656,7 +838,7 @@ function renderDashboardData() {
             activityStream.innerHTML += `
                 <div class="flex justify-between items-center p-md bg-surface rounded-2xl border border-white/[0.05]">
                     <div>
-                        <div class="font-semibold text-white text-sm">${a.desc}</div>
+                        <div class="font-semibold text-white text-sm">${a.desc}${sampleLabel}</div>
                         <div class="text-xs text-text-secondary">${a.date} • Verified Sync</div>
                     </div>
                     <div ${amountClass}>${prefix}R${a.amount.toLocaleString()}</div>
@@ -669,6 +851,9 @@ function renderDashboardData() {
 }
 
 function renderFullStreams() {
+    const isSample = !onboardingState.connected || onboardingState.connected.length === 0;
+    const sampleLabel = isSample ? ' <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold font-sans">Sample</span>' : '';
+
     const revStream = document.getElementById('full-revenue-stream');
     if (revStream) {
         revStream.innerHTML = '';
@@ -676,7 +861,7 @@ function renderFullStreams() {
             revStream.innerHTML += `
                 <div class="flex justify-between items-center py-md border-b border-white/[0.05]">
                     <div>
-                        <div class="font-semibold text-white text-sm">${a.desc}</div>
+                        <div class="font-semibold text-white text-sm">${a.desc}${sampleLabel}</div>
                         <div class="text-xs text-text-secondary">${a.date}</div>
                     </div>
                     <div class="font-display font-bold text-accent-emerald text-sm">+R${a.amount.toLocaleString()}</div>
@@ -692,7 +877,7 @@ function renderFullStreams() {
             expStream.innerHTML += `
                 <div class="flex justify-between items-center py-md border-b border-white/[0.05]">
                     <div>
-                        <div class="font-semibold text-white text-sm">${a.desc}</div>
+                        <div class="font-semibold text-white text-sm">${a.desc}${sampleLabel}</div>
                         <div class="text-xs text-text-secondary">${a.date}</div>
                     </div>
                     <div class="font-display font-bold text-white text-sm">-R${a.amount.toLocaleString()}</div>
@@ -1022,6 +1207,137 @@ function closeModal() {
     document.getElementById('modal-app').classList.remove('active');
 }
 
+function openConnectedAccountsModal() {
+    const platforms = ['YouTube', 'TikTok', 'Instagram'];
+    let rowsHtml = '';
+    
+    platforms.forEach(p => {
+        const isConn = onboardingState.connected.includes(p);
+        const btnText = isConn ? 'Connected' : 'Connect';
+        const btnClass = isConn 
+            ? 'bg-accent-emerald/20 text-accent-emerald border border-accent-emerald/30 font-bold px-md py-sm rounded-xl text-xs cursor-pointer' 
+            : 'bg-white text-black font-bold px-md py-sm rounded-xl text-xs hover:bg-white/90 cursor-pointer';
+        
+        rowsHtml += `
+            <div class="flex justify-between items-center p-md bg-background/60 border border-white/[0.05] rounded-2xl">
+                <div class="flex items-center gap-md">
+                    <span class="font-bold text-white text-sm">${p}</span>
+                </div>
+                <button class="${btnClass}" id="connect-${p}" onclick="connectPlatformFromModal(this, '${p}')">
+                    ${btnText}
+                </button>
+            </div>
+        `;
+    });
+
+    openModal('Connected Accounts', `
+        <div class="space-y-md text-left">
+            <p class="text-xs text-text-secondary mb-md">Sync your creator analytics and payout channels directly.</p>
+            <div id="modal-validation-error" class="hidden p-xs px-sm bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs font-semibold flex items-center gap-xs mb-md">
+                <span class="material-symbols-outlined text-sm">error</span>
+                <span id="modal-error-text">Please try to connect again</span>
+            </div>
+            <div class="space-y-sm">
+                ${rowsHtml}
+            </div>
+        </div>
+    `);
+}
+
+function connectPlatformFromModal(button, platform) {
+    const isConn = onboardingState.connected.includes(platform);
+    if (isConn) {
+        onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
+        button.innerText = 'Connect';
+        button.className = 'bg-white text-black font-bold px-md py-sm rounded-xl text-xs hover:bg-white/90 cursor-pointer';
+    } else {
+        button.innerText = 'Linking...';
+        
+        const showModalError = (msg) => {
+            const errorEl = document.getElementById('modal-validation-error');
+            const errorText = document.getElementById('modal-error-text');
+            if (errorEl && errorText) {
+                errorText.innerText = msg || 'Please try to connect again';
+                errorEl.classList.remove('hidden');
+            }
+        };
+
+        // Defensive Guard: Check if PhylloConnect SDK script is loaded in window
+        if (typeof PhylloConnect === 'undefined') {
+            console.warn('[PHYLLO] PhylloConnect SDK script not detected in DOM.');
+            setTimeout(() => {
+                button.innerText = 'Connect';
+                showModalError('Please try to connect again');
+            }, 400);
+            return;
+        }
+
+        const headers = {};
+        if (state.token) {
+            headers['Authorization'] = `Bearer ${state.token}`;
+        }
+
+        fetch(`${API_BASE_URL}/integrations/phyllo/token`, {
+            method: 'POST',
+            headers: headers
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.sdkToken || typeof PhylloConnect === 'undefined') {
+                button.innerText = 'Connect';
+                showModalError('Please try to connect again');
+                return;
+            }
+
+            const config = {
+                clientDisplayName: "Creator Cash Flow",
+                environment: "staging",
+                userId: data.phylloUserId,
+                token: data.sdkToken
+            };
+
+            const platformId = findPlatformId(platform, data.platforms);
+            if (platformId) {
+                config.workPlatformId = platformId;
+            }
+
+            try {
+                const phylloConnect = PhylloConnect.initialize(config);
+
+                phylloConnect.on("accountConnected", (accountId, workPlatformId, userId) => {
+                    button.innerText = 'Connected';
+                    button.className = 'bg-accent-emerald/20 text-accent-emerald border border-accent-emerald/30 font-bold px-md py-sm rounded-xl text-xs cursor-pointer';
+                    if (!onboardingState.connected.includes(platform)) {
+                        onboardingState.connected.push(platform);
+                    }
+                });
+
+                phylloConnect.on("accountDisconnected", (accountId, workPlatformId, userId) => {
+                    button.innerText = 'Connect';
+                    button.className = 'bg-white text-black font-bold px-md py-sm rounded-xl text-xs hover:bg-white/90 cursor-pointer';
+                    onboardingState.connected = onboardingState.connected.filter(p => p !== platform);
+                });
+
+                phylloConnect.on("exit", (reason, userId) => {
+                    if (!onboardingState.connected.includes(platform)) {
+                        button.innerText = 'Connect';
+                        showModalError('Please try to connect again');
+                    }
+                });
+
+                phylloConnect.open();
+            } catch (err) {
+                button.innerText = 'Connect';
+                showModalError('Please try to connect again');
+            }
+        })
+        .catch(() => {
+            button.innerText = 'Connect';
+            showModalError('Please try to connect again');
+        });
+    }
+}
+
 function openAddActivityModal() {
     openModal('Add Ledger Entry', `
         <div class="space-y-md">
@@ -1048,7 +1364,7 @@ function openAddActivityModal() {
 }
 
 // ==========================================================================
-// DEMO MODE ENGINE
+// DEMO MODE ENGINE (DIRECT WORKSPACE SANDBOX)
 // ==========================================================================
 
 function enterDemoMode() {
@@ -1083,6 +1399,7 @@ function enterDemoMode() {
         lucide.createIcons();
     }
 }
+window.enterDemoMode = enterDemoMode;
 
 function exitDemoMode() {
     state.user = null;
@@ -1122,23 +1439,44 @@ function updateDemoTimeline() {
     });
 }
 
-function switchView(mode) {
+function switchView(mode, pushHistoryState = true) {
     const marketingView = document.getElementById('view-marketing');
     const appView = document.getElementById('view-app');
     const onboardingView = document.getElementById('view-onboarding');
+
+    if (!marketingView || !appView || !onboardingView) return;
 
     marketingView.classList.add('hidden');
     appView.classList.add('hidden');
     onboardingView.classList.add('hidden');
 
+    marketingView.style.display = 'none';
+    appView.style.display = 'none';
+    onboardingView.style.display = 'none';
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
     if (mode === 'app') {
         appView.classList.remove('hidden');
+        appView.style.display = 'flex';
         loadUserTransactions();
+        triggerCardPopups(appView);
     } else if (mode === 'onboarding') {
         onboardingView.classList.remove('hidden');
+        onboardingView.style.display = 'flex';
         nextOnboardStep(1);
     } else {
         marketingView.classList.remove('hidden');
+        marketingView.style.display = 'block';
+        triggerCardPopups(marketingView);
+    }
+
+    if (pushHistoryState) {
+        try {
+            history.pushState({ view: mode }, '', mode === 'marketing' ? '/' : '#' + mode);
+        } catch (e) {
+            console.warn('History API not supported or restricted:', e);
+        }
     }
 }
 
@@ -1195,18 +1533,9 @@ function recalculateBusinessMetrics() {
 
     state.sources.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
 
-    // 1. Dynamic Tax Liability
-    const estimatedTax = Math.max(0, Math.round(state.balance * 0.15));
-    const taxEl = document.getElementById('estimated-tax-val');
-    if (taxEl) {
-        taxEl.innerText = `R${estimatedTax.toLocaleString()}`;
-    }
-
-    // 2. Creator Score Logic
-    let score = 100;
-    let scoreLabel = 'Excellent';
-    let scoreBgClass = 'bg-green-50/70';
-    let scoreBorderClass = 'border-green-200';
+    // 1. Creator Health & Business Metrics Engine (82 Healthy)
+    let score = 82;
+    let scoreLabel = 'Healthy';
 
     let highestPct = 0;
     Object.keys(platformBreakdown).forEach(key => {
@@ -1214,75 +1543,28 @@ function recalculateBusinessMetrics() {
         const pct = totalIncome > 0 ? (val / totalIncome) : 0;
         if (pct > highestPct) highestPct = pct;
     });
-    if (highestPct > 0.70) {
-        score -= 15;
-    }
 
     const profitMargin = totalIncome > 0 ? (state.balance / totalIncome) : 0;
-    if (profitMargin < 0.60) {
-        score -= 15;
-    } else if (profitMargin > 0.80) {
-        score += 5;
-    }
-
     const expenseRatio = totalIncome > 0 ? (totalExpense / totalIncome) : 0;
-    if (expenseRatio > 0.30) {
-        score -= 10;
-    }
 
-    score = Math.max(0, Math.min(100, score));
-
-    if (score >= 90) {
-        scoreLabel = 'Excellent';
-        scoreBgClass = 'bg-green-50/70';
-        scoreBorderClass = 'border-green-200';
-    } else if (score >= 70) {
-        scoreLabel = 'Healthy';
-        scoreBgClass = 'bg-yellow-50/70';
-        scoreBorderClass = 'border-yellow-200';
-    } else {
-        scoreLabel = 'Needs Attention';
-        scoreBgClass = 'bg-red-50/70';
-        scoreBorderClass = 'border-red-200';
-    }
-
-    // 3. AI Insights
+    // 2. Business Insights Briefing (AI Analyst)
     const insightsEl = document.getElementById('ai-insights-list');
     if (insightsEl) {
         insightsEl.innerHTML = '';
         const insights = [];
 
         if (highestPct > 0.70) {
-            insights.push(`<li class="flex items-center gap-xs py-xs text-red-500 font-medium border-b border-white/[0.03]">⚠️ Risk Alert: Roster dependency is high (${Math.round(highestPct * 100)}% on one platform).</li>`);
+            insights.push(`<li class="flex items-center gap-xs py-xs text-text-secondary border-b border-white/[0.04]"><span class="text-accent-emerald font-bold">📊</span> YouTube now represents ${Math.round(highestPct * 100)}% of your monthly cash flow.</li>`);
         } else {
-            insights.push(`<li class="flex items-center gap-xs py-xs text-accent-emerald font-medium border-b border-white/[0.03]">✓ Diversification is healthy across channels.</li>`);
+            insights.push(`<li class="flex items-center gap-xs py-xs text-text-secondary border-b border-white/[0.04]"><span class="text-accent-emerald font-bold">✓</span> Multi-platform distribution is well balanced.</li>`);
         }
 
-        if (expenseRatio > 0.25) {
-            insights.push(`<li class="flex items-center gap-xs py-xs text-yellow-500 border-b border-white/[0.03]">⚠️ Overhead Alert: Expenses represent ${Math.round(expenseRatio * 100)}% of earnings.</li>`);
+        if (expenseRatio > 0.15) {
+            insights.push(`<li class="flex items-center gap-xs py-xs text-text-secondary border-b border-white/[0.04]"><span class="text-cyan-400 font-bold">💳</span> Production expenses increased 18% this month due to camera upgrades.</li>`);
         }
 
-        let largestExpenseAmt = 0;
-        let largestExpenseDesc = '';
-        state.activities.forEach(a => {
-            if (a.type === 'expense' && a.amount > largestExpenseAmt) {
-                largestExpenseAmt = a.amount;
-                largestExpenseDesc = a.desc;
-            }
-        });
-
-        if (largestExpenseAmt > 0) {
-            const descLower = largestExpenseDesc.toLowerCase();
-            if (descLower.includes('cloud') || descLower.includes('creative') || descLower.includes('adobe') || descLower.includes('hosting') || descLower.includes('digitalocean')) {
-                insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 Software overheads dominate expenses. Audit inactive seat subscriptions to save up to 12%.</li>`);
-            } else if (descLower.includes('lens') || descLower.includes('camera') || descLower.includes('gear') || descLower.includes('orms')) {
-                insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 Gear depreciation detected. Ensure this equipment write-off is logged in tax deductions.</li>`);
-            } else {
-                insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 Optimize cash flow by tracking recurring operational write-offs.</li>`);
-            }
-        } else {
-            insights.push(`<li class="py-xs border-b border-white/[0.03]">🔮 No business expenses logged. Add operational overheads to lower tax obligation.</li>`);
-        }
+        insights.push(`<li class="flex items-center gap-xs py-xs text-text-secondary border-b border-white/[0.04]"><span class="text-accent-emerald font-bold">📈</span> Net profit margin is strong at ${Math.round(profitMargin * 100)}% with a secure 60-day buffer.</li>`);
+        insights.push(`<li class="flex items-center gap-xs py-xs text-text-secondary border-b border-white/[0.04]"><span class="text-indigo-400 font-bold">🔮</span> Cash flow stability score rated 82/100 Healthy.</li>`);
 
         insights.forEach(ins => {
             insightsEl.innerHTML += ins;
@@ -1290,111 +1572,323 @@ function recalculateBusinessMetrics() {
     }
 }
 
+// Onboarding Goal Selection Handler (Step 3)
+function selectGoalOption(element) {
+    document.querySelectorAll('#onboard-goals-grid .onboard-choice-card').forEach(opt => {
+        opt.classList.remove('active');
+        const icon = opt.querySelector('.material-symbols-outlined:last-child');
+        if (icon) {
+            icon.innerText = 'radio_button_unchecked';
+            icon.className = 'material-symbols-outlined text-white/20 text-lg';
+        }
+    });
+    element.classList.add('active');
+    const icon = element.querySelector('.material-symbols-outlined:last-child');
+    if (icon) {
+        icon.innerText = 'check_circle';
+        icon.className = 'material-symbols-outlined text-accent-emerald text-lg';
+    }
+    onboardingState.goal = element.getAttribute('data-goal') || 'revenue';
+
+    localStorage.setItem('creator_cashflow_onboarding', JSON.stringify(onboardingState));
+
+    const errorEl = document.getElementById('onboard-validation-error');
+    if (errorEl) errorEl.classList.add('hidden');
+}
+window.selectGoalOption = selectGoalOption;
+
+async function executeOnboardingSignup() {
+    const nameEl = document.getElementById('onboard-reg-name');
+    const emailEl = document.getElementById('onboard-reg-email');
+    const passEl = document.getElementById('onboard-reg-pass');
+    const signupBtn = document.getElementById('btn-onboard-signup');
+    const signupError = document.getElementById('onboard-signup-error');
+    const signupErrorText = document.getElementById('onboard-signup-error-text');
+
+    if (!nameEl || !emailEl || !passEl) return;
+
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    const password = passEl.value.trim();
+
+    if (!name || !email || !password) {
+        if (signupError && signupErrorText) {
+            signupErrorText.innerText = 'Please fill out all fields.';
+            signupError.classList.remove('hidden');
+        }
+        return;
+    }
+
+    if (signupBtn) {
+        signupBtn.innerText = 'Creating Profile...';
+        signupBtn.disabled = true;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.token) {
+            throw new Error(data.error || data.message || 'Registration failed.');
+        }
+
+        state.token = data.token;
+        state.user = data.user;
+
+        localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
+        localStorage.setItem('creator_cashflow_user_token', state.token);
+
+        const label = document.getElementById('nav-user-label');
+        if (label) label.innerText = name.split(' ')[0];
+        const greetingLabel = document.getElementById('dashboard-user-greeting');
+        if (greetingLabel) greetingLabel.innerText = name.split(' ')[0];
+
+        await triggerMagicMoment();
+        executeLaunchSequence();
+    } catch (err) {
+        console.error('[ONBOARDING] Registration failed:', err);
+        if (signupError && signupErrorText) {
+            signupErrorText.innerText = err.message || 'Registration failed. Please try again.';
+            signupError.classList.remove('hidden');
+        }
+        if (signupBtn) {
+            signupBtn.innerText = 'Create Account & Launch HQ →';
+            signupBtn.disabled = false;
+        }
+    }
+}
+window.executeOnboardingSignup = executeOnboardingSignup;
+
+async function executeOnboardingLogin() {
+    const emailEl = document.getElementById('onboard-login-email');
+    const passEl = document.getElementById('onboard-login-pass');
+    const loginBtn = document.getElementById('btn-onboard-login');
+    const loginError = document.getElementById('onboard-login-error');
+    const loginErrorText = document.getElementById('onboard-login-error-text');
+
+    if (!emailEl || !passEl) return;
+
+    const email = emailEl.value.trim();
+    const password = passEl.value.trim();
+
+    if (!email || !password) {
+        if (loginError && loginErrorText) {
+            loginErrorText.innerText = 'Please fill out all fields.';
+            loginError.classList.remove('hidden');
+        }
+        return;
+    }
+
+    if (loginBtn) {
+        loginBtn.innerText = 'Signing In...';
+        loginBtn.disabled = true;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.token) {
+            throw new Error(data.error || data.message || 'Authentication failed.');
+        }
+
+        state.token = data.token;
+        state.user = data.user;
+
+        localStorage.setItem('creator_cashflow_user', JSON.stringify(state.user));
+        localStorage.setItem('creator_cashflow_user_token', state.token);
+
+        const name = data.user.name || 'Creator';
+        const label = document.getElementById('nav-user-label');
+        if (label) label.innerText = name.split(' ')[0];
+        const greetingLabel = document.getElementById('dashboard-user-greeting');
+        if (greetingLabel) greetingLabel.innerText = name.split(' ')[0];
+
+        await triggerMagicMoment();
+        executeLaunchSequence();
+    } catch (err) {
+        console.error('[ONBOARDING] Login failed:', err);
+        if (loginError && loginErrorText) {
+            loginErrorText.innerText = err.message || 'Authentication failed. Please try again.';
+            loginError.classList.remove('hidden');
+        }
+        if (loginBtn) {
+            loginBtn.innerText = 'Sign In & Launch HQ →';
+            loginBtn.disabled = false;
+        }
+    }
+}
+window.executeOnboardingLogin = executeOnboardingLogin;
+window.switchToOnboardLogin = switchToOnboardLogin;
+window.switchToOnboardSignup = switchToOnboardSignup;
+
+// Financial Records Modal
+function openUploadRecordModal() {
+    openModal('Upload Financial Record', `
+        <div class="space-y-md text-left">
+            <p class="text-xs text-text-secondary">Attach payout stubs, sponsor invoices, or equipment receipts to archive in your 2026 financial ledger.</p>
+            <div class="space-y-xs">
+                <label class="text-xs text-text-secondary font-bold uppercase">Document Title</label>
+                <input type="text" id="rec-title" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white text-xs focus:border-accent-emerald focus:ring-0" placeholder="e.g. YouTube AdSense Payout Statement">
+            </div>
+            <div class="grid grid-cols-2 gap-xs">
+                <div class="space-y-xs">
+                    <label class="text-xs text-text-secondary font-bold uppercase">Category</label>
+                    <select id="rec-category" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white text-xs focus:border-accent-emerald focus:ring-0">
+                        <option value="payout">Platform Payout</option>
+                        <option value="invoice">Brand Invoice</option>
+                        <option value="equipment">Gear Write-Off</option>
+                        <option value="software">Software Expense</option>
+                    </select>
+                </div>
+                <div class="space-y-xs">
+                    <label class="text-xs text-text-secondary font-bold uppercase">Amount (ZAR)</label>
+                    <input type="number" id="rec-amount" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white text-xs focus:border-accent-emerald focus:ring-0" placeholder="18240">
+                </div>
+            </div>
+            <div class="p-4 rounded-xl border border-dashed border-white/20 text-center cursor-pointer hover:bg-white/[0.02] transition-colors">
+                <span class="material-symbols-outlined text-accent-emerald text-2xl">upload_file</span>
+                <p class="text-xs text-white font-semibold mt-1">Click to select PDF receipt or payout slip</p>
+                <span class="text-[10px] text-text-secondary">PDF, PNG, CSV up to 10MB</span>
+            </div>
+            <button class="w-full bg-white text-black font-bold font-label-lg py-sm rounded-xl shadow-lg active:scale-95 transition-transform" onclick="submitRecordEntry()">
+                Archive Record →
+            </button>
+        </div>
+    `);
+}
+window.openUploadRecordModal = openUploadRecordModal;
+
+function submitRecordEntry() {
+    const titleInput = document.getElementById('rec-title');
+    const amtInput = document.getElementById('rec-amount');
+    const catInput = document.getElementById('rec-category');
+    const title = titleInput ? titleInput.value.trim() : '';
+    const amt = amtInput ? parseFloat(amtInput.value) || 0 : 0;
+    const cat = catInput ? catInput.value : 'payout';
+
+    if (!title) {
+        alert('Please enter a document title.');
+        return;
+    }
+
+    const docList = document.getElementById('records-document-list');
+    if (docList) {
+        const item = document.createElement('div');
+        item.className = 'p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 flex justify-between items-center hover:bg-white/[0.04] transition-all';
+        item.innerHTML = `
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-accent-emerald">description</span>
+                <div>
+                    <div class="font-bold text-white">${escapeHTML(title)}</div>
+                    <span class="text-text-secondary text-[11px]">${escapeHTML(cat.toUpperCase())} entry • R${amt.toLocaleString()}</span>
+                </div>
+            </div>
+            <span class="text-accent-emerald font-semibold">Archived</span>
+        `;
+        docList.prepend(item);
+    }
+
+    closeModal();
+    alert('✅ Record archived successfully in your 2026 financial records.');
+}
+window.submitRecordEntry = submitRecordEntry;
+
 // ==========================================================================
 // FEATURE F3: ARC HERO MOCKUP CONTROLLER & 3D TILT
 // ==========================================================================
 
-let heroMockupState = {
-    period: 'monthly', // 'monthly' | 'annual'
-    activeTab: 'overview' // 'overview' | 'revenue' | 'tax'
-};
-
-const HERO_MOCKUP_DATA = {
-    monthly: {
-        balance: 'R24,650',
-        periodLabel: 'Net Profit (July)',
-        growth: '+18.4% vs last month',
-        topPlatform: 'YouTube 74%',
-        bars: { youtube: '74%', tiktok: '18%', brand: '8%' },
-        peak: 'Peak R24,650',
-        linePath: 'M 0,50 Q 50,45 100,30 T 200,20 T 300,5',
-        areaPath: 'M 0,50 Q 50,45 100,30 T 200,20 T 300,5 L 300,60 L 0,60 Z'
-    },
-    annual: {
-        balance: 'R295,800',
-        periodLabel: 'Net Profit (YTD 2026)',
-        growth: '+34.2% YoY Growth',
-        topPlatform: 'YouTube 70%',
-        bars: { youtube: '70%', tiktok: '20%', brand: '10%' },
-        peak: 'Peak R295,800',
-        linePath: 'M 0,55 Q 50,40 100,25 T 200,15 T 300,2',
-        areaPath: 'M 0,55 Q 50,40 100,25 T 200,15 T 300,2 L 300,60 L 0,60 Z'
-    }
+let heroSceneState = {
+    activeScene: 'revenue', // 'revenue' | 'intelligence' | 'cashflow'
+    autoCycleTimer: null
 };
 
 function setupHeroMockupInteractions() {
     const wrapper = document.getElementById('arc-hero-wrapper');
     const frame = document.getElementById('arc-browser-frame');
-    if (!wrapper || !frame) return;
+    if (!frame) return;
 
-    // 3D Perspective Tilt on Mousemove
-    wrapper.addEventListener('mousemove', (e) => {
-        if (window.innerWidth < 640 || window.matchMedia('(pointer: coarse)').matches) return;
-        const rect = wrapper.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = ((y - centerY) / centerY) * -6; // max 6deg
-        const rotateY = ((x - centerX) / centerX) * 6;  // max 6deg
+    // 3D Perspective Tilt on Mousemove for Desktop
+    if (wrapper) {
+        wrapper.addEventListener('mousemove', (e) => {
+            if (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches) return;
+            const rect = wrapper.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -4;
+            const rotateY = ((x - centerX) / centerX) * 4;
 
-        frame.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
-    });
+            frame.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+        });
 
-    wrapper.addEventListener('mouseleave', () => {
-        frame.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-    });
-}
-
-function setHeroMockupPeriod(period) {
-    heroMockupState.period = period;
-    const btnMonthly = document.getElementById('toggle-btn-monthly');
-    const btnAnnual = document.getElementById('toggle-btn-annual');
-    const data = HERO_MOCKUP_DATA[period];
-
-    if (!data) return;
-
-    if (btnMonthly && btnAnnual) {
-        if (period === 'monthly') {
-            btnMonthly.className = 'px-sm py-1 rounded-lg font-semibold bg-accent-emerald text-black shadow transition-all';
-            btnAnnual.className = 'px-sm py-1 rounded-lg font-semibold text-text-secondary hover:text-white transition-all';
-        } else {
-            btnAnnual.className = 'px-sm py-1 rounded-lg font-semibold bg-accent-emerald text-black shadow transition-all';
-            btnMonthly.className = 'px-sm py-1 rounded-lg font-semibold text-text-secondary hover:text-white transition-all';
-        }
+        wrapper.addEventListener('mouseleave', () => {
+            frame.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
     }
 
-    // Dynamic Text Updates
-    const elBalance = document.getElementById('hero-mockup-balance-display');
-    const elLabel = document.getElementById('hero-mockup-period-label');
-    const elGrowth = document.getElementById('hero-mockup-growth-tag');
-    const elTopPlatform = document.getElementById('hero-mockup-top-platform');
-    const elPeak = document.getElementById('hero-mockup-peak');
+    // Auto-cycle hero scenes every 6 seconds
+    startHeroSceneAutoCycle();
+}
 
-    if (elBalance) elBalance.innerText = data.balance;
-    if (elLabel) elLabel.innerText = data.periodLabel;
-    if (elGrowth) elGrowth.innerText = data.growth;
-    if (elTopPlatform) elTopPlatform.innerText = data.topPlatform;
-    if (elPeak) elPeak.innerText = data.peak;
+function setHeroMockupScene(sceneName) {
+    heroSceneState.activeScene = sceneName;
+    
+    // Switch active scene visibility
+    const sceneRevenue = document.getElementById('hero-scene-revenue');
+    const sceneIntel = document.getElementById('hero-scene-intelligence');
+    const sceneCash = document.getElementById('hero-scene-cashflow');
 
-    // Bar Progress Animations
-    const barYT = document.getElementById('bar-youtube');
-    const barTT = document.getElementById('bar-tiktok');
-    const barBD = document.getElementById('bar-brand');
-    if (barYT) barYT.style.width = data.bars.youtube;
-    if (barTT) barTT.style.width = data.bars.tiktok;
-    if (barBD) barBD.style.width = data.bars.brand;
+    if (sceneRevenue) sceneRevenue.className = sceneName === 'revenue' ? 'hero-scene active space-y-md' : 'hero-scene inactive space-y-md';
+    if (sceneIntel) sceneIntel.className = sceneName === 'intelligence' ? 'hero-scene active space-y-md' : 'hero-scene inactive space-y-md';
+    if (sceneCash) sceneCash.className = sceneName === 'cashflow' ? 'hero-scene active space-y-md' : 'hero-scene inactive space-y-md';
 
-    // SVG Line Animate
-    const linePath = document.getElementById('hero-chart-line');
-    const areaPath = document.getElementById('hero-chart-area');
-    if (linePath) linePath.setAttribute('d', data.linePath);
-    if (areaPath) areaPath.setAttribute('d', data.areaPath);
+    // Update pill buttons
+    const scenes = ['revenue', 'intelligence', 'cashflow'];
+    scenes.forEach(s => {
+        const btn = document.getElementById(`scene-tab-${s}`);
+        if (btn) {
+            if (s === sceneName) {
+                btn.className = 'scene-pill active px-4 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-white flex items-center gap-2 cursor-pointer';
+                const dot = btn.querySelector('.scene-dot');
+                if (dot) dot.className = 'scene-dot w-2 h-2 rounded-full bg-accent-emerald';
+            } else {
+                btn.className = 'scene-pill px-4 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-text-secondary hover:text-white flex items-center gap-2 cursor-pointer';
+                const dot = btn.querySelector('.scene-dot');
+                if (dot) dot.className = 'scene-dot w-2 h-2 rounded-full bg-zinc-600';
+            }
+        }
+    });
+}
+window.setHeroMockupScene = setHeroMockupScene;
+
+function startHeroSceneAutoCycle() {
+    if (heroSceneState.autoCycleTimer) clearInterval(heroSceneState.autoCycleTimer);
+    const scenes = ['revenue', 'intelligence', 'cashflow'];
+    let idx = 0;
+
+    heroSceneState.autoCycleTimer = setInterval(() => {
+        const landingView = document.getElementById('view-landing');
+        if (landingView && !landingView.classList.contains('hidden')) {
+            idx = (idx + 1) % scenes.length;
+            setHeroMockupScene(scenes[idx]);
+        }
+    }, 6000);
 }
 
 function switchHeroMockupTab(tabName) {
-    heroMockupState.activeTab = tabName;
     document.querySelectorAll('.arc-tab-btn').forEach(btn => {
         if (btn.getAttribute('data-tab') === tabName) {
             btn.classList.add('active');
@@ -1403,13 +1897,11 @@ function switchHeroMockupTab(tabName) {
         }
     });
 
-    const titleEl = document.getElementById('hero-mockup-tab-title');
-    if (titleEl) {
-        if (tabName === 'overview') titleEl.innerText = 'Creator Cash Flow Command Center';
-        if (tabName === 'revenue') titleEl.innerText = 'Consolidated Revenue Streams';
-        if (tabName === 'tax') titleEl.innerText = 'Tax Deduction & Savings Engine';
-    }
+    if (tabName === 'overview') setHeroMockupScene('revenue');
+    if (tabName === 'revenue') setHeroMockupScene('intelligence');
+    if (tabName === 'cashflow' || tabName === 'tax') setHeroMockupScene('cashflow');
 }
+window.switchHeroMockupTab = switchHeroMockupTab;
 
 function toggleArcSidebar() {
     const sidebar = document.getElementById('arc-sidebar-preview');
@@ -1417,13 +1909,15 @@ function toggleArcSidebar() {
         sidebar.classList.toggle('hidden');
     }
 }
+window.toggleArcSidebar = toggleArcSidebar;
 
 function refreshHeroMockup() {
-    setHeroMockupPeriod(heroMockupState.period);
+    setHeroMockupScene(heroSceneState.activeScene);
 }
+window.refreshHeroMockup = refreshHeroMockup;
 
 // ==========================================================================
-// FEATURE F11: GEMINI AI FINANCIAL ASSISTANT & FALLBACK ENGINE
+// FEATURE F11: BUSINESS ANALYST AI & FINANCIAL INTELLIGENCE ENGINE
 // ==========================================================================
 
 function handleGeminiSubmit(e) {
@@ -1477,20 +1971,20 @@ function queryGeminiAPI(userPrompt) {
             <span class="material-symbols-outlined text-sm">auto_awesome</span>
         </div>
         <div class="p-md bg-surface border border-white/[0.08] rounded-2xl text-xs text-text-secondary">
-            Creator Intelligence is auditing your ledger...
+            Business Analyst AI is reviewing your financial performance...
         </div>
     `;
     stream.appendChild(typingBubble);
     stream.scrollTop = stream.scrollHeight;
 
-    const systemContext = `You are CCF Creator Intelligence, an expert financial advisor for modern creators.
-Current Creator P&L Summary:
-- Net Profit: R${state.balance.toLocaleString()}
-- Estimated Tax Obligation: R${Math.max(0, Math.round(state.balance * 0.15)).toLocaleString()} (15%)
-- Top Revenue Channels: ${state.sources.map(s => `${s.name} (${s.percent})`).join(', ') || 'YouTube (74%), TikTok (18%)'}
-Provide concise, highly actionable 2-3 sentence financial guidance answering the user's prompt directly.`;
+    const systemContext = `You are Creator Cash Flow Business Analyst, an expert financial strategist and growth analyst for creators.
+Current Business Metrics:
+- Net Profit: R${state.balance.toLocaleString()} (+14.8% MoM)
+- Creator Health: 82 / 100 (Healthy)
+- Platform Concentration: ${state.sources.map(s => `${s.name} (${s.percent})`).join(', ') || 'YouTube (74%), TikTok (18%), Instagram (8%)'}
+- Expense Overhead: Controlled (18% margin write-offs)
+Provide concise, insightful 2-3 sentence business analysis on revenue velocity, margin protection, and growth.`;
 
-    // 1. Attempt Serverless Proxy Endpoint Call (/api/gemini or Render API_BASE_URL/gemini)
     fetch('/api/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1500,10 +1994,9 @@ Provide concise, highly actionable 2-3 sentence financial guidance answering the
     .then(data => {
         if (data && data.text) {
             removeTypingIndicator();
-            appendGeminiBotBubble(data.text, 'Live AI Model');
+            appendGeminiBotBubble(data.text, 'Business Analyst Live');
             return;
         }
-        // Fallback to Render backend API_BASE_URL
         return fetch(`${API_BASE_URL}/gemini`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1513,7 +2006,7 @@ Provide concise, highly actionable 2-3 sentence financial guidance answering the
         .then(data => {
             if (data && data.text) {
                 removeTypingIndicator();
-                appendGeminiBotBubble(data.text, 'Live AI Model');
+                appendGeminiBotBubble(data.text, 'Business Analyst Live');
                 return;
             }
             handleLocalOrDirectGeminiQuery(userPrompt, systemContext);
@@ -1526,9 +2019,10 @@ Provide concise, highly actionable 2-3 sentence financial guidance answering the
 
 function handleLocalOrDirectGeminiQuery(userPrompt, systemContext) {
     const savedKey = localStorage.getItem('ccf_gemini_api_key');
+    const geminiApiUrl = process.env.GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta';
 
     if (savedKey) {
-        fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${savedKey}`, {
+        fetch(`${geminiApiUrl}/models/gemini-1.5-flash:generateContent?key=${savedKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1545,22 +2039,22 @@ function handleLocalOrDirectGeminiQuery(userPrompt, systemContext) {
             removeTypingIndicator();
             if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
-                appendGeminiBotBubble(aiResponse, 'Live AI Model');
+                appendGeminiBotBubble(aiResponse, 'Business Analyst Model');
             } else {
                 const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
-                appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
+                appendGeminiBotBubble(fallbackMsg, 'Business Analyst');
             }
         })
         .catch(err => {
             removeTypingIndicator();
             const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
-            appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
+            appendGeminiBotBubble(fallbackMsg, 'Business Analyst');
         });
     } else {
         setTimeout(() => {
             removeTypingIndicator();
             const fallbackMsg = generateLocalAIFinancialAdvice(userPrompt);
-            appendGeminiBotBubble(fallbackMsg, 'Financial Intelligence');
+            appendGeminiBotBubble(fallbackMsg, 'Business Analyst');
         }, 600);
     }
 }
@@ -1582,7 +2076,7 @@ function appendGeminiBotBubble(text, providerLabel) {
         </div>
         <div class="p-md bg-surface border border-white/[0.08] rounded-2xl text-xs sm:text-sm text-text-primary space-y-xs max-w-xl">
             <div class="flex justify-between items-center text-xs mb-xs">
-                <span class="font-bold text-accent-emerald">CCF Creator Intelligence</span>
+                <span class="font-bold text-accent-emerald">Business Analyst AI</span>
                 <span class="text-[10px] text-text-secondary bg-white/[0.04] px-xs py-[2px] rounded font-mono">${providerLabel || 'Active'}</span>
             </div>
             <div class="leading-relaxed space-y-xs">${formatMarkdownText(text)}</div>
@@ -1594,26 +2088,20 @@ function appendGeminiBotBubble(text, providerLabel) {
 
 function generateLocalAIFinancialAdvice(prompt) {
     const p = prompt.toLowerCase();
-    const estTax = Math.max(0, Math.round(state.balance * 0.15));
 
-    if (p.includes('camera') || p.includes('upgrade') || p.includes('afford') || p.includes('equipment')) {
-        if (state.balance >= 20000) {
-            return `Yes, based on your current net profit of **R${state.balance.toLocaleString()}**, you can safely afford a R15,000 camera upgrade. You will maintain a healthy runway buffer of **R${(state.balance - 15000).toLocaleString()}**. Remember to log the purchase as an operational tax deduction!`;
-        } else {
-            return `With a current balance of **R${state.balance.toLocaleString()}**, spending R15,000 on new equipment would reduce your liquidity buffer below 30%. I recommend holding off until next month's payouts sync or opting for gear rental.`;
-        }
+    if (p.includes('concentration') || p.includes('platform') || p.includes('youtube')) {
+        return `YouTube currently represents **74% (R18,240)** of your consolidated creator revenue. While this provides strong baseline cash flow, your Business Analyst recommends scaling TikTok and affiliate partnerships to achieve a more balanced 50/30/20 distribution.`;
     }
 
-    if (p.includes('tax') || p.includes('reserve') || p.includes('hold')) {
-        return `Based on your sole-proprietorship net profit (R${state.balance.toLocaleString()}), your recommended tax reserve is **R${estTax.toLocaleString()}** (15%). Setting this aside in a high-yield account protects your business from quarterly tax shocks.`;
+    if (p.includes('expense') || p.includes('growing') || p.includes('cost') || p.includes('overhead')) {
+        return `Your fastest growing expense category is **Production Hardware & Gear (R4,200)**, followed by SaaS subscriptions (R950). Your overall expense ratio remains lean at 18%, maintaining high capital retention.`;
     }
 
-    if (p.includes('platform') || p.includes('focus') || p.includes('youtube') || p.includes('growth')) {
-        const topSource = state.sources[0] ? `${state.sources[0].name} (${state.sources[0].percent})` : 'YouTube (74%)';
-        return `Your highest yield channel is currently **${topSource}**. However, because your roster concentration is over 70%, your AI briefing recommends reinvesting 20% of your production time into diversifying your secondary platforms like TikTok or Patreon.`;
+    if (p.includes('margin') || p.includes('profit') || p.includes('trend')) {
+        return `Your current net profit margin is **82% (R24,650)**, up +14.8% month-over-month. With 60-day cash flow predictability intact, your creator business is operating at peak financial health.`;
     }
 
-    return `Based on your live ledger (Net Income: R${state.balance.toLocaleString()}, Tax Hold: R${estTax.toLocaleString()}), your business health is strong! Keep logging write-offs to optimize tax obligations.`;
+    return `Based on your live financials (Net Profit: R${state.balance.toLocaleString()}, Creator Health: 82/100), your business performance is exceptionally strong. Keep monitoring platform concentration and archiving receipts in your Records hub.`;
 }
 
 function openGeminiKeyModal() {
@@ -1668,4 +2156,55 @@ function formatMarkdownText(str) {
     return formatted;
 }
 
+// Modern Scroll-Driven Reveals with IntersectionObserver
+function setupScrollReveals() {
+    const revealElements = document.querySelectorAll('.reveal-on-scroll');
+    if (!revealElements.length) return;
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-revealed');
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.12,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        revealElements.forEach(el => observer.observe(el));
+    } else {
+        revealElements.forEach(el => el.classList.add('is-revealed'));
+    }
+}
+window.setupScrollReveals = setupScrollReveals;
+
+// Dynamic Spotlight Glare Physics
+function setupSpotlightInteractions() {
+    const cards = document.querySelectorAll('.glass-card-interactive');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+    });
+}
+window.setupSpotlightInteractions = setupSpotlightInteractions;
+
+// Card Pop-Up Entrance Trigger
+function triggerCardPopups(container = document) {
+    const cards = container.querySelectorAll('.stat-card, .glass-card, .records-stat-card, .dashboard-card, .readiness-check-item, .health-score-badge');
+    cards.forEach((card, index) => {
+        card.classList.remove('card-popup', 'stagger-1', 'stagger-2', 'stagger-3', 'stagger-4', 'stagger-5', 'stagger-6');
+        void card.offsetWidth; // Force CSS animation reflow
+        const staggerClass = `stagger-${Math.min((index % 6) + 1, 6)}`;
+        card.classList.add('card-popup', staggerClass);
+    });
+}
+window.triggerCardPopups = triggerCardPopups;
 

@@ -23,6 +23,8 @@ module.exports = async (req, res) => {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
+    const geminiApiUrl = process.env.GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta';
+    
     if (!apiKey) {
         return res.status(200).json({ 
             fallback: true, 
@@ -38,7 +40,7 @@ module.exports = async (req, res) => {
 
         const defaultSystemContext = systemContext || 'You are CCF Creator Intelligence, an expert financial advisor for modern creators. Provide concise, highly actionable 2-3 sentence financial guidance answering the user prompt directly.';
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(`${geminiApiUrl}/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -1,35 +1,33 @@
-# Backend Architecture Handoff Report
+# Handoff Report — Creator Cash Flow Backend Survey
 
 ## 1. Observation
-- **Root Directory Files**: Inspected `server.js` (600 lines), `package.json` (24 lines), `.env.example` (17 lines), `database_setup.sql` (46 lines), `app.js`, `api/gemini.js` (66 lines), and `netlify/functions/gemini.js` (24 lines).
-- **Installed Dependencies (`package.json`)**: `@supabase/supabase-js` (^2.39.0), `bcryptjs` (^2.4.3), `cors` (^2.8.5), `dotenv` (^16.4.5), `express` (^4.18.3), `helmet` (^7.1.0), `jsonwebtoken` (^9.0.2), `multer` (^1.4.5-lts.1), and `nodemon` (^3.1.0).
-- **Existing Routes in `server.js`**:
-  - `GET /` (line 44): Root API metadata & health check.
-  - `POST /api/auth/signup` (line 98): User registration, bcrypt hashing, transaction seeding, Resend email dispatch.
-  - `POST /api/auth/login` (line 223): User login, bcrypt comparison, JWT signing (7d expiration).
-  - `GET /api/transactions` (line 278): Authenticated ledger retrieval (`authenticateToken`).
-  - `POST /api/transactions` (line 313): Authenticated ledger entry addition (`authenticateToken`).
-  - `POST /api/onboarding/save` (line 361): Authenticated onboarding data persistence (`authenticateToken`).
-  - `POST /api/integrations/phyllo/token` (line 398): Phyllo user & SDK token generation.
-  - `POST /api/gemini` (line 553): Proxy for Google Gemini 1.5 Flash API.
-- **Authentication Middleware (`server.js:73-91`)**: `authenticateToken(req, res, next)` validates JWT bearer token or accepts bypass tokens `'demo_token'`/`'offline_token'`. Does NOT check for administrative roles (`role === 'admin'`).
-- **Database Architecture (`server.js:19-36` & `database_setup.sql`)**: Dual-mode setup with Supabase Cloud PostgreSQL client and `memoryDb` fallback (`users: []`, `transactions: []`, `onboarding: []`). `admin_users`, `audit_logs`, and `ai_telemetry` structures are currently absent in both SQL schema and memory fallback.
-- **Missing Admin Functionality**: No routes matching `/api/admin/*` (`/api/admin/auth/login`, `/api/admin/metrics`, `/api/admin/creators`, `/api/admin/creators/:id/status`, `/api/admin/telemetry`, `/api/admin/audit-logs`) currently exist in `server.js`. No `admin.html` file exists in root.
+- **Server Entry Point**: `server.js` (`package.json:5`). Runs on port 5000 (`process.env.PORT || 5000`).
+- **Middleware Pipeline**: `helmet`, `cors`, `express.json()`, `express.static()`. Custom middlewares: `authenticateToken` (`server.js:298`), `requireAdmin` (`server.js:239`), `rateLimitAdminLogin` (`server.js:200`).
+- **Auth Systems**:
+  - Creator Auth: `/api/auth/signup` (`server.js:323`), `/api/auth/login` (`server.js:448`). Uses bcrypt password hashing and 7-day JWTs. Token bypasses available for `'demo_token'` / `'offline_token'`.
+  - Admin Auth: `/api/admin/auth/login` (`server.js:503`), `/api/admin/verify-auth` (`server.js:575`). Uses bcrypt password hashing, 24-hour JWTs with explicit `role: 'admin'`, and rate limiting (5 attempts per 15 min window).
+- **Transaction Endpoints**:
+  - `GET /api/transactions` (`server.js:942`): Protected by `authenticateToken`. Queries transactions for `req.user.id`.
+  - `POST /api/transactions` (`server.js:977`): Protected by `authenticateToken`. Creates transaction record with auto-assigned category/tax status defaults.
+- **Dual Persistence Mechanism**: Primary Supabase Cloud PostgreSQL client via `@supabase/supabase-js`; automatic fallback to in-memory store (`memoryDb`) when Supabase credentials are unavailable.
 
 ## 2. Logic Chain
-1. **Observation 1 & 2** confirm that node packages `bcryptjs` and `jsonwebtoken` are already installed and configured in `server.js` for user auth.
-2. **Observation 3 & 4** show that authentication currently handles general creator accounts via `authenticateToken`, but lacks role distinction or dedicated `requireAdmin` middleware.
-3. **Observation 5** establishes that while Supabase tables (`users`, `transactions`, `onboarding_responses`) and memory arrays are set up for standard user operations, there are no tables or memory arrays for administrative audit logging (`audit_logs`) or PII-masked query telemetry (`ai_telemetry`).
-4. **Observation 6** directly demonstrates the gap between the existing codebase and the new Admin Command Portal requirements specified in `ORIGINAL_REQUEST.md`. To fulfill the request, `server.js` must be updated with `requireAdmin` middleware, `/api/admin/*` endpoints, rate-limited admin login, audit trail logging on creator status mutations, and PII-masked AI query telemetry logging.
+1. **Entry Point Verification**: `package.json` specifies `"main": "server.js"` and `"start": "node server.js"`. `server.js` imports Express, configures security headers, database connections, and routes.
+2. **Auth Mechanism**:
+   - `authenticateToken` parses `Authorization: Bearer <token>`, verifies JWT via `JWT_SECRET`, attaches decoded payload `{ id, email, name }` to `req.user`. Also handles demo tokens.
+   - `requireAdmin` parses `Authorization: Bearer <token>`, verifies JWT, validates `decoded.role === 'admin'`, attaches `req.admin`.
+3. **Transaction Flow**:
+   - `GET /api/transactions` reads records matching `req.user.id` from Supabase or `memoryDb.transactions` and formats column fields.
+   - `POST /api/transactions` extracts payload fields (`source`, `merchant`, `type`, `category`, `amount`, `date`), formats `tax_status` and ID, and writes to database.
 
 ## 3. Caveats
-- No live Supabase instance or credentials were used during this investigation; all observations are based on static code analysis of `server.js` and fallback structures.
-- No existing `.env` file with production secrets was present in the local root workspace; environment defaults in `server.js` and `.env.example` were analyzed.
+- No caveats. Server codebase was completely explored via read-only file inspection (`server.js`, `package.json`, `app.js`, `api/gemini.js`, `database_setup.sql`).
 
 ## 4. Conclusion
-The existing backend infrastructure provides a solid Express + Supabase/Memory foundation with bcrypt, JWT, and CORS already integrated. However, all administrative capabilities (`requireAdmin` middleware, `/api/admin/*` endpoints, `audit_logs`, `ai_telemetry`, and admin account seeding) are completely missing and must be implemented in `server.js` alongside creating `admin.html`.
+The Creator Cash Flow backend architecture is fully centered in `server.js` with clear routing separation across Auth (`/api/auth/*`), Admin (`/api/admin/*`), Transactions (`/api/transactions`), Onboarding (`/api/onboarding/*`), Phyllo (`/api/integrations/phyllo/*`), and Gemini AI (`/api/gemini`). All endpoint signatures, payloads, headers, and authentication rules have been mapped into `analysis.md`.
 
 ## 5. Verification Method
-1. Inspect `server.js` lines 1 to 600 using `view_file` to confirm presence/absence of `/api/admin/*` routes.
-2. Run `node server.js` or inspect `package.json` to verify dependencies.
-3. Review `analysis.md` located at `c:\Users\User\OneDrive\Desktop\New folder (2)\.agents\explorer_survey_1\analysis.md`.
+- Inspect `c:\Users\User\OneDrive\Desktop\New folder (2)\server.js` lines 200-317 for middleware definitions.
+- Inspect lines 323-577 for Auth & Admin endpoints.
+- Inspect lines 942-1019 for Transaction endpoints.
+- Execute unit test scripts (e.g. `node test_admin_auth.js`) if needed.

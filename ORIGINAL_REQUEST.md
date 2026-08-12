@@ -87,3 +87,32 @@ Implement requireAdmin middleware protecting all /api/admin/* endpoints:
 - [ ] AI query telemetry displays token consumption, model source, and latency with PII masking applied.
 - [ ] Automated verification script validates admin.html authentication flow, audit logging, and search responsiveness.
 </USER_REQUEST>
+
+## Follow-up — 2026-08-09T00:20:39Z
+
+<USER_REQUEST>
+Establish a robust stress testing harness to benchmark the Creator Cash Flow Express/Supabase backend under simulated concurrent creator traffic and volume spikes.
+
+Working directory: c:/Users/User/OneDrive/Desktop/New folder (2)
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Concurrency Load Generator (Auth & Transactions)
+Implement a custom Node.js stress testing harness that simulates 100-200 concurrent users performing high-frequency registration, authentication (JWT creation/validation), and transaction listings.
+
+### R2. Latency Metrics & Performance Telemetry
+Track and report performance metrics, including p95/p99 latencies, average response times, request throughput, and database query latency.
+
+### R3. Database Connection Pooling Stability under Load
+Validate that the database connection pool (Supabase / local memory backup) handles concurrent read/write transactions cleanly without leaks, lockups, or connection timeout errors.
+
+## Acceptance Criteria
+
+### Test Execution & Harness Stability
+- [ ] Staging server handles a simulated load of 150 concurrent users executing requests.
+- [ ] Average response latency remains under 250ms under peak target load.
+- [ ] Test harness reports p95/p99 latency values, throughput (requests/sec), and HTTP success/error rates.
+- [ ] Server achieves 100% success rate (zero HTTP 500 errors, database pool failures, or server crashes).
+</USER_REQUEST>
+

@@ -1,124 +1,324 @@
-# Backend Architecture & Codebase Analysis Report
+# Creator Cash Flow Backend Survey & Architectural Analysis
 
-**Target System**: Creator Cash Flow REST API & Business Command Center Backend  
-**Working Directory**: `c:\Users\User\OneDrive\Desktop\New folder (2)`  
-**Investigated Files**: `server.js`, `package.json`, `.env.example`, `database_setup.sql`, `app.js`, `api/gemini.js`, `netlify/functions/gemini.js`
-
----
-
-## 1. Executive Technical Summary
-
-The Creator Cash Flow backend is a Node.js + Express REST API application designed to operate in dual database modes:
-1. **Supabase Cloud PostgreSQL Mode**: Active when valid `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` / `SUPABASE_ANON_KEY` environment variables are present.
-2. **High-Reliability Memory Backup Mode**: Automatically activated if Supabase credentials are missing or unconfigured (`memoryDb` in-memory object store).
-
-The server provides user registration, bcrypt password hashing, JWT session signing and verification, transaction seeding (in ZAR), onboarding data persistence, Phyllo SDK token orchestration, Resend transactional email integration, and a Gemini 1.5 Flash AI proxy endpoint.
+## 1. Executive Summary
+This document details the survey and architectural analysis of the **Creator Cash Flow** backend REST API server. The backend is built using Express.js on Node.js with a dual-persistence architecture: primary storage via Supabase Cloud PostgreSQL, with a fallback in-memory database (`memoryDb`) for high reliability and local testing.
 
 ---
 
-## 2. Dependency & Stack Analysis
+## 2. Server Entry Points & Server Architecture
 
-From `package.json`:
-- **Node Framework**: Express (`express` `^4.18.3`)
-- **Security & Headers**: Helmet (`helmet` `^7.1.0`), CORS (`cors` `^2.8.5`)
-- **Authentication & Cryptography**: 
-  - `bcryptjs` (`^2.4.3`): Used for asynchronous password hashing (`bcrypt.hash(password, 10)`) and credential verification (`bcrypt.compare`).
-  - `jsonwebtoken` (`^9.0.2`): Used for issuing and verifying JWT bearer tokens with 7-day expiration (`jwt.sign`, `jwt.verify`).
-- **Database Client**: `@supabase/supabase-js` (`^2.39.0`)
-- **Environment Management**: `dotenv` (`^16.4.5`)
-- **File Upload Support**: `multer` (`^1.4.5-lts.1`)
-- **Dev Utilities**: `nodemon` (`^3.1.0`)
+### 2.1 File Locations & Configuration
+- **Primary Entry Point**: `server.js` (declared in `package.json` `"main": "server.js"` and `"start": "node server.js"`)
+- **Serverless Proxies**: 
+  - `api/gemini.js` (Vercel serverless function proxy)
+  - `netlify/functions/gemini.js` (Netlify function handler delegating to `api/gemini.js`)
+- **Default Port**: `process.env.PORT || 5000`
+- **Environment Variables**:
+  - `PORT`: Server listen port
+  - `JWT_SECRET`: Secret key for JWT signing & verification (fallback: `'fallback-creator-cashflow-secret-key-2026'`)
+  - `ENCRYPTION_KEY`: 32-byte key for AES-256-CBC
+  - `SUPABASE_URL`: Supabase project URL (`https://iekofqagtcztyavhunai.supabase.co`)
+  - `SUPABASE_SERVICE_ROLE_KEY` / `SUPABASE_ANON_KEY`: Supabase API credentials
+  - `ADMIN_PASSWORD`: Master admin password override
+  - `RESEND_API_KEY`: API key for sending welcome emails via Resend
+  - `PHYLLO_AUTH_HEADER`: Auth header for Phyllo integrations API
+  - `GEMINI_API_KEY`: API key for Gemini 1.5 Flash AI requests
 
----
+### 2.2 Global Middleware Pipeline
+1. `helmet({ contentSecurityPolicy: false })`: Express security headers (CSP disabled for inline demo scripts & external CDNs).
+2. `cors({ origin: '*', credentials: true })`: CORS headers for cross-origin requests.
+3. `express.json()`: Request body parsing for JSON payloads.
+4. `express.static(__dirname)`: Serving static frontend files (e.g. `index.html`, `admin.html`, `app.js`, `style.css`).
 
-## 3. Server Configuration & Environment Variables
+### 2.3 Custom Middleware Modules
+1. **`authenticateToken(req, res, next)`** (`server.js:298-316`):
+   - **Header**: `Authorization: Bearer <token>`
+   - **Bypass Tokens**: `'demo_token'` and `'offline_token'` set `req.user = { id: 'demo_creator_user', email: 'demo@creatorcashflow.com', name: 'Demo Creator' }`.
+   - **Verification**: Verifies JWT using `JWT_SECRET`. If invalid/expired, returns `HTTP 403 Forbidden` (`{ error: 'Invalid or expired session token' }`). If missing token, returns `HTTP 401 Unauthorized` (`{ error: 'Access token required' }`).
+   - **Attached Payload**: Sets `req.user` decoded from token payload `{ id, email, name }`.
 
-| Variable | Default Fallback in `server.js` | Description |
-|---|---|---|
-| `PORT` | `5000` | HTTP Server Port |
-| `NODE_ENV` | `production` (in `.env.example`) | Environment state |
-| `JWT_SECRET` | `'fallback-creator-cashflow-secret-key-2026'` | Secret key for JWT signature verification |
-| `ENCRYPTION_KEY` | `'12345678901234567890123456789012'` (32 bytes) | AES-256 key for sensitive payload encryption |
-| `SUPABASE_URL` | `'https://iekofqagtcztyavhunai.supabase.co'` | Supabase project URL |
-| `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | `undefined` | Supabase API authentication key |
-| `PHYLLO_AUTH_HEADER` | `undefined` | Basic Auth token for Phyllo Staging API (`api.staging.getphyllo.com`) |
-| `RESEND_API_KEY` | `undefined` | API key for transactional emails via Resend (`api.resend.com`) |
-| `FROM_EMAIL` | `'Creator Cash Flow <onboarding@resend.dev>'` | Sender email identity for Resend |
-| `GEMINI_API_KEY` | `undefined` | Google Generative AI API key for Gemini 1.5 Flash |
+2. **`requireAdmin(req, res, next)`** (`server.js:239-257`):
+   - **Header**: `Authorization: Bearer <token>`
+   - **Verification**: Verifies JWT using `JWT_SECRET`.
+   - **Authorization**: Checks `decoded.role === 'admin'`. If role is missing or not `'admin'`, returns `HTTP 403 Forbidden` (`{ error: 'Forbidden: Administrative privileges required' }`). If missing token or invalid token, returns `HTTP 401 Unauthorized`.
+   - **Attached Payload**: Sets `req.admin` decoded from token payload `{ id, email, role }`.
 
----
-
-## 4. Existing Database Models & Setup (`database_setup.sql`)
-
-### Existing PostgreSQL Tables (Supabase) & Memory Fallback Structures
-1. **`users`**:
-   - Schema: `id` (TEXT PK), `email` (TEXT UNIQUE), `password_hash` (TEXT), `name` (TEXT), `phyllo_user_id` (TEXT), `created_at` (TIMESTAMPTZ).
-   - RLS Policy: Open read/write during beta.
-   - In-Memory Fallback: `memoryDb.users` array (stores `id`, `email`, `passwordHash`, `name`, `phyllo_user_id`).
-2. **`transactions`**:
-   - Schema: `id` (TEXT PK), `user_id` (FK -> users.id), `date` (TEXT), `source` (TEXT), `merchant` (TEXT), `type` (TEXT CHECK ('income', 'expense')), `category` (TEXT), `tax_status` (TEXT), `amount` (NUMERIC(12,2)), `created_at` (TIMESTAMPTZ).
-   - In-Memory Fallback: `memoryDb.transactions` array.
-3. **`onboarding_responses`**:
-   - Schema: `user_id` (PK FK -> users.id), `creator_type` (TEXT), `platforms` (TEXT[]), `goal` (TEXT), `created_at` (TIMESTAMPTZ).
-   - In-Memory Fallback: `memoryDb.onboarding` array.
+3. **`rateLimitAdminLogin(req, res, next)`** (`server.js:200-236`):
+   - **Scope**: Applied to `POST /api/admin/auth/login`.
+   - **Limit**: Max 5 failed/successful login attempts per IP within a sliding 15-minute window (`15 * 60 * 1000 ms`).
+   - **Response when exceeded**: `HTTP 429 Too Many Requests` (`{ error: 'Too many login attempts', message: '...', retryAfterSeconds: number }`).
 
 ---
 
-## 5. Existing API Routes & Middleware Inventory
+## 3. Authentication & Authorization Endpoints
 
-### Core Middleware
-- `app.use(helmet())`: Adds security HTTP headers.
-- `app.use(cors({ origin: '*', credentials: true }))`: Allows cross-origin requests.
-- `app.use(express.json())`: Body parser for JSON payloads.
-- `authenticateToken(req, res, next)`: Middleware validating `Authorization: Bearer <token>`. Supports bypass tokens `'demo_token'` and `'offline_token'` (attaches demo user details). Decodes JWT using `JWT_SECRET` and attaches `req.user`.
+### 3.1 Creator Registration (`POST /api/auth/signup`)
+- **File**: `server.js:323-445`
+- **Authentication**: Public (None)
+- **HTTP Method**: `POST`
+- **Endpoint URL**: `/api/auth/signup`
+- **Request Headers**: `Content-Type: application/json`
+- **Request Payload**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "SecretPassword123!",
+    "name": "Jane Creator"
+  }
+  ```
+- **Validation Rules**:
+  - `email`, `password`, and `name` are mandatory. Returns `400` if any are missing (`{ error: 'Name, email, and password are required.' }`).
+  - Checks duplicate email in Supabase `users` table / `memoryDb.users`. Returns `400` if email exists (`{ error: 'An account with this email already exists.' }`).
+- **Processing Logic**:
+  - Hashes password using `bcrypt.hash(password, 10)`.
+  - Generates `userId` formatted as `usr_<timestamp>_<4_random_hex_bytes>`.
+  - Seeds default starter transactions for the new creator via `seedDefaultTransactions(userId)`.
+  - Dispatches welcome transactional email via Resend API if `RESEND_API_KEY` is configured.
+- **Success Response** (`HTTP 201 Created`):
+  ```json
+  {
+    "message": "Registration successful!",
+    "userId": "usr_1770503000000_a1b2c3d4",
+    "email": "user@example.com"
+  }
+  ```
+- **Error Responses**:
+  - `HTTP 400 Bad Request`: Validation failure or existing user.
+  - `HTTP 500 Internal Server Error`: `{ error: 'Server error during signup.' }`
 
-### Existing API Routes
+---
 
-| Endpoint | Method | Auth Required | Description |
+### 3.2 Creator Authentication (`POST /api/auth/login`)
+- **File**: `server.js:448-496`
+- **Authentication**: Public (None)
+- **HTTP Method**: `POST`
+- **Endpoint URL**: `/api/auth/login`
+- **Request Headers**: `Content-Type: application/json`
+- **Request Payload**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "SecretPassword123!"
+  }
+  ```
+- **Validation & Auth Logic**:
+  - Looks up user by lowercased email in Supabase `users` or `memoryDb.users`. Returns `401` (`{ error: 'Invalid email or password.' }`) if not found.
+  - Validates password using `bcrypt.compare(password, user.passwordHash)`. Returns `401` on mismatch.
+- **JWT Token Generation**:
+  - Signed with `JWT_SECRET`.
+  - Expiration: `7d` (7 days).
+  - Payload: `{ id: string, email: string, name: string }`
+- **Success Response** (`HTTP 200 OK`):
+  ```json
+  {
+    "message": "Login successful",
+    "token": "<JWT_STRING>",
+    "user": {
+      "id": "usr_1770503000000_a1b2c3d4",
+      "name": "Jane Creator",
+      "email": "user@example.com"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `HTTP 401 Unauthorized`: Invalid credentials.
+  - `HTTP 500 Internal Server Error`: `{ error: 'Server error during login.' }`
+
+---
+
+### 3.3 Admin Authentication (`POST /api/admin/auth/login`)
+- **File**: `server.js:503-572`
+- **Authentication**: Public (guarded by `rateLimitAdminLogin`)
+- **HTTP Method**: `POST`
+- **Endpoint URL**: `/api/admin/auth/login`
+- **Request Headers**: `Content-Type: application/json`
+- **Request Payload**:
+  ```json
+  {
+    "email": "reamogetswemolefe0190@gmail.com",
+    "password": "R3@m0g3tsw3M0l3f3"
+  }
+  ```
+- **Validation & Auth Logic**:
+  - Evaluates rate limiting (max 5 attempts per 15 mins).
+  - Validates `email` and `password` presence (`400 Bad Request`).
+  - Looks up normalized email in Supabase `admin_users` or `memoryDb.adminUsers`. Returns `401` (`{ error: 'Invalid credentials' }`) if missing.
+  - Validates password hash via `bcrypt.compare`.
+- **JWT Token Generation**:
+  - Signed with `JWT_SECRET`.
+  - Expiration: `24h` (24 hours).
+  - Payload: `{ id: string, email: string, role: 'admin' }`
+- **Success Response** (`HTTP 200 OK`):
+  ```json
+  {
+    "success": true,
+    "token": "<ADMIN_JWT_STRING>",
+    "admin": {
+      "id": "admin_master_1",
+      "email": "reamogetswemolefe0190@gmail.com",
+      "role": "admin"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `HTTP 400 Bad Request`: Missing fields.
+  - `HTTP 401 Unauthorized`: Invalid credentials.
+  - `HTTP 429 Too Many Requests`: Rate limit exceeded.
+  - `HTTP 500 Internal Server Error`: `{ error: 'Server error during admin authentication.' }`
+
+---
+
+### 3.4 Admin Verify Session (`GET /api/admin/verify-auth`)
+- **File**: `server.js:575-577`
+- **Authentication**: Protected (`requireAdmin`)
+- **HTTP Method**: `GET`
+- **Endpoint URL**: `/api/admin/verify-auth`
+- **Request Headers**: `Authorization: Bearer <ADMIN_JWT>`
+- **Success Response** (`HTTP 200 OK`):
+  ```json
+  {
+    "success": true,
+    "admin": {
+      "id": "admin_master_1",
+      "email": "reamogetswemolefe0190@gmail.com",
+      "role": "admin"
+    }
+  }
+  ```
+
+---
+
+## 4. Transaction & Cash Flow Ledger Endpoints
+
+### 4.1 Get User Transactions (`GET /api/transactions`)
+- **File**: `server.js:942-974`
+- **Authentication**: Protected (`authenticateToken`)
+- **HTTP Method**: `GET`
+- **Endpoint URL**: `/api/transactions`
+- **Request Headers**: `Authorization: Bearer <USER_JWT>`
+- **Query Parameters**: None (returns all transaction records associated with `req.user.id`).
+- **Database Query**:
+  - Supabase: `supabase.from('transactions').select('*').eq('user_id', req.user.id).order('created_at', { ascending: false })`
+  - Memory fallback: `memoryDb.transactions.filter(t => t.user_id === req.user.id)`
+- **Response Format Mapping**: Converts DB `tax_status` field to camelCase `taxStatus` in output array.
+- **Success Response** (`HTTP 200 OK`):
+  ```json
+  {
+    "transactions": [
+      {
+        "id": "tx_seed_101",
+        "date": "Feb 20",
+        "source": "YouTube",
+        "merchant": "Google AdSense SA",
+        "type": "income",
+        "category": "YouTube AdSense",
+        "taxStatus": "Taxable Income",
+        "amount": 45000.00
+      }
+    ]
+  }
+  ```
+- **Error Response**:
+  - `HTTP 401 Unauthorized`: Token missing.
+  - `HTTP 403 Forbidden`: Token invalid.
+  - `HTTP 500 Internal Server Error`: `{ error: 'Failed to retrieve ledger data.' }`
+
+---
+
+### 4.2 Create Transaction (`POST /api/transactions`)
+- **File**: `server.js:977-1019`
+- **Authentication**: Protected (`authenticateToken`)
+- **HTTP Method**: `POST`
+- **Endpoint URL**: `/api/transactions`
+- **Request Headers**:
+  - `Authorization: Bearer <USER_JWT>`
+  - `Content-Type: application/json`
+- **Request Payload**:
+  ```json
+  {
+    "source": "YouTube",
+    "merchant": "Google AdSense South Africa",
+    "type": "income",
+    "category": "YouTube AdSense",
+    "amount": 15000.00,
+    "date": "Aug 09"
+  }
+  ```
+- **Field Defaults & Business Rules**:
+  - `id`: `tx_<timestamp>`
+  - `user_id`: `req.user.id`
+  - `date`: defaults to current date in `MMM DD` format if omitted.
+  - `category`: defaults to `'Creator Revenue'` if `type === 'income'`, else `'Operating Expense'`.
+  - `tax_status`: defaults to `'Taxable Income'` if `type === 'income'`, else `'100% Tax Write-Off'`.
+  - `amount`: parsed via `parseFloat(amount)`.
+- **Persistence**: Inserted into Supabase `transactions` table or unshifted to `memoryDb.transactions`.
+- **Success Response** (`HTTP 201 Created`):
+  ```json
+  {
+    "message": "Transaction saved successfully.",
+    "transaction": {
+      "id": "tx_1770503500000",
+      "date": "Aug 09",
+      "source": "YouTube",
+      "merchant": "Google AdSense South Africa",
+      "type": "income",
+      "category": "YouTube AdSense",
+      "taxStatus": "Taxable Income",
+      "amount": 15000.00
+    }
+  }
+  ```
+- **Error Responses**:
+  - `HTTP 401 Unauthorized` / `403 Forbidden`
+  - `HTTP 500 Internal Server Error`: `{ error: 'Failed to save transaction.' }`
+
+---
+
+## 5. Other Backend API Endpoints Reference
+
+| Endpoint | Method | Auth | Description |
 |---|---|---|---|
-| `/` | GET | None | Health check & API version metadata |
-| `/api/auth/signup` | POST | None | Creates new creator account with bcrypt password hash, seeds 5 ZAR default transactions, dispatches welcome email via Resend if API key is present |
-| `/api/auth/login` | POST | None | Authenticates user credentials via bcrypt.compare and returns 7-day signed JWT |
-| `/api/transactions` | GET | `authenticateToken` | Retrieves transaction ledger items for `req.user.id` |
-| `/api/transactions` | POST | `authenticateToken` | Adds new transaction item for `req.user.id` |
-| `/api/onboarding/save` | POST | `authenticateToken` | Saves onboarding wizard choices (creatorType, platforms, goal, connected, isManual) |
-| `/api/integrations/phyllo/token` | POST | Optional | Generates Phyllo SDK token and fetches active platform mapping |
-| `/api/gemini` | POST | None | Backend proxy forwarding queries to Google Gemini 1.5 Flash REST API |
+| `/api/health` | GET | Public | Health check and system status report |
+| `/api/onboarding/save` | POST | User JWT | Save onboarding wizard responses |
+| `/api/integrations/phyllo/token` | POST | Optional User JWT | Obtain Phyllo SDK user and connection token |
+| `/api/admin/metrics` | GET | Admin JWT | Aggregate platform KPIs (GPV, MRR, Chart.js timeline) |
+| `/api/admin/creators` | GET | Admin JWT | Retrieve complete creator directory |
+| `/api/admin/creators/:id/status` | POST | Admin JWT | Update creator status/tier + record immutable audit log |
+| `/api/admin/audit-logs` | GET | Admin JWT | Query chronological administrative audit trail |
+| `/api/admin/telemetry` | GET | Admin JWT | Query PII-masked AI query logs (30-day TTL) |
+| `/api/gemini` | POST | Public | Gemini 1.5 Flash AI proxy with PII masking & telemetry |
 
 ---
 
-## 6. Gap Analysis for Admin Command Portal Requirements
+## 6. Architecture & Data Flow Summary
 
-To fulfill the requirements outlined in `ORIGINAL_REQUEST.md` (Follow-up), the backend architecture must be expanded to include:
-
-### 1. Cryptographically Enforced Admin Authentication (`requireAdmin` Middleware & Admin Route)
-- **Missing Middleware**: `requireAdmin(req, res, next)` which verifies that `req.user` exists and possesses `role === 'admin'`. Rejects unauthenticated requests with HTTP 401 and non-admin requests with HTTP 403.
-- **Missing Route**: `POST /api/admin/auth/login`. Must validate admin credentials with `bcrypt.compare`, enforce rate-limiting/brute-force protection, and issue signed JWTs containing explicit `{ id, email, name, role: 'admin' }`.
-- **Admin Seeding**: Pre-configured admin user account (e.g. `admin@creatorcashflow.com` / hashed password) in both database setup SQL and `memoryDb`.
-
-### 2. Immutable Audit Logging System
-- **Missing Storage**: Table `audit_logs` (or `memoryDb.audit_logs` array) with columns: `id`, `admin_id`, `target_creator_id`, `action_type`, `old_value`, `new_value`, `timestamp`, `ip_hash`.
-- **Missing Routes**:
-  - `GET /api/admin/audit-logs`: Retrieves chronological audit trail entries.
-  - `POST /api/admin/creators/:id/status`: Updates creator account status (plan tier, status Active/Suspended, notes) and automatically appends an audit log entry.
-
-### 3. PII-Safe AI Query Telemetry
-- **Missing Storage**: Table `ai_telemetry` (or `memoryDb.ai_telemetry` array) recording: `id`, `user_id`, `question_category` (e.g. "Tax Deduction Strategy"), `tokens_used`, `model`, `latency_ms`, `masked_prompt`, `timestamp`.
-- **Missing Retention Policy**: 30-day retention filter / deletion routine.
-- **Missing Route**: `GET /api/admin/telemetry` returning PII-masked query metrics.
-- **Integration**: `/api/gemini` must log masked telemetry data upon execution.
-
-### 4. Platform KPIs & Creator Management
-- **Missing Routes**:
-  - `GET /api/admin/metrics`: Computes aggregate Total Creators, GPV (ZAR), MRR (Pro creators), Tax Reserves (15% estimate), and historical breakdown.
-  - `GET /api/admin/creators`: Lists creator directory with pagination/search/filtering attributes.
-
----
-
-## 7. Evidence Chain
-
-1. **Password Hashing & JWT Capabilities**: `server.js` lines 10-11, 106, 252-256 (`bcrypt.hash`, `bcrypt.compare`, `jwt.sign`, `jwt.verify`).
-2. **Database Fallback Mechanism**: `server.js` lines 24-36 (checks Supabase env vars, initializes `memoryDb`).
-3. **Transaction Seeding**: `server.js` lines 56-70 (`seedDefaultTransactions` creates ZAR transactions for AdSense, Sony Lens, TikTok, Adobe CC, Woolworths).
-4. **Current Route Absence**: No routes starting with `/api/admin/*` exist in `server.js` (lines 1-600).
-5. **Database Setup SQL**: `database_setup.sql` contains `users`, `transactions`, and `onboarding_responses`, but lacks `admin_users`, `audit_logs`, and `ai_telemetry`.
+```
+                 +-----------------------------------+
+                 |           Client Layer            |
+                 | (index.html, admin.html, app.js)  |
+                 +-----------------+-----------------+
+                                   |
+                   Authorization: Bearer <JWT>
+                                   |
+                                   v
+                 +-----------------------------------+
+                 |          Express Server           |
+                 |            (server.js)            |
+                 +-----------------+-----------------+
+                                   |
+         +-------------------------+-------------------------+
+         | Middleware Pipeline:                              |
+         | - Helmet & CORS                                   |
+         | - rateLimitAdminLogin (POST /api/admin/auth/login)|
+         | - authenticateToken (User JWT)                    |
+         | - requireAdmin (Admin JWT & role=='admin')        |
+         +-------------------------+-------------------------+
+                                   |
+                  +----------------+----------------+
+                  |                                 |
+                  v                                 v
+     +-------------------------+       +--------------------------+
+     |   Supabase Cloud DB     |       |    In-Memory Fallback    |
+     |   (PostgreSQL REST API) |       |        (memoryDb)        |
+     +-------------------------+       +--------------------------+
+```

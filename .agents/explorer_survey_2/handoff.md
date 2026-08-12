@@ -1,53 +1,113 @@
-# Handoff Report — Frontend Architecture Explorer (Explorer 2)
-
-**Agent**: Explorer 2 (Frontend Architecture Explorer)  
-**Working Directory**: `c:\Users\User\OneDrive\Desktop\New folder (2)\.agents\explorer_survey_2`  
-**Date**: 2026-08-07  
-
----
+# Explorer Survey 2 Handoff Report
 
 ## 1. Observation
+Direct, verifiable observations from codebase inspection of `server.js`, `database_setup.sql`, `package.json`, `.env.example`, and performance test scripts (`test_metrics_concurrency.js`, `test_admin_metrics_stress.js`):
 
-Direct observations from examining the codebase in `c:\Users\User\OneDrive\Desktop\New folder (2)`:
+1. **Database Client Setup (`server.js`, lines 19-30)**:
+   ```javascript
+   const SUPABASE_URL = process.env.SUPABASE_URL || 'https://iekofqagtcztyavhunai.supabase.co';
+   const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+   let supabase = null;
 
-- **Files Analyzed**:
-  - `ORIGINAL_REQUEST.md`: Specified dark luxury aesthetic (`#050505`, `#0B0B0B`, 24px radius), `admin.html` portal requirements (R1: Auth & Login Gate, R2: Audit Logs, R3: PII AI Telemetry, R4: Scorecards & Chart.js, R5: Creator Directory Table, R6: Backend Integration).
-  - `index.html`: Contains embedded Tailwind configuration script (lines 96-148) defining `background` (`#050505`), `surface` (`#0B0B0B`), `border-slate` (`rgba(255,255,255,0.08)`), `text-primary` (`#FFFFFF`), `text-secondary` (`#8E8E93`), `accent-emerald` (`#22C55E`), `3xl` border radius (`24px`), `Plus Jakarta Sans` display font, and `Inter` body font. Includes CDN links for Tailwind CSS, Chart.js, Lucide, Material Symbols, and Phyllo Connect.
-  - `style.css`: Defines global utility classes including `.noise-overlay` (lines 154-165), `.card-shadow` (lines 10-12, 166-168), `.glass-pill-nav` (lines 219-225), `.glass-card` (lines 227-233), `.glass-card-nested` (lines 235-240), `.ambient-mesh-wrapper` with emerald, teal, and indigo radial glowing orbs (lines 246-390), hover elevation (`transform: translateY(-2px)`, line 197), and keyframes (`fadeSlideUp`, `selectionIndicatorSpring`, `iconBoxSpring`, `launchPulse`, `shake`).
-  - `app.js`: Demonstrates state management (`state` and `onboardingState`), authentication token handling (`localStorage.getItem('creator_cashflow_user_token')`), Chart.js instance initialization (`initIntelligenceChart`, lines 652-730), modal open/close helpers (`openModal`, `closeModal`, lines 959-968), and API fetch patterns using `Authorization: Bearer <token>`.
-  - `server.js`: Implements Express server with Helmet security, CORS, JWT verification (`authenticateToken`, lines 73-91), Supabase cloud database integration with memory fallback, and REST API routes for authentication, transactions, onboarding, Phyllo SDK tokens, and Gemini AI proxy.
+   if (SUPABASE_URL && SUPABASE_KEY && SUPABASE_KEY !== 'your-supabase-anon-key') {
+       supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+       console.log('🔌 Connected to Supabase Cloud Database: ' + SUPABASE_URL);
+   } else {
+       console.log('⚠️ Supabase credentials not fully configured. Running in high-reliability Memory Backup Mode.');
+   }
+   ```
+   Package `@supabase/supabase-js` is version `^2.39.0` (`package.json`, line 11). `createClient` is instantiated once at module load without custom HTTPS agents, custom pool limits, or socket keep-alive options.
+
+2. **In-Memory Backup Structure (`server.js`, lines 31-39)**:
+   ```javascript
+   const memoryDb = {
+       users: [],
+       transactions: [],
+       onboarding: [],
+       adminUsers: [],
+       audit_logs: [],
+       ai_telemetry: []
+   };
+   ```
+
+3. **Database Schema & Missing Indexes (`database_setup.sql`)**:
+   - `users`: PRIMARY KEY (`id`), UNIQUE (`email`).
+   - `transactions`: PRIMARY KEY (`id`), FOREIGN KEY (`user_id` REFERENCES `users(id)` ON DELETE CASCADE).
+   - `onboarding_responses`: PRIMARY KEY (`user_id`).
+   - `admin_users`: PRIMARY KEY (`id`), UNIQUE (`email`).
+   - `audit_logs`: PRIMARY KEY (`id`).
+   - `ai_telemetry`: PRIMARY KEY (`id`).
+   - **Observed Absence**: Zero `CREATE INDEX` statements exist in `database_setup.sql`. Specifically, `transactions.user_id`, `transactions.created_at`, `users.created_at`, `audit_logs.timestamp`, and `ai_telemetry.created_at` lack B-tree indexes.
+
+4. **Query Behaviors & Dual-Storage Inconsistency (`server.js`)**:
+   - `GET /api/admin/metrics` (lines 585-592):
+     ```javascript
+     if (supabase) {
+         const { data: usersData, error: uErr } = await supabase.from('users').select('*');
+         if (uErr) throw uErr;
+         users = usersData || [];
+
+         const { data: txData, error: tErr } = await supabase.from('transactions').select('*');
+         if (tErr) throw tErr;
+         transactions = txData || [];
+     }
+     ```
+     Executes full table scans (`select('*')`) on both `users` and `transactions` tables without filtering, streaming all records over HTTP to aggregate in JS memory. If `uErr` or `tErr` occurs, it throws an unhandled error returning HTTP 500 without falling back to `memoryDb`.
+   - `POST /api/auth/signup` (lines 334-367) & `POST /api/transactions` (lines 995-1000):
+     Uses `if (supabase) { ... } else { ... }`. When `supabase` is non-null, write operations occur ONLY in Supabase and are NOT written to `memoryDb`.
+   - `GET /api/admin/creators` (lines 720-742), `GET /api/admin/audit-logs` (lines 889-894), `GET /api/admin/telemetry` (lines 913-925):
+     Attempt to read from Supabase first; if Supabase returns an error or no data, they dynamically fall back to reading from `memoryDb`.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Design System Integration**: Since `index.html` relies on Tailwind CDN with inline custom theme tokens (`index.html:96-148`) and `style.css` utility classes (`style.css:1-515`), `admin.html` can immediately achieve pixel-perfect dark luxury design parity by copying the Tailwind script configuration and linking `style.css`.
-2. **Component Blueprinting**: The modal system (`#modal-app` in `index.html:986-998` and JS helpers in `app.js:959-968`) and form inputs (`input.px-md.py-sm.bg-background.border-white/[0.08]`) provide an exact template for `admin.html` modals (e.g. Creator Detail Inspection Modal) and search/filtering bars.
-3. **Chart.js Standardization**: The chart configuration in `app.js:652-730` defines the exact canvas settings (grid lines `rgba(255,255,255,0.05)`, custom tooltip `#0B0B0B`, linear gradient fill `#22C55E`), which must be mirrored for the Admin Platform Growth & Channel Revenue Breakdown chart.
-4. **Backend Security Alignment**: `server.js` currently handles user Bearer authentication via JWT. Expanding `server.js` with `requireAdmin` middleware and admin routes (`/api/admin/auth/login`, `/api/admin/metrics`, `/api/admin/creators`, `/api/admin/creators/:id/status`, `/api/admin/audit-logs`, `/api/admin/telemetry`) will allow `admin.html` to operate securely without breaking existing user flows.
+1. **Premise 1**: `@supabase/supabase-js` uses PostgREST over HTTPS. Connections are managed upstream by Supabase (PgBouncer/Supavisor), while Node client side uses default `http.globalAgent` without explicit socket pool limits or exponential backoff retry configuration.
+2. **Premise 2**: Under heavy concurrent user load (100–200 parallel users requesting `GET /api/transactions`), PostgreSQL must resolve queries for each user.
+3. **Step A**: Because `database_setup.sql` does NOT define a B-tree index on `transactions.user_id`, PostgreSQL is forced to execute full table Sequential Scans for every `GET /api/transactions` query.
+4. **Step B**: Executing 150+ concurrent Sequential Scans rapidly consumes database CPU and PostgREST connection slots, elevating response latencies and triggering gateway timeouts or 503/504 connection errors.
+5. **Step C**: When Supabase PostgREST queries fail, endpoints like `GET /api/admin/metrics` and `GET /api/transactions` throw unhandled errors, returning HTTP 500 responses to clients rather than falling back to `memoryDb`.
+6. **Step D**: Furthermore, because `signup` and `POST /api/transactions` perform single-branch writes (`if (supabase) ... else ...`), data created while Supabase is online is never mirrored to `memoryDb`. If secondary fallback endpoints (`GET /api/admin/creators`) fall back to `memoryDb` during a Supabase outage, they return stale/outdated initial seed data, creating data drift.
 
 ---
 
 ## 3. Caveats
 
-- `admin.html` does not yet exist on disk and must be created by the implementer team based on the architectural blueprint in `analysis.md`.
-- No backend code changes were executed during this read-only investigation turn.
-- Supabase credentials rely on environment variables (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`), with fallback to memory storage (`memoryDb`). Admin implementation must handle both cloud database and memory backup modes gracefully.
+- **External Supabase Instance Configuration**: The exact PgBouncer pool size (e.g. 20 vs 60 connection limit) configured in the remote Supabase cloud dashboard (`https://iekofqagtcztyavhunai.supabase.co`) was not directly inspectable via local code view; analysis is based on standard Supabase default tier behaviors.
+- **Node Environment**: Benchmarks and code inspection assume standard Node.js runtime (v18+ / v20+) executing Express.
 
 ---
 
 ## 4. Conclusion
 
-The existing Creator Cash Flow frontend architecture provides a robust, modular design system with reusable glassmorphic utilities, custom dark luxury canvas themes, and standardized modal/form components. `admin.html` can be seamlessly integrated into the codebase as a standalone page by using the existing `style.css`, Tailwind theme tokens, Chart.js configuration rules, and JWT Bearer authentication patterns.
-
-Detailed technical findings and architectural component blueprints have been saved to `.agents/explorer_survey_2/analysis.md`.
+The Creator Cash Flow backend features a working dual-database setup (Supabase Cloud + `memoryDb`), but exhibits three major structural vulnerabilities under high concurrent load:
+1. **Critical Missing Indexing**: Missing B-tree index on `transactions.user_id` causes PostgreSQL sequential scans during user transaction reads under concurrency.
+2. **In-Memory Full Table Aggregation**: `GET /api/admin/metrics` fetches all users and transactions raw over HTTP instead of leveraging SQL server-side aggregation (`SUM`, `COUNT`, `GROUP BY`).
+3. **Dual-Storage Synchronization & Fallback Asymmetry**: Single-write branching on signup/transactions creates data drift between Supabase and `memoryDb`, while fallback behavior on query failure is inconsistent across routes.
 
 ---
 
 ## 5. Verification Method
 
-To verify the findings of this survey:
-1. Inspect `.agents/explorer_survey_2/analysis.md` for the complete design token catalog, Glassmorphism class map, and `admin.html` structural blueprint.
-2. Cross-reference token values against `index.html` (lines 96-148) and `style.css` (lines 1-515).
-3. Validate Chart.js canvas configuration against `app.js` (lines 652-730).
-4. Check backend authentication middleware in `server.js` (lines 73-91).
+To independently verify these findings:
+
+1. **Verify Missing Indexes in SQL Schema**:
+   Inspect `database_setup.sql` to confirm no `CREATE INDEX` statements exist for `transactions.user_id`, `users.created_at`, or `audit_logs.timestamp`:
+   ```bash
+   grep -i "CREATE INDEX" database_setup.sql
+   ```
+   *Expected result*: No matches found.
+
+2. **Verify Full Table Scan Behavior in `GET /api/admin/metrics`**:
+   Inspect `server.js` at lines 585–593:
+   ```bash
+   node -e "const fs = require('fs'); const content = fs.readFileSync('server.js','utf8'); console.log(content.includes('supabase.from(\'users\').select(\'*\')'));"
+   ```
+   *Expected result*: `true`.
+
+3. **Verify Concurrency Benchmark Harness**:
+   Execute the existing concurrency test harness:
+   ```bash
+   node test_metrics_concurrency.js
+   ```
+   *Expected result*: Validates response latencies and status codes across parallel requests.
