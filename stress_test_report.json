@@ -1,0 +1,100 @@
+{
+  "timestamp": "2026-08-11T21:19:32.561Z",
+  "config": {
+    "concurrency": 150,
+    "durationSeconds": 15,
+    "targetUrl": "http://localhost:5000",
+    "pacingMs": 10
+  },
+  "summary": {
+    "totalRequests": 10593,
+    "successfulRequests": 10593,
+    "clientErrors": 0,
+    "serverErrors": 0,
+    "networkErrors": 0,
+    "successRatePercent": 100,
+    "actualDurationSeconds": 15.22,
+    "requestsPerSecond": 696.05
+  },
+  "latenciesMs": {
+    "min": 21.54,
+    "avg": 201.95,
+    "max": 1077.21,
+    "p50": 166.29,
+    "p90": 315.87,
+    "p95": 511.89,
+    "p99": 826.09
+  },
+  "endpointBreakdown": {
+    "POST /api/auth/signup": {
+      "count": 2188,
+      "successCount": 2188,
+      "successRatePercent": 100,
+      "latenciesMs": {
+        "min": 34.6,
+        "avg": 160.57,
+        "max": 518.8,
+        "p50": 148.34,
+        "p90": 256.48,
+        "p95": 320.75,
+        "p99": 501.29
+      }
+    },
+    "POST /api/auth/login": {
+      "count": 2166,
+      "successCount": 2166,
+      "successRatePercent": 100,
+      "latenciesMs": {
+        "min": 21.54,
+        "avg": 176.81,
+        "max": 792.53,
+        "p50": 120.52,
+        "p90": 501.63,
+        "p95": 541.33,
+        "p99": 775.06
+      }
+    },
+    "GET /api/transactions": {
+      "count": 2094,
+      "successCount": 2094,
+      "successRatePercent": 100,
+      "latenciesMs": {
+        "min": 40.25,
+        "avg": 257.75,
+        "max": 1077.21,
+        "p50": 198.37,
+        "p90": 508.1,
+        "p95": 612.77,
+        "p99": 1064.98
+      }
+    },
+    "POST /api/transactions": {
+      "count": 2078,
+      "successCount": 2078,
+      "successRatePercent": 100,
+      "latenciesMs": {
+        "min": 35.29,
+        "avg": 177.6,
+        "max": 902.84,
+        "p50": 139.11,
+        "p90": 231.06,
+        "p95": 626.95,
+        "p99": 839.73
+      }
+    },
+    "GET /api/admin/metrics": {
+      "count": 2067,
+      "successCount": 2067,
+      "successRatePercent": 100,
+      "latenciesMs": {
+        "min": 94.89,
+        "avg": 240.06,
+        "max": 1075.34,
+        "p50": 220.72,
+        "p90": 326.99,
+        "p95": 390.81,
+        "p99": 947.72
+      }
+    }
+  }
+}
